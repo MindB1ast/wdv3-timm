@@ -19,6 +19,7 @@ MODEL_REPO_MAP = {
     "vit": "SmilingWolf/wd-vit-tagger-v3",
     "swinv2": "SmilingWolf/wd-swinv2-tagger-v3",
     "convnext": "SmilingWolf/wd-convnext-tagger-v3",
+    "big": "SmilingWolf/wd-eva02-large-tagger-v3",
 }
 
 
@@ -43,7 +44,7 @@ def pil_pad_square(image: Image.Image) -> Image.Image:
     canvas.paste(image, ((px - w) // 2, (px - h) // 2))
     return canvas
 
-
+# что бы не писать init, и ещё для сравнения
 @dataclass
 class LabelData:
     names: list[str]
@@ -51,7 +52,13 @@ class LabelData:
     general: list[np.int64]
     character: list[np.int64]
 
-
+"""
+Скачивает csv файл с тегами и получаем LabekData с листами 
+всех тегов, 
+Ratings: general, sensitive, questionable, explicit
+Список обычных тегов general
+и список персонажей
+"""
 def load_labels_hf(
     repo_id: str,
     revision: Optional[str] = None,
@@ -61,7 +68,7 @@ def load_labels_hf(
         csv_path = hf_hub_download(
             repo_id=repo_id, filename="selected_tags.csv", revision=revision, token=token
         )
-        csv_path = Path(csv_path).resolve()
+        csv_path = Path(csv_path).resolve()#resolve - получение полного пути, не относительного
     except HfHubHTTPError as e:
         raise FileNotFoundError(f"selected_tags.csv failed to download from {repo_id}") from e
 
@@ -75,7 +82,14 @@ def load_labels_hf(
 
     return tag_data
 
+"""
+Получаем теги из предсказаний
+Caption - теги с _
+taglist - теги без _
+rating_labels - список вероятностей отношения к к рейтингу
+char_labels - вероятность отношения к персонажу
 
+"""
 def get_tags(
     probs: Tensor,
     labels: LabelData,

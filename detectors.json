@@ -1,0 +1,41 @@
+[
+    {
+        "name": "person_detector",
+        "model_path": "yolov8n.pt",
+        "confidence": 0.25,
+        "classes": [0],
+        "remove_tags_from_full": ["1girl", "1boy"],
+        "remove_tags_from_region": ["multiple views"],
+        "add_tags_to_region": {"person": 1.0},
+        "exclude_from_region": ["close-up", "cowboy_shot", "full_body"],
+        "specific_excluded_tags": [],
+        "region_gen_threshold": 0.4,
+        "region_char_threshold": 0.8
+    },
+    {
+        "name": "face_detector",
+        "model_path": "yolov8n-face.pt",
+        "confidence": 0.3,
+        "classes": [0],
+        "remove_tags_from_full": ["face"],
+        "remove_tags_from_region": ["full body"],
+        "add_tags_to_region": {"face": 1.0},
+        "exclude_from_region": ["1girl", "portrait", "upper_body"],
+        "specific_excluded_tags": ["blue_eyes", "green_eyes", "yellow_eyes", "smile"],
+        "region_gen_threshold": 0.5,
+        "region_char_threshold": 0.85
+    },
+    {
+        "name": "building_detector",
+        "model_path": "yolov8n-buildings.pt",
+        "confidence": 0.25,
+        "classes": [67],
+        "remove_tags_from_full": ["building"],
+        "remove_tags_from_region": ["multiple views"],
+        "add_tags_to_region": {"building": 1.0},
+        "exclude_from_region": ["close-up", "portrait"],
+        "specific_excluded_tags": ["window", "door"],
+        "region_gen_threshold": 0.45,
+        "region_char_threshold": 0.75
+    }
+]
