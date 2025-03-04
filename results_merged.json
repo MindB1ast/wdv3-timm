@@ -117,7 +117,8 @@
         "questionable": 0.003154827980324626,
         "explicit": 0.0012027198681607842
       }
-    }
+    },
+    "txt_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestPic\\test1.txt"
   },
   {
     "image_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestPic\\test2.png",
@@ -196,7 +197,8 @@
         "questionable": 0.00582140265032649,
         "explicit": 0.0012688108254224062
       }
-    }
+    },
+    "txt_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestPic\\test2.txt"
   },
   {
     "image_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestPic\\test3.png",
@@ -279,7 +281,8 @@
         "questionable": 0.0017896309727802873,
         "explicit": 0.000877264654263854
       }
-    }
+    },
+    "txt_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestPic\\test3.txt"
   },
   {
     "image_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestPic\\test4.png",
@@ -330,6 +333,7 @@
         "questionable": 0.002840697765350342,
         "explicit": 0.0006545206997543573
       }
-    }
+    },
+    "txt_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestPic\\test4.txt"
   }
 ]
