@@ -54,8 +54,8 @@
             535.6759033203125,
             2615.764404296875
           ],
-          "caption": "1girl, long_hair, blonde_hair, solo, yellow_eyes, sitting_on_stairs, sitting, blush_stickers, pointy_ears, stairs, very_long_hair, shoes, mary_janes, :<, dress, oshino_shinobu",
-          "taglist": "1girl, long_hair, blonde_hair, solo, yellow_eyes, sitting_on_stairs, sitting, blush_stickers, pointy_ears, stairs, very_long_hair, shoes, mary_janes, :<, dress, person, oshino_shinobu",
+          "caption": "1girl, long_hair, blonde_hair, solo, yellow_eyes, sitting_on_stairs, sitting, blush_stickers, pointy_ears, stairs, very_long_hair, shoes, mary_janes, :<, dress, no_socks, looking_at_viewer, tears, blush, oshino_shinobu",
+          "taglist": "1girl, long_hair, blonde_hair, solo, yellow_eyes, sitting_on_stairs, sitting, blush_stickers, pointy_ears, stairs, very_long_hair, shoes, mary_janes, :<, dress, no_socks, looking_at_viewer, tears, blush, person, oshino_shinobu",
           "ratings": {
             "general": 0.3159349858760834,
             "sensitive": 0.7888705730438232,
@@ -81,6 +81,10 @@
             "mary_janes": 0.6180683374404907,
             ":<": 0.570331871509552,
             "dress": 0.4873362183570862,
+            "no_socks": 0.3503984212875366,
+            "looking_at_viewer": 0.34445565938949585,
+            "tears": 0.3216152787208557,
+            "blush": 0.25522366166114807,
             "person": 1.0
           }
         },
@@ -92,8 +96,8 @@
             848.8878173828125,
             1878.3348388671875
           ],
-          "caption": "1girl, barefoot, long_hair, solo, skirt, sitting, blonde_hair, toes, feet, blush_stickers, stairs, yellow_eyes, sitting_on_stairs, shirt, white_shirt, blue_skirt, legs, very_long_hair, toenails, short_sleeves, pleated_skirt, neck_ribbon, full_body, collared_shirt, ribbon, pointy_ears, bare_legs, open_mouth, shirt_tucked_in, :o, school_uniform, petite, blush, long_legs, shiny_skin, parted_lips, swept_bangs, oshino_shinobu",
-          "taglist": "1girl, barefoot, long_hair, solo, skirt, sitting, blonde_hair, toes, feet, blush_stickers, stairs, yellow_eyes, sitting_on_stairs, shirt, white_shirt, blue_skirt, legs, very_long_hair, toenails, short_sleeves, pleated_skirt, neck_ribbon, full_body, collared_shirt, ribbon, pointy_ears, bare_legs, open_mouth, shirt_tucked_in, :o, school_uniform, petite, blush, long_legs, shiny_skin, parted_lips, swept_bangs, person, oshino_shinobu",
+          "caption": "1girl, barefoot, long_hair, solo, skirt, sitting, blonde_hair, toes, feet, blush_stickers, stairs, yellow_eyes, sitting_on_stairs, shirt, white_shirt, blue_skirt, legs, very_long_hair, toenails, short_sleeves, pleated_skirt, neck_ribbon, full_body, collared_shirt, ribbon, pointy_ears, bare_legs, open_mouth, shirt_tucked_in, :o, school_uniform, petite, blush, long_legs, shiny_skin, parted_lips, swept_bangs, eyelashes, black_ribbon, shadow, flipped_hair, indoors, foreshortening, slit_pupils, sidelocks, outdoors, straight_hair, looking_to_the_side, sunlight, oshino_shinobu",
+          "taglist": "1girl, barefoot, long_hair, solo, skirt, sitting, blonde_hair, toes, feet, blush_stickers, stairs, yellow_eyes, sitting_on_stairs, shirt, white_shirt, blue_skirt, legs, very_long_hair, toenails, short_sleeves, pleated_skirt, neck_ribbon, full_body, collared_shirt, ribbon, pointy_ears, bare_legs, open_mouth, shirt_tucked_in, :o, school_uniform, petite, blush, long_legs, shiny_skin, parted_lips, swept_bangs, eyelashes, black_ribbon, shadow, flipped_hair, indoors, foreshortening, slit_pupils, sidelocks, outdoors, straight_hair, looking_to_the_side, sunlight, person, oshino_shinobu",
           "ratings": {
             "general": 0.3239787518978119,
             "sensitive": 0.7440060973167419,
@@ -141,6 +145,18 @@
             "shiny_skin": 0.4107147753238678,
             "parted_lips": 0.4084842801094055,
             "swept_bangs": 0.4039287567138672,
+            "eyelashes": 0.38915887475013733,
+            "black_ribbon": 0.3659105598926544,
+            "shadow": 0.36335620284080505,
+            "flipped_hair": 0.3620298504829407,
+            "indoors": 0.3362138569355011,
+            "foreshortening": 0.31398195028305054,
+            "slit_pupils": 0.31291934847831726,
+            "sidelocks": 0.30783700942993164,
+            "outdoors": 0.3041765093803406,
+            "straight_hair": 0.29779425263404846,
+            "looking_to_the_side": 0.2801816761493683,
+            "sunlight": 0.2681722044944763,
             "person": 1.0
           }
         },
@@ -152,8 +168,8 @@
             1022.8773803710938,
             3871.950927734375
           ],
-          "caption": "1girl, long_hair, blonde_hair, solo, blush_stickers, yellow_eyes, pointy_ears, very_long_hair, :<, sitting, dress, looking_at_viewer, black_dress, hand_on_own_chest, skirt, oshino_shinobu",
-          "taglist": "1girl, long_hair, blonde_hair, solo, blush_stickers, yellow_eyes, pointy_ears, very_long_hair, :<, sitting, dress, looking_at_viewer, black_dress, hand_on_own_chest, skirt, person, oshino_shinobu",
+          "caption": "1girl, long_hair, blonde_hair, solo, blush_stickers, yellow_eyes, pointy_ears, very_long_hair, :<, sitting, dress, looking_at_viewer, black_dress, hand_on_own_chest, skirt, navel, closed_mouth, feet_out_of_frame, black_skirt, hand_up, oshino_shinobu",
+          "taglist": "1girl, long_hair, blonde_hair, solo, blush_stickers, yellow_eyes, pointy_ears, very_long_hair, :<, sitting, dress, looking_at_viewer, black_dress, hand_on_own_chest, skirt, navel, closed_mouth, feet_out_of_frame, black_skirt, hand_up, person, oshino_shinobu",
           "ratings": {
             "general": 0.6470567584037781,
             "sensitive": 0.4167235195636749,
@@ -179,6 +195,11 @@
             "black_dress": 0.5918018817901611,
             "hand_on_own_chest": 0.45181286334991455,
             "skirt": 0.4413330554962158,
+            "navel": 0.39485815167427063,
+            "closed_mouth": 0.39016520977020264,
+            "feet_out_of_frame": 0.3314502239227295,
+            "black_skirt": 0.2845994830131531,
+            "hand_up": 0.2788678705692291,
             "person": 1.0
           }
         },
@@ -190,8 +211,8 @@
             676.0604858398438,
             1688.76171875
           ],
-          "caption": "long_hair, blonde_hair, stairs, blush_stickers, yellow_eyes, skirt, 3girls, sitting, very_long_hair, shirt, pointy_ears, sailor_collar, white_shirt, multiple_girls, multiple_persona, looking_back, looking_at_viewer, black_skirt, railing, sitting_on_stairs, short_sleeves, neck_ribbon, suspender_skirt, suspenders, dress, strap_slip, from_behind, petite, school_uniform, collared_shirt, ribbon, open_mouth, barefoot, standing, blush, parted_lips, black_ribbon, oshino_shinobu",
-          "taglist": "long_hair, blonde_hair, stairs, blush_stickers, yellow_eyes, skirt, 3girls, sitting, very_long_hair, shirt, pointy_ears, sailor_collar, white_shirt, multiple_girls, multiple_persona, looking_back, looking_at_viewer, black_skirt, railing, sitting_on_stairs, short_sleeves, neck_ribbon, suspender_skirt, suspenders, dress, strap_slip, from_behind, petite, school_uniform, collared_shirt, ribbon, open_mouth, barefoot, standing, blush, parted_lips, black_ribbon, person, oshino_shinobu",
+          "caption": "long_hair, blonde_hair, stairs, blush_stickers, yellow_eyes, skirt, 3girls, sitting, very_long_hair, shirt, pointy_ears, sailor_collar, white_shirt, multiple_girls, multiple_persona, looking_back, looking_at_viewer, black_skirt, railing, sitting_on_stairs, short_sleeves, neck_ribbon, suspender_skirt, suspenders, dress, strap_slip, from_behind, petite, school_uniform, collared_shirt, ribbon, open_mouth, barefoot, standing, blush, parted_lips, black_ribbon, :o, outdoors, clone, dual_persona, bare_shoulders, 1girl, black_sailor_collar, sleeveless, back, pleated_skirt, suspenders_slip, multiple_views, blood, oshino_shinobu",
+          "taglist": "long_hair, blonde_hair, stairs, blush_stickers, yellow_eyes, skirt, 3girls, sitting, very_long_hair, shirt, pointy_ears, sailor_collar, white_shirt, multiple_girls, multiple_persona, looking_back, looking_at_viewer, black_skirt, railing, sitting_on_stairs, short_sleeves, neck_ribbon, suspender_skirt, suspenders, dress, strap_slip, from_behind, petite, school_uniform, collared_shirt, ribbon, open_mouth, barefoot, standing, blush, parted_lips, black_ribbon, :o, outdoors, clone, dual_persona, bare_shoulders, 1girl, black_sailor_collar, sleeveless, back, pleated_skirt, suspenders_slip, multiple_views, blood, person, oshino_shinobu",
           "ratings": {
             "general": 0.5759877562522888,
             "sensitive": 0.5049132704734802,
@@ -239,7 +260,311 @@
             "blush": 0.41780462861061096,
             "parted_lips": 0.4147862195968628,
             "black_ribbon": 0.40355417132377625,
+            ":o": 0.3872660994529724,
+            "outdoors": 0.37597230076789856,
+            "clone": 0.3748861849308014,
+            "dual_persona": 0.37204739451408386,
+            "bare_shoulders": 0.3459816873073578,
+            "1girl": 0.3379041254520416,
+            "black_sailor_collar": 0.3290928602218628,
+            "sleeveless": 0.30799317359924316,
+            "back": 0.30634430050849915,
+            "pleated_skirt": 0.29182183742523193,
+            "suspenders_slip": 0.2716033458709717,
+            "multiple_views": 0.2535557150840759,
+            "blood": 0.2510235011577606,
             "person": 1.0
+          }
+        }
+      ],
+      "face_detector": [
+        {
+          "region_id": 0,
+          "bbox": [
+            793.1068115234375,
+            3482.0546875,
+            919.5814819335938,
+            3602.1484375
+          ],
+          "caption": "1girl, blonde_hair, solo, yellow_eyes, blush_stickers, long_hair, pointy_ears, :<, looking_at_viewer, portrait, blurry, close-up, depth_of_field, closed_mouth, vampire, oshino_shinobu",
+          "taglist": "1girl, blonde_hair, solo, yellow_eyes, blush_stickers, long_hair, pointy_ears, :<, looking_at_viewer, portrait, blurry, close-up, depth_of_field, closed_mouth, vampire, oshino_shinobu",
+          "ratings": {
+            "general": 0.9338976740837097,
+            "sensitive": 0.07813083380460739,
+            "questionable": 0.0016303732991218567,
+            "explicit": 0.0004127186257392168
+          },
+          "character": {
+            "oshino_shinobu": 0.9805915951728821
+          },
+          "general": {
+            "1girl": 0.9985839128494263,
+            "blonde_hair": 0.989188015460968,
+            "solo": 0.9810097217559814,
+            "yellow_eyes": 0.9603682160377502,
+            "blush_stickers": 0.9334973692893982,
+            "long_hair": 0.9289371371269226,
+            "pointy_ears": 0.9047775268554688,
+            ":<": 0.8840981721878052,
+            "looking_at_viewer": 0.7717885971069336,
+            "portrait": 0.7321264147758484,
+            "blurry": 0.5520747303962708,
+            "close-up": 0.5150014758110046,
+            "depth_of_field": 0.447274774312973,
+            "closed_mouth": 0.4065055847167969,
+            "vampire": 0.3022536635398865
+          }
+        },
+        {
+          "region_id": 1,
+          "bbox": [
+            255.133544921875,
+            2047.7144775390625,
+            376.57476806640625,
+            2158.889404296875
+          ],
+          "caption": "1girl, solo, blonde_hair, yellow_eyes, blush_stickers, long_hair, pointy_ears, blurry, :<, portrait, depth_of_field, close-up, closed_mouth, blush, looking_at_viewer, chromatic_aberration, oshino_shinobu",
+          "taglist": "1girl, solo, blonde_hair, yellow_eyes, blush_stickers, long_hair, pointy_ears, blurry, :<, portrait, depth_of_field, close-up, closed_mouth, blush, looking_at_viewer, chromatic_aberration, oshino_shinobu",
+          "ratings": {
+            "general": 0.9244405031204224,
+            "sensitive": 0.08690652251243591,
+            "questionable": 0.001463813241571188,
+            "explicit": 0.0003587336977943778
+          },
+          "character": {
+            "oshino_shinobu": 0.9944221377372742
+          },
+          "general": {
+            "1girl": 0.9989959597587585,
+            "solo": 0.9894866943359375,
+            "blonde_hair": 0.9879186749458313,
+            "yellow_eyes": 0.9734513759613037,
+            "blush_stickers": 0.9517126083374023,
+            "long_hair": 0.9126085042953491,
+            "pointy_ears": 0.8531724214553833,
+            "blurry": 0.7519177794456482,
+            ":<": 0.7310436964035034,
+            "portrait": 0.6996681094169617,
+            "depth_of_field": 0.6656623482704163,
+            "close-up": 0.5676894187927246,
+            "closed_mouth": 0.5098720192909241,
+            "blush": 0.489474892616272,
+            "looking_at_viewer": 0.34663456678390503,
+            "chromatic_aberration": 0.26416149735450745
+          }
+        },
+        {
+          "region_id": 2,
+          "bbox": [
+            383.1984558105469,
+            3061.51806640625,
+            500.88458251953125,
+            3180.59619140625
+          ],
+          "caption": "1girl, solo, blonde_hair, blush_stickers, yellow_eyes, long_hair, pointy_ears, close-up, blurry, depth_of_field, looking_at_viewer, portrait, bare_shoulders, sleeveless, oshino_shinobu",
+          "taglist": "1girl, solo, blonde_hair, blush_stickers, yellow_eyes, long_hair, pointy_ears, close-up, blurry, depth_of_field, looking_at_viewer, portrait, bare_shoulders, sleeveless, oshino_shinobu",
+          "ratings": {
+            "general": 0.8892338275909424,
+            "sensitive": 0.1418011635541916,
+            "questionable": 0.0015408649342134595,
+            "explicit": 0.0003981618501711637
+          },
+          "character": {
+            "oshino_shinobu": 0.9938145875930786
+          },
+          "general": {
+            "1girl": 0.9992663264274597,
+            "solo": 0.988918125629425,
+            "blonde_hair": 0.9885013103485107,
+            "blush_stickers": 0.9619664549827576,
+            "yellow_eyes": 0.9582120776176453,
+            "long_hair": 0.8286223411560059,
+            "pointy_ears": 0.8068826794624329,
+            "close-up": 0.7638192176818848,
+            "blurry": 0.7245850563049316,
+            "depth_of_field": 0.7008069753646851,
+            "looking_at_viewer": 0.6444549560546875,
+            "portrait": 0.41876715421676636,
+            "bare_shoulders": 0.39210283756256104,
+            "sleeveless": 0.3415169417858124
+          }
+        },
+        {
+          "region_id": 3,
+          "bbox": [
+            345.1797790527344,
+            1345.9896240234375,
+            461.9986267089844,
+            1459.1497802734375
+          ],
+          "caption": "1girl, blonde_hair, solo, yellow_eyes, long_hair, pointy_ears, blush_stickers, portrait, :<, closed_mouth, close-up, blurry, collared_shirt, looking_at_viewer, shirt, depth_of_field, blush, grey_background, white_shirt, eye_reflection, vampire, school_uniform, frown, film_grain, eyelashes, oshino_shinobu",
+          "taglist": "1girl, blonde_hair, solo, yellow_eyes, long_hair, pointy_ears, blush_stickers, portrait, :<, closed_mouth, close-up, blurry, collared_shirt, looking_at_viewer, shirt, depth_of_field, blush, grey_background, white_shirt, eye_reflection, vampire, school_uniform, frown, film_grain, eyelashes, oshino_shinobu",
+          "ratings": {
+            "general": 0.9660906791687012,
+            "sensitive": 0.044509951025247574,
+            "questionable": 0.0018140794709324837,
+            "explicit": 0.0008996631950139999
+          },
+          "character": {
+            "oshino_shinobu": 0.9972981810569763
+          },
+          "general": {
+            "1girl": 0.9983583092689514,
+            "blonde_hair": 0.9890901446342468,
+            "solo": 0.9786166548728943,
+            "yellow_eyes": 0.972053050994873,
+            "long_hair": 0.9373500347137451,
+            "pointy_ears": 0.9322595000267029,
+            "blush_stickers": 0.8993476033210754,
+            "portrait": 0.798340380191803,
+            ":<": 0.7868319153785706,
+            "closed_mouth": 0.7036382555961609,
+            "close-up": 0.6962487101554871,
+            "blurry": 0.6910733580589294,
+            "collared_shirt": 0.6840152144432068,
+            "looking_at_viewer": 0.6467210650444031,
+            "shirt": 0.5851627588272095,
+            "depth_of_field": 0.5709389448165894,
+            "blush": 0.4433820843696594,
+            "grey_background": 0.4242743253707886,
+            "white_shirt": 0.3770642876625061,
+            "eye_reflection": 0.3515545725822449,
+            "vampire": 0.3400014340877533,
+            "school_uniform": 0.29888027906417847,
+            "frown": 0.2832901179790497,
+            "film_grain": 0.2623089849948883,
+            "eyelashes": 0.2540039122104645
+          }
+        },
+        {
+          "region_id": 4,
+          "bbox": [
+            602.1200561523438,
+            1344.968994140625,
+            712.40869140625,
+            1457.7635498046875
+          ],
+          "caption": "1girl, solo, blonde_hair, yellow_eyes, blush_stickers, blurry, portrait, long_hair, pointy_ears, depth_of_field, collared_shirt, close-up, blush, :o, open_mouth, parted_lips, shirt, border, swept_bangs, blurry_foreground, sidelocks, white_shirt, blurry_background, white_border, oshino_shinobu",
+          "taglist": "1girl, solo, blonde_hair, yellow_eyes, blush_stickers, blurry, portrait, long_hair, pointy_ears, depth_of_field, collared_shirt, close-up, blush, :o, open_mouth, parted_lips, shirt, border, swept_bangs, blurry_foreground, sidelocks, white_shirt, blurry_background, white_border, oshino_shinobu",
+          "ratings": {
+            "general": 0.8348265886306763,
+            "sensitive": 0.19827955961227417,
+            "questionable": 0.001467631314881146,
+            "explicit": 0.0017237606225535274
+          },
+          "character": {
+            "oshino_shinobu": 0.983322024345398
+          },
+          "general": {
+            "1girl": 0.9978482723236084,
+            "solo": 0.9686543941497803,
+            "blonde_hair": 0.9432317614555359,
+            "yellow_eyes": 0.923119843006134,
+            "blush_stickers": 0.8789222240447998,
+            "blurry": 0.8261594176292419,
+            "portrait": 0.7992897033691406,
+            "long_hair": 0.7805729508399963,
+            "pointy_ears": 0.7309749126434326,
+            "depth_of_field": 0.7187427282333374,
+            "collared_shirt": 0.6535114049911499,
+            "close-up": 0.6108531951904297,
+            "blush": 0.6097468733787537,
+            ":o": 0.5854342579841614,
+            "open_mouth": 0.5007252097129822,
+            "parted_lips": 0.47436875104904175,
+            "shirt": 0.466989666223526,
+            "border": 0.42880967259407043,
+            "swept_bangs": 0.41688233613967896,
+            "blurry_foreground": 0.41447797417640686,
+            "sidelocks": 0.3545830547809601,
+            "white_shirt": 0.26301121711730957,
+            "blurry_background": 0.25385361909866333,
+            "white_border": 0.25178641080856323
+          }
+        },
+        {
+          "region_id": 5,
+          "bbox": [
+            623.5053100585938,
+            2082.81103515625,
+            740.9312133789062,
+            2196.135986328125
+          ],
+          "caption": "1girl, solo, blonde_hair, yellow_eyes, blush_stickers, long_hair, pointy_ears, looking_at_viewer, portrait, collarbone, closed_mouth, blurry, close-up, :<, depth_of_field, frown, dress, vampire, blush, oshino_shinobu",
+          "taglist": "1girl, solo, blonde_hair, yellow_eyes, blush_stickers, long_hair, pointy_ears, looking_at_viewer, portrait, collarbone, closed_mouth, blurry, close-up, :<, depth_of_field, frown, dress, vampire, blush, oshino_shinobu",
+          "ratings": {
+            "general": 0.973230242729187,
+            "sensitive": 0.03129430487751961,
+            "questionable": 0.001715806545689702,
+            "explicit": 0.00040960064507089555
+          },
+          "character": {
+            "oshino_shinobu": 0.9972586631774902
+          },
+          "general": {
+            "1girl": 0.9988195300102234,
+            "solo": 0.9814271330833435,
+            "blonde_hair": 0.9803568720817566,
+            "yellow_eyes": 0.9803383350372314,
+            "blush_stickers": 0.950271487236023,
+            "long_hair": 0.9421014785766602,
+            "pointy_ears": 0.839271605014801,
+            "looking_at_viewer": 0.8092667460441589,
+            "portrait": 0.7993447184562683,
+            "collarbone": 0.7379049062728882,
+            "closed_mouth": 0.7340713143348694,
+            "blurry": 0.6576566100120544,
+            "close-up": 0.5172719359397888,
+            ":<": 0.4766991138458252,
+            "depth_of_field": 0.4410511553287506,
+            "frown": 0.43746456503868103,
+            "dress": 0.34566208720207214,
+            "vampire": 0.3142507076263428,
+            "blush": 0.2881409227848053
+          }
+        },
+        {
+          "region_id": 6,
+          "bbox": [
+            459.4176330566406,
+            1040.528564453125,
+            552.6263427734375,
+            1135.368408203125
+          ],
+          "caption": "1girl, blonde_hair, solo, long_hair, pointy_ears, blurry, depth_of_field, blush, yellow_eyes, looking_back, looking_at_viewer, bare_shoulders, green_eyes, sailor_collar, from_behind, school_uniform, upper_body, sleeveless, closed_mouth, close-up, serafuku, eyelashes, oshino_shinobu",
+          "taglist": "1girl, blonde_hair, solo, long_hair, pointy_ears, blurry, depth_of_field, blush, yellow_eyes, looking_back, looking_at_viewer, bare_shoulders, green_eyes, sailor_collar, from_behind, school_uniform, upper_body, sleeveless, closed_mouth, close-up, serafuku, eyelashes, oshino_shinobu",
+          "ratings": {
+            "general": 0.5282977819442749,
+            "sensitive": 0.5513892769813538,
+            "questionable": 0.0015376163646578789,
+            "explicit": 0.0009085718775168061
+          },
+          "character": {
+            "oshino_shinobu": 0.9946893453598022
+          },
+          "general": {
+            "1girl": 0.9989204406738281,
+            "blonde_hair": 0.9777156710624695,
+            "solo": 0.9686917662620544,
+            "long_hair": 0.9476056694984436,
+            "pointy_ears": 0.9405537247657776,
+            "blurry": 0.7760334610939026,
+            "depth_of_field": 0.7149215340614319,
+            "blush": 0.711654782295227,
+            "yellow_eyes": 0.6762989163398743,
+            "looking_back": 0.6343146562576294,
+            "looking_at_viewer": 0.6191551685333252,
+            "bare_shoulders": 0.5457953214645386,
+            "green_eyes": 0.5211077332496643,
+            "sailor_collar": 0.4974254071712494,
+            "from_behind": 0.3188982307910919,
+            "school_uniform": 0.31864485144615173,
+            "upper_body": 0.287578284740448,
+            "sleeveless": 0.2874234616756439,
+            "closed_mouth": 0.27995002269744873,
+            "close-up": 0.2754644751548767,
+            "serafuku": 0.27304261922836304,
+            "eyelashes": 0.25584354996681213
           }
         }
       ]
@@ -320,8 +645,8 @@
             1185.803466796875,
             1824.0
           ],
-          "caption": "1girl, hat, long_hair, sword, solo, weapon, bandaid, yellow_eyes, blonde_hair, blush_stickers, fang, bandaid_on_leg, bracelet, bandaid_on_knee, dress, jacket_on_shoulders, blue_background, jewelry, katana, pirate_hat, planted_sword, contrapposto, pointy_ears, planted, fang_out, standing, looking_at_viewer, jacket, black_headwear, closed_mouth, white_dress, collarbone, crossed_arms, very_long_hair, feet_out_of_frame, bangle, shiny_skin, coat, short_dress, frown, flat_chest, military_jacket, jolly_roger, legs_apart, skull_and_crossbones, simple_background, oshino_shinobu",
-          "taglist": "1girl, hat, long_hair, sword, solo, weapon, bandaid, yellow_eyes, blonde_hair, blush_stickers, fang, bandaid_on_leg, bracelet, bandaid_on_knee, dress, jacket_on_shoulders, blue_background, jewelry, katana, pirate_hat, planted_sword, contrapposto, pointy_ears, planted, fang_out, standing, looking_at_viewer, jacket, black_headwear, closed_mouth, white_dress, collarbone, crossed_arms, very_long_hair, feet_out_of_frame, bangle, shiny_skin, coat, short_dress, frown, flat_chest, military_jacket, jolly_roger, legs_apart, skull_and_crossbones, simple_background, person, oshino_shinobu",
+          "caption": "1girl, hat, long_hair, sword, solo, weapon, bandaid, yellow_eyes, blonde_hair, blush_stickers, fang, bandaid_on_leg, bracelet, bandaid_on_knee, dress, jacket_on_shoulders, blue_background, jewelry, katana, pirate_hat, planted_sword, contrapposto, pointy_ears, planted, fang_out, standing, looking_at_viewer, jacket, black_headwear, closed_mouth, white_dress, collarbone, crossed_arms, very_long_hair, feet_out_of_frame, bangle, shiny_skin, coat, short_dress, frown, flat_chest, military_jacket, jolly_roger, legs_apart, skull_and_crossbones, simple_background, skin_fang, body_blush, military_hat, blush, peaked_cap, shirt, ass_visible_through_thighs, v-shaped_eyebrows, cowboy_shot, open_clothes, thighs, petite, small_breasts, breasts, looking_to_the_side, oshino_shinobu",
+          "taglist": "1girl, hat, long_hair, sword, solo, weapon, bandaid, yellow_eyes, blonde_hair, blush_stickers, fang, bandaid_on_leg, bracelet, bandaid_on_knee, dress, jacket_on_shoulders, blue_background, jewelry, katana, pirate_hat, planted_sword, contrapposto, pointy_ears, planted, fang_out, standing, looking_at_viewer, jacket, black_headwear, closed_mouth, white_dress, collarbone, crossed_arms, very_long_hair, feet_out_of_frame, bangle, shiny_skin, coat, short_dress, frown, flat_chest, military_jacket, jolly_roger, legs_apart, skull_and_crossbones, simple_background, skin_fang, body_blush, military_hat, blush, peaked_cap, shirt, ass_visible_through_thighs, v-shaped_eyebrows, cowboy_shot, open_clothes, thighs, petite, small_breasts, breasts, looking_to_the_side, person, oshino_shinobu",
           "ratings": {
             "general": 0.06330246478319168,
             "sensitive": 0.9351624250411987,
@@ -378,7 +703,66 @@
             "legs_apart": 0.4179611802101135,
             "skull_and_crossbones": 0.4105217456817627,
             "simple_background": 0.4085976481437683,
+            "skin_fang": 0.38345465064048767,
+            "body_blush": 0.38177400827407837,
+            "military_hat": 0.37373873591423035,
+            "blush": 0.3667353689670563,
+            "peaked_cap": 0.360665887594223,
+            "shirt": 0.3539292514324188,
+            "ass_visible_through_thighs": 0.33126741647720337,
+            "v-shaped_eyebrows": 0.3246660828590393,
+            "cowboy_shot": 0.2998221218585968,
+            "open_clothes": 0.28834712505340576,
+            "thighs": 0.28317025303840637,
+            "petite": 0.265453577041626,
+            "small_breasts": 0.2589092254638672,
+            "breasts": 0.25443753600120544,
+            "looking_to_the_side": 0.25356587767601013,
             "person": 1.0
+          }
+        }
+      ],
+      "face_detector": [
+        {
+          "region_id": 0,
+          "bbox": [
+            449.53399658203125,
+            221.18812561035156,
+            842.89306640625,
+            603.0465087890625
+          ],
+          "caption": "1girl, blonde_hair, yellow_eyes, solo, hat, fang, blush_stickers, long_hair, portrait, pointy_ears, blue_background, black_headwear, peaked_cap, jacket, closed_mouth, close-up, military_hat, skin_fang, frown, looking_to_the_side, oshino_shinobu",
+          "taglist": "1girl, blonde_hair, yellow_eyes, solo, hat, fang, blush_stickers, long_hair, portrait, pointy_ears, blue_background, black_headwear, peaked_cap, jacket, closed_mouth, close-up, military_hat, skin_fang, frown, looking_to_the_side, oshino_shinobu",
+          "ratings": {
+            "general": 0.9664613604545593,
+            "sensitive": 0.04108985513448715,
+            "questionable": 0.0014299809699878097,
+            "explicit": 0.0006794276996515691
+          },
+          "character": {
+            "oshino_shinobu": 0.9913519620895386
+          },
+          "general": {
+            "1girl": 0.9987969398498535,
+            "blonde_hair": 0.9862254858016968,
+            "yellow_eyes": 0.9742151498794556,
+            "solo": 0.9706469774246216,
+            "hat": 0.960845410823822,
+            "fang": 0.9458119869232178,
+            "blush_stickers": 0.9406692385673523,
+            "long_hair": 0.8309728503227234,
+            "portrait": 0.7410686612129211,
+            "pointy_ears": 0.6333366632461548,
+            "blue_background": 0.5281270742416382,
+            "black_headwear": 0.49569958448410034,
+            "peaked_cap": 0.47339630126953125,
+            "jacket": 0.42824235558509827,
+            "closed_mouth": 0.3844897747039795,
+            "close-up": 0.34449902176856995,
+            "military_hat": 0.33817851543426514,
+            "skin_fang": 0.2829767167568207,
+            "frown": 0.27897873520851135,
+            "looking_to_the_side": 0.26476338505744934
           }
         }
       ]
@@ -434,7 +818,339 @@
       }
     },
     "detectors": {
-      "person_detector": []
+      "person_detector": [],
+      "face_detector": [
+        {
+          "region_id": 0,
+          "bbox": [
+            1059.5025634765625,
+            1.473876953125,
+            1787.346923828125,
+            578.9421997070312
+          ],
+          "caption": "1girl, solo, green_eyes, blonde_hair, fang, open_mouth, smile, blush_stickers, portrait, looking_at_viewer, :d, close-up, short_hair, purple_scarf, blush",
+          "taglist": "1girl, solo, green_eyes, blonde_hair, fang, open_mouth, smile, blush_stickers, portrait, looking_at_viewer, :d, close-up, short_hair, purple_scarf, blush",
+          "ratings": {
+            "general": 0.9715012311935425,
+            "sensitive": 0.04083092138171196,
+            "questionable": 0.0008157033007591963,
+            "explicit": 0.0003477422578725964
+          },
+          "character": {},
+          "general": {
+            "1girl": 0.9982654452323914,
+            "solo": 0.9867653846740723,
+            "green_eyes": 0.9705182909965515,
+            "blonde_hair": 0.9602777361869812,
+            "fang": 0.9369229078292847,
+            "open_mouth": 0.9367140531539917,
+            "smile": 0.9194850325584412,
+            "blush_stickers": 0.8740109801292419,
+            "portrait": 0.8421083688735962,
+            "looking_at_viewer": 0.7007814049720764,
+            ":d": 0.6703457236289978,
+            "close-up": 0.6383764147758484,
+            "short_hair": 0.4364608824253082,
+            "purple_scarf": 0.3453937768936157,
+            "blush": 0.3058722913265228
+          }
+        },
+        {
+          "region_id": 1,
+          "bbox": [
+            1491.8968505859375,
+            1318.532470703125,
+            2032.0125732421875,
+            1834.1331787109375
+          ],
+          "caption": "1girl, solo, black_hair, slit_pupils, red_eyes, close-up, yellow_eyes, short_hair, multicolored_eyes, portrait, black_background, personification, helmet, simple_background, genderswap_(mtf), child, closed_mouth, blush, looking_at_viewer, frown, genderswap, :<",
+          "taglist": "1girl, solo, black_hair, slit_pupils, red_eyes, close-up, yellow_eyes, short_hair, multicolored_eyes, portrait, black_background, personification, helmet, simple_background, genderswap_(mtf), child, closed_mouth, blush, looking_at_viewer, frown, genderswap, :<",
+          "ratings": {
+            "general": 0.7706594467163086,
+            "sensitive": 0.2717263400554657,
+            "questionable": 0.0014437008649110794,
+            "explicit": 0.0007527890847995877
+          },
+          "character": {},
+          "general": {
+            "1girl": 0.9926450252532959,
+            "solo": 0.9826199412345886,
+            "black_hair": 0.8680313229560852,
+            "slit_pupils": 0.86033034324646,
+            "red_eyes": 0.8007072806358337,
+            "close-up": 0.7494628429412842,
+            "yellow_eyes": 0.7325124740600586,
+            "short_hair": 0.7219943404197693,
+            "multicolored_eyes": 0.6824560165405273,
+            "portrait": 0.6461191177368164,
+            "black_background": 0.4427180886268616,
+            "personification": 0.40218326449394226,
+            "helmet": 0.39687880873680115,
+            "simple_background": 0.395083487033844,
+            "genderswap_(mtf)": 0.3902585804462433,
+            "child": 0.345176637172699,
+            "closed_mouth": 0.34157344698905945,
+            "blush": 0.333207905292511,
+            "looking_at_viewer": 0.3245669901371002,
+            "frown": 0.3207528293132782,
+            "genderswap": 0.2603428065776825,
+            ":<": 0.25181299448013306
+          }
+        },
+        {
+          "region_id": 2,
+          "bbox": [
+            729.5026245117188,
+            1061.838134765625,
+            1453.2166748046875,
+            1736.7916259765625
+          ],
+          "caption": "1girl, blue_eyes, solo, blue_hair, blush_stickers, portrait, long_hair, horns, no_mouth, looking_at_viewer, blunt_bangs, no_nose, bow, maid_headdress, close-up, collared_shirt, slit_pupils",
+          "taglist": "1girl, blue_eyes, solo, blue_hair, blush_stickers, portrait, long_hair, horns, no_mouth, looking_at_viewer, blunt_bangs, no_nose, bow, maid_headdress, close-up, collared_shirt, slit_pupils",
+          "ratings": {
+            "general": 0.9620861411094666,
+            "sensitive": 0.05760961025953293,
+            "questionable": 0.0009349148604087532,
+            "explicit": 0.0005931301275268197
+          },
+          "character": {},
+          "general": {
+            "1girl": 0.9868230819702148,
+            "blue_eyes": 0.9695854783058167,
+            "solo": 0.9691253900527954,
+            "blue_hair": 0.9475354552268982,
+            "blush_stickers": 0.9322258234024048,
+            "portrait": 0.8485180139541626,
+            "long_hair": 0.8319374322891235,
+            "horns": 0.8109548091888428,
+            "no_mouth": 0.7936815619468689,
+            "looking_at_viewer": 0.7310916185379028,
+            "blunt_bangs": 0.666416585445404,
+            "no_nose": 0.5508880019187927,
+            "bow": 0.5223342180252075,
+            "maid_headdress": 0.4388543963432312,
+            "close-up": 0.4298560321331024,
+            "collared_shirt": 0.4145635962486267,
+            "slit_pupils": 0.297139972448349
+          }
+        },
+        {
+          "region_id": 3,
+          "bbox": [
+            0.0,
+            2.184863328933716,
+            463.7054138183594,
+            562.3259887695312
+          ],
+          "caption": "green_eyes, smile, brown_hair, dark_skin, thick_eyebrows, close-up, blonde_hair, blush, hug, dark-skinned_female, 1girl, 1boy, closed_mouth, 2girls, short_hair, multiple_girls, solo_focus, dark-skinned_male, forked_eyebrows, portrait",
+          "taglist": "green_eyes, smile, brown_hair, dark_skin, thick_eyebrows, close-up, blonde_hair, blush, hug, dark-skinned_female, 1girl, 1boy, closed_mouth, 2girls, short_hair, multiple_girls, solo_focus, dark-skinned_male, forked_eyebrows, portrait",
+          "ratings": {
+            "general": 0.7706589698791504,
+            "sensitive": 0.3916195333003998,
+            "questionable": 0.003339356044307351,
+            "explicit": 0.0014677387662231922
+          },
+          "character": {},
+          "general": {
+            "green_eyes": 0.9667977094650269,
+            "smile": 0.9561598300933838,
+            "brown_hair": 0.9419071078300476,
+            "dark_skin": 0.887617826461792,
+            "thick_eyebrows": 0.8554505705833435,
+            "close-up": 0.8335084915161133,
+            "blonde_hair": 0.822293221950531,
+            "blush": 0.8045669198036194,
+            "hug": 0.6776877045631409,
+            "dark-skinned_female": 0.5809122920036316,
+            "1girl": 0.559164822101593,
+            "1boy": 0.4984060227870941,
+            "closed_mouth": 0.4858417510986328,
+            "2girls": 0.4801260232925415,
+            "short_hair": 0.4678497612476349,
+            "multiple_girls": 0.4352990984916687,
+            "solo_focus": 0.335712194442749,
+            "dark-skinned_male": 0.3260056674480438,
+            "forked_eyebrows": 0.30561724305152893,
+            "portrait": 0.27141088247299194
+          }
+        },
+        {
+          "region_id": 4,
+          "bbox": [
+            37.42485427856445,
+            1096.5262451171875,
+            690.3736572265625,
+            1735.65234375
+          ],
+          "caption": "1girl, solo, portrait, black_hair, blush_stickers, close-up, looking_at_viewer, closed_mouth, long_hair, blunt_bangs, brown_eyes, red_eyes, no_nose, slit_pupils, hime_cut, expressionless",
+          "taglist": "1girl, solo, portrait, black_hair, blush_stickers, close-up, looking_at_viewer, closed_mouth, long_hair, blunt_bangs, brown_eyes, red_eyes, no_nose, slit_pupils, hime_cut, expressionless",
+          "ratings": {
+            "general": 0.9757687449455261,
+            "sensitive": 0.03324555978178978,
+            "questionable": 0.0008939164690673351,
+            "explicit": 0.00040016259299591184
+          },
+          "character": {},
+          "general": {
+            "1girl": 0.9990078806877136,
+            "solo": 0.992461621761322,
+            "portrait": 0.9670297503471375,
+            "black_hair": 0.9417020082473755,
+            "blush_stickers": 0.9034681916236877,
+            "close-up": 0.7700161337852478,
+            "looking_at_viewer": 0.7643729448318481,
+            "closed_mouth": 0.7582647204399109,
+            "long_hair": 0.7031912207603455,
+            "blunt_bangs": 0.7027403712272644,
+            "brown_eyes": 0.6947691440582275,
+            "red_eyes": 0.6671689748764038,
+            "no_nose": 0.523780107498169,
+            "slit_pupils": 0.5095609426498413,
+            "hime_cut": 0.41038092970848083,
+            "expressionless": 0.3206120729446411
+          }
+        },
+        {
+          "region_id": 5,
+          "bbox": [
+            72.0094223022461,
+            588.603515625,
+            519.0138549804688,
+            1097.759765625
+          ],
+          "caption": "1girl, solo, blonde_hair, yellow_eyes, smile, profile, portrait, close-up, closed_mouth, long_hair, short_hair, kurodani_yamame",
+          "taglist": "1girl, solo, blonde_hair, yellow_eyes, smile, profile, portrait, close-up, closed_mouth, long_hair, short_hair, kurodani_yamame",
+          "ratings": {
+            "general": 0.974284291267395,
+            "sensitive": 0.04305814206600189,
+            "questionable": 0.0014582360163331032,
+            "explicit": 0.0005512183997780085
+          },
+          "character": {
+            "kurodani_yamame": 0.9450372457504272
+          },
+          "general": {
+            "1girl": 0.9993451237678528,
+            "solo": 0.992340087890625,
+            "blonde_hair": 0.9769705533981323,
+            "yellow_eyes": 0.9758217930793762,
+            "smile": 0.9560170769691467,
+            "profile": 0.765527069568634,
+            "portrait": 0.7216475605964661,
+            "close-up": 0.6837117671966553,
+            "closed_mouth": 0.3439369797706604,
+            "long_hair": 0.2691267430782318,
+            "short_hair": 0.25917622447013855
+          }
+        },
+        {
+          "region_id": 6,
+          "bbox": [
+            383.16015625,
+            0.0,
+            1018.0416259765625,
+            531.45556640625
+          ],
+          "caption": "1girl, solo, brown_hair, smile, blush_stickers, black_eyes, looking_at_viewer, closed_mouth, close-up, portrait, short_hair, hair_ornament, blush, star_hair_ornament",
+          "taglist": "1girl, solo, brown_hair, smile, blush_stickers, black_eyes, looking_at_viewer, closed_mouth, close-up, portrait, short_hair, hair_ornament, blush, star_hair_ornament",
+          "ratings": {
+            "general": 0.8776143193244934,
+            "sensitive": 0.15262629091739655,
+            "questionable": 0.0016700997948646545,
+            "explicit": 0.0006614802405238152
+          },
+          "character": {},
+          "general": {
+            "1girl": 0.9937148690223694,
+            "solo": 0.9777581691741943,
+            "brown_hair": 0.970604419708252,
+            "smile": 0.9581863284111023,
+            "blush_stickers": 0.9184888005256653,
+            "black_eyes": 0.8566464781761169,
+            "looking_at_viewer": 0.7531709671020508,
+            "closed_mouth": 0.6673243045806885,
+            "close-up": 0.6600610613822937,
+            "portrait": 0.6485076546669006,
+            "short_hair": 0.4531487822532654,
+            "hair_ornament": 0.426251620054245,
+            "blush": 0.3692309856414795,
+            "star_hair_ornament": 0.2558918595314026
+          }
+        },
+        {
+          "region_id": 7,
+          "bbox": [
+            1390.4320068359375,
+            629.0199584960938,
+            2045.5921630859375,
+            1266.8348388671875
+          ],
+          "caption": "solo, 1girl, open_mouth, black_eyes, portrait, smile, looking_at_viewer, short_hair, close-up, brown_hair, blush, :d, grey_eyes, blonde_hair, hat, orange_hair, androgynous",
+          "taglist": "solo, 1girl, open_mouth, black_eyes, portrait, smile, looking_at_viewer, short_hair, close-up, brown_hair, blush, :d, grey_eyes, blonde_hair, hat, orange_hair, androgynous",
+          "ratings": {
+            "general": 0.7906558513641357,
+            "sensitive": 0.23936249315738678,
+            "questionable": 0.0012326785363256931,
+            "explicit": 0.0007110538426786661
+          },
+          "character": {},
+          "general": {
+            "solo": 0.9753186106681824,
+            "1girl": 0.9616044163703918,
+            "open_mouth": 0.903313159942627,
+            "black_eyes": 0.8392018675804138,
+            "portrait": 0.8300889730453491,
+            "smile": 0.7972292304039001,
+            "looking_at_viewer": 0.7797435522079468,
+            "short_hair": 0.7591092586517334,
+            "close-up": 0.7450076937675476,
+            "brown_hair": 0.5486369729042053,
+            "blush": 0.45016881823539734,
+            ":d": 0.41863659024238586,
+            "grey_eyes": 0.3964383602142334,
+            "blonde_hair": 0.3541012108325958,
+            "hat": 0.28591033816337585,
+            "orange_hair": 0.275981068611145,
+            "androgynous": 0.2631487250328064
+          }
+        },
+        {
+          "region_id": 8,
+          "bbox": [
+            683.3978881835938,
+            491.3983459472656,
+            1243.904296875,
+            1015.4108276367188
+          ],
+          "caption": "1girl, white_hair, red_eyes, solo, slit_pupils, close-up, portrait, blush_stickers, looking_at_viewer, short_hair, closed_mouth, demon_girl, pointy_ears, horns, blush, albino",
+          "taglist": "1girl, white_hair, red_eyes, solo, slit_pupils, close-up, portrait, blush_stickers, looking_at_viewer, short_hair, closed_mouth, demon_girl, pointy_ears, horns, blush, albino",
+          "ratings": {
+            "general": 0.8997101783752441,
+            "sensitive": 0.1449921578168869,
+            "questionable": 0.0022322500590234995,
+            "explicit": 0.0009943500626832247
+          },
+          "character": {},
+          "general": {
+            "1girl": 0.9848098158836365,
+            "white_hair": 0.9731096625328064,
+            "red_eyes": 0.9634782075881958,
+            "solo": 0.9518634676933289,
+            "slit_pupils": 0.9018779993057251,
+            "close-up": 0.8444937467575073,
+            "portrait": 0.6491231322288513,
+            "blush_stickers": 0.6436457633972168,
+            "looking_at_viewer": 0.4898330271244049,
+            "short_hair": 0.42856869101524353,
+            "closed_mouth": 0.3642340302467346,
+            "demon_girl": 0.3630232810974121,
+            "pointy_ears": 0.35992637276649475,
+            "horns": 0.3093739449977875,
+            "blush": 0.3047820031642914,
+            "albino": 0.2604735791683197
+          }
+        }
+      ]
     }
   },
   {
@@ -482,8 +1198,8 @@
             1057.774169921875,
             755.9320678710938
           ],
-          "caption": "1boy, 1girl, black_hair, sitting, shorts, back, from_behind, topless_male, blonde_hair, indian_style, blurry, facing_away, araragi_koyomi",
-          "taglist": "1boy, 1girl, black_hair, sitting, shorts, back, from_behind, topless_male, blonde_hair, indian_style, blurry, facing_away, person, araragi_koyomi",
+          "caption": "1boy, 1girl, black_hair, sitting, shorts, back, from_behind, topless_male, blonde_hair, indian_style, blurry, facing_away, solo, depth_of_field, short_hair, long_hair, araragi_koyomi",
+          "taglist": "1boy, 1girl, black_hair, sitting, shorts, back, from_behind, topless_male, blonde_hair, indian_style, blurry, facing_away, solo, depth_of_field, short_hair, long_hair, person, araragi_koyomi",
           "ratings": {
             "general": 0.052259474992752075,
             "sensitive": 0.9021768569946289,
@@ -506,6 +1222,10 @@
             "indian_style": 0.5748909115791321,
             "blurry": 0.5221145153045654,
             "facing_away": 0.5083680152893066,
+            "solo": 0.35383039712905884,
+            "depth_of_field": 0.2759617567062378,
+            "short_hair": 0.27412888407707214,
+            "long_hair": 0.2619246244430542,
             "person": 1.0
           }
         },
@@ -517,8 +1237,8 @@
             879.1649780273438,
             715.051025390625
           ],
-          "caption": "1girl, blonde_hair, long_hair, yellow_eyes, dress, blush_stickers, chair, sitting, crossed_arms, blurry, depth_of_field, solo, white_dress, looking_at_viewer, sandals, oshino_shinobu",
-          "taglist": "1girl, blonde_hair, long_hair, yellow_eyes, dress, blush_stickers, chair, sitting, crossed_arms, blurry, depth_of_field, solo, white_dress, looking_at_viewer, sandals, person, oshino_shinobu",
+          "caption": "1girl, blonde_hair, long_hair, yellow_eyes, dress, blush_stickers, chair, sitting, crossed_arms, blurry, depth_of_field, solo, white_dress, looking_at_viewer, sandals, sundress, long_legs, solo_focus, oshino_shinobu",
+          "taglist": "1girl, blonde_hair, long_hair, yellow_eyes, dress, blush_stickers, chair, sitting, crossed_arms, blurry, depth_of_field, solo, white_dress, looking_at_viewer, sandals, sundress, long_legs, solo_focus, person, oshino_shinobu",
           "ratings": {
             "general": 0.04735083505511284,
             "sensitive": 0.7419921159744263,
@@ -544,10 +1264,14 @@
             "white_dress": 0.47717419266700745,
             "looking_at_viewer": 0.46617165207862854,
             "sandals": 0.45295068621635437,
+            "sundress": 0.3704829812049866,
+            "long_legs": 0.34892070293426514,
+            "solo_focus": 0.27289682626724243,
             "person": 1.0
           }
         }
-      ]
+      ],
+      "face_detector": []
     }
   }
 ]
