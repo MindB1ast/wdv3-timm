@@ -1,0 +1,168 @@
+from pathlib import Path
+import torch
+from PIL import Image
+from timm.data import create_transform, resolve_data_config
+import glob
+import os
+from .wdv3_timm import MODEL_REPO_MAP
+from .configs import ScriptOptions
+from .model import ensure_model_folder, download_model_files, load_model_local_or_remote, load_labels_local_or_remote, load_yolo_model
+from .detection import load_detectors_config
+from .tagging import process_image_with_multiple_detectors
+from .preprocess import merge_tags_from_regions, save_results_to_json
+import matplotlib as plt
+from .visualization import view_image_results
+from .savingProc import save_tags_to_txt
+
+
+
+# Фукнция для тегирования изображений
+# Для параметров ввода посотри файл configs.py
+def BatchTagging(opts: ScriptOptions):
+    if opts.model not in MODEL_REPO_MAP:
+        print(f"Доступные модели: {list(MODEL_REPO_MAP.keys())}")
+        raise ValueError(f"Неизвестная модель: {opts.model}")
+    
+    repo_id = MODEL_REPO_MAP[opts.model]
+    image_folder = Path(opts.ImageFolder).resolve()
+    if not image_folder.is_dir():
+        raise FileNotFoundError(f"Директория не найдена: {image_folder}")
+    
+    # Создаем папку для моделей тегирования, если она не существует
+    model_folder = ensure_model_folder(Path(opts.model_folder))
+    
+    # Создаем папку для моделей YOLO, если она не существует
+    yolo_model_dir = ensure_model_folder(Path(opts.yolo_model_dir))
+    
+    # Загружаем или скачиваем файлы модели тегирования
+    download_model_files(repo_id, model_folder)
+    
+    # Загружаем модель из локальной папки или из Hub
+    print(f"Загрузка модели тегирования '{opts.model}' из '{repo_id}'...")
+    tagger_model = load_model_local_or_remote(repo_id, model_folder)
+    
+    # Загружаем теги из локальной папки или из Hub
+    print("Загрузка списка тегов...")
+    labels = load_labels_local_or_remote(repo_id, model_folder)
+    
+    print("Создание трансформации данных...")
+    transform = create_transform(**resolve_data_config(tagger_model.pretrained_cfg, model=tagger_model))
+    
+    # Загружаем конфигурацию детекторов
+    print(f"Загрузка конфигурации детекторов из {opts.detectors_config}...")
+    detectors = load_detectors_config(opts.detectors_config)
+    
+    # Загружаем все уникальные модели YOLO
+    yolo_models = {}
+    for detector in detectors:
+        if detector.model_path not in yolo_models:
+            print(f"Загрузка модели YOLO {detector.model_path}...")
+            try:
+                # Используем новую функцию для загрузки YOLO модели
+                yolo_models[detector.model_path] = load_yolo_model(detector.model_path, yolo_model_dir)
+            except Exception as e:
+                print(f"Ошибка загрузки модели YOLO {detector.model_path}: {e}")
+                print(f"Детектор {detector.name} будет пропущен")
+    
+    # Получаем список изображений
+    if opts.recursive:
+        image_files = list(image_folder.rglob("*.jpg")) + list(image_folder.rglob("*.jpeg")) + list(image_folder.rglob("*.png"))
+    else:
+        image_files = list(image_folder.glob("*.jpg")) + list(image_folder.glob("*.jpeg")) + list(image_folder.glob("*.png"))
+    
+    if not image_files:
+        print("Изображения не найдены в указанной директории.")
+        return
+    
+    torch_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    tagger_model = tagger_model.to(torch_device)
+    
+    all_results = []
+    all_merged_results = []
+    total_images = len(image_files)
+    
+    print(f"Всего изображений для обработки: {total_images}")
+    
+    for i, img_path in enumerate(image_files):
+        print(f"\nОбработка изображения {i+1}/{total_images}: {img_path}")
+        
+        # Обрабатываем изображение со всеми детекторами
+        result = process_image_with_multiple_detectors(
+            str(img_path),
+            tagger_model,
+            transform,
+            labels,
+            detectors,
+            yolo_models,
+            opts.gen_threshold,
+            opts.char_threshold,
+            torch_device
+        )
+        
+        if result:
+            all_results.append(result)
+            
+            # Объединяем теги из всех источников
+            merged_tags = merge_tags_from_regions(result, detectors)
+            
+            # Добавляем информацию о результатах для текущего изображения
+            merged_result = {
+                "image_path": result["image_path"],
+                "merged_tags": merged_tags
+            }
+            all_merged_results.append(merged_result)
+            
+            # Если включена опция сохранения в TXT, сохраняем теги в отдельный файл
+            if opts.save_txt:
+                txt_path = save_tags_to_txt(
+                    result["image_path"], 
+                    merged_tags, 
+                    append_tags=opts.append_txt
+                )
+                # Добавляем путь к TXT файлу в результаты
+                merged_result["txt_path"] = txt_path
+            
+            # Выводим информацию о результатах
+            print("--------")
+            print(f"Путь к изображению: {result['image_path']}")
+            print("\nРезультаты для полного изображения:")
+            print(f"Описание: {result['full_image']['caption']}")
+            print(f"Теги: {result['full_image']['taglist']}")
+            
+            # Выводим информацию о найденных областях для каждого детектора
+            for detector_name, regions in result["detectors"].items():
+                if regions:
+                    print(f"\nДетектор {detector_name}: найдено областей: {len(regions)}")
+                    for region in regions:
+                        print(f"  Область {region['region_id']+1}, координаты: {region['bbox']}")
+                        print(f"  Описание: {region['caption']}")
+                        print(f"  Теги: {region['taglist']}")
+                else:
+                    print(f"\nДетектор {detector_name}: областей не найдено")
+            
+            # Выводим объединенные теги
+            print("\nОбъединенные теги:")
+            print(f"Описание: {merged_tags['caption']}")
+            print(f"Теги: {merged_tags['taglist']}")
+            
+            # Если сохранили в TXT, показываем информацию
+            if opts.save_txt:
+                if opts.append_txt:
+                    print(f"Теги добавлены/обновлены в: {merged_result['txt_path']}")
+                else:
+                    print(f"Теги сохранены в: {merged_result['txt_path']}")
+            
+            print("--------")
+    
+    print(f"\nОбработка завершена. Обработано изображений: {len(all_results)}/{total_images}")
+    
+    # Сохраняем результаты в файл
+    if opts.output_file:
+        save_results_to_json(all_results, opts.output_file)
+        
+        # Также сохраняем объединенные результаты
+        merged_output = os.path.splitext(opts.output_file)[0] + "_merged" + os.path.splitext(opts.output_file)[1]
+        save_results_to_json(all_merged_results, merged_output)
+    
+    return all_results, all_merged_results
+

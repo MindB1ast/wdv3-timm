@@ -4,11 +4,10 @@
     "model_path": "yolov8n.pt",
     "confidence": 0.25,
     "classes": [0],
-    "remove_tags_from_full": ["1girl", "1boy"],
-    "remove_tags_from_region": ["multiple views"],
-    "add_tags_to_region": {"person": 1.0},
-    "exclude_from_region": ["close-up", "cowboy_shot", "full_body"],
-    "specific_excluded_tags": [],
+    "remove_tags_from_full": [],
+    "remove_tags_from_region": [],
+    "add_tags_to_region": {},
+    "exclude_from_region": [],
     "region_gen_threshold": 0.25,
     "region_char_threshold": 0.8
   },
@@ -21,7 +20,6 @@
     "remove_tags_from_region": [],
     "add_tags_to_region": {},
     "exclude_from_region": [],
-    "specific_excluded_tags": [],
     "region_gen_threshold": 0.25,
     "region_char_threshold": 0.85
   }

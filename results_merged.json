@@ -2,8 +2,8 @@
   {
     "image_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestPic\\test1.png",
     "merged_tags": {
-      "caption": "1girl, :<, :o, age_progression, arm_at_side, arm_support, backlighting, bare_legs, bare_shoulders, barefoot, black_dress, black_footwear, black_ribbon, black_shirt, black_skirt, black_vest, blonde_hair, blue_ribbon, blue_skirt, blurry, blurry_background, blush, blush_stickers, border, buttons, clone, closed_mouth, collarbone, collared_shirt, depth_of_field, doughnut, dress, dual_persona, feet, feet_out_of_frame, food, frilled_skirt, frills, from_behind, frown, green_eyes, hand_up, high_collar, legs, long_hair, long_sleeves, looking_at_viewer, looking_back, mary_janes, multiple_girls, multiple_persona, multiple_views, navel, neck_ribbon, no_socks, open_mouth, oshino_shinobu, outdoors, parted_lips, person, pleated_skirt, pointy_ears, railing, ribbon, school_uniform, shirt, shirt_tucked_in, shoes, short_sleeves, sidelocks, sitting, sitting_on_stairs, skirt, sleeveless, stairs, standing, sunlight, suspender_skirt, suspenders, tears, thighhighs, toenails, toes, very_long_hair, vest, white_border, white_dress, white_shirt, yellow_eyes",
-      "taglist": "1girl, :<, :o, age progression, arm at side, arm support, backlighting, bare legs, bare shoulders, barefoot, black dress, black footwear, black ribbon, black shirt, black skirt, black vest, blonde hair, blue ribbon, blue skirt, blurry, blurry background, blush, blush stickers, border, buttons, clone, closed mouth, collarbone, collared shirt, depth of field, doughnut, dress, dual persona, feet, feet out of frame, food, frilled skirt, frills, from behind, frown, green eyes, hand up, high collar, legs, long hair, long sleeves, looking at viewer, looking back, mary janes, multiple girls, multiple persona, multiple views, navel, neck ribbon, no socks, open mouth, oshino shinobu, outdoors, parted lips, person, pleated skirt, pointy ears, railing, ribbon, school uniform, shirt, shirt tucked in, shoes, short sleeves, sidelocks, sitting, sitting on stairs, skirt, sleeveless, stairs, standing, sunlight, suspender skirt, suspenders, tears, thighhighs, toenails, toes, very long hair, vest, white border, white dress, white shirt, yellow eyes",
+      "caption": "1girl, :<, :o, age_progression, arm_at_side, arm_support, backlighting, bare_legs, bare_shoulders, barefoot, black_dress, black_footwear, black_ribbon, black_shirt, black_skirt, black_vest, blonde_hair, blue_ribbon, blue_skirt, blurry, blurry_background, blush, blush_stickers, border, buttons, clone, closed_mouth, collarbone, collared_shirt, depth_of_field, doughnut, dress, dual_persona, feet, feet_out_of_frame, food, frilled_skirt, frills, from_behind, frown, green_eyes, hand_up, high_collar, legs, long_hair, long_sleeves, looking_at_viewer, looking_back, mary_janes, multiple_girls, multiple_persona, multiple_views, navel, neck_ribbon, no_socks, open_mouth, oshino_shinobu, outdoors, parted_lips, pleated_skirt, pointy_ears, railing, ribbon, school_uniform, shirt, shirt_tucked_in, shoes, short_sleeves, sidelocks, sitting, sitting_on_stairs, skirt, sleeveless, stairs, standing, sunlight, suspender_skirt, suspenders, tears, thighhighs, toenails, toes, very_long_hair, vest, white_border, white_dress, white_shirt, yellow_eyes",
+      "taglist": "1girl, :<, :o, age progression, arm at side, arm support, backlighting, bare legs, bare shoulders, barefoot, black dress, black footwear, black ribbon, black shirt, black skirt, black vest, blonde hair, blue ribbon, blue skirt, blurry, blurry background, blush, blush stickers, border, buttons, clone, closed mouth, collarbone, collared shirt, depth of field, doughnut, dress, dual persona, feet, feet out of frame, food, frilled skirt, frills, from behind, frown, green eyes, hand up, high collar, legs, long hair, long sleeves, looking at viewer, looking back, mary janes, multiple girls, multiple persona, multiple views, navel, neck ribbon, no socks, open mouth, oshino shinobu, outdoors, parted lips, pleated skirt, pointy ears, railing, ribbon, school uniform, shirt, shirt tucked in, shoes, short sleeves, sidelocks, sitting, sitting on stairs, skirt, sleeveless, stairs, standing, sunlight, suspender skirt, suspenders, tears, thighhighs, toenails, toes, very long hair, vest, white border, white dress, white shirt, yellow eyes",
       "general": {
         "1girl": 0.9984588623046875,
         "long_hair": 0.9920341372489929,
@@ -39,7 +39,6 @@
         "collared_shirt": 0.522318959236145,
         "no_socks": 0.29328346252441406,
         "backlighting": 0.2702391743659973,
-        "person": 1.0,
         "barefoot": 0.97852623462677,
         "toes": 0.9466455578804016,
         "feet": 0.9397603273391724,
@@ -110,8 +109,8 @@
   {
     "image_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestPic\\test2.png",
     "merged_tags": {
-      "caption": "1girl, bandaid, bandaid_on_knee, bandaid_on_leg, blonde_hair, blush_stickers, bracelet, coat, cosplay, crossed_arms, dress, fang, fang_out, hat, jacket, jacket_on_shoulders, jewelry, katana, long_hair, looking_at_viewer, ootachi, oshino_shinobu, peaked_cap, person, planted, planted_sword, pointy_ears, solo, sword, uniform, weapon, white_dress, yellow_eyes",
-      "taglist": "1girl, bandaid, bandaid on knee, bandaid on leg, blonde hair, blush stickers, bracelet, coat, cosplay, crossed arms, dress, fang, fang out, hat, jacket, jacket on shoulders, jewelry, katana, long hair, looking at viewer, ootachi, oshino shinobu, peaked cap, person, planted, planted sword, pointy ears, solo, sword, uniform, weapon, white dress, yellow eyes",
+      "caption": "1girl, bandaid, bandaid_on_knee, bandaid_on_leg, blonde_hair, blush_stickers, bracelet, coat, cosplay, crossed_arms, dress, fang, fang_out, hat, jacket, jacket_on_shoulders, jewelry, katana, long_hair, looking_at_viewer, ootachi, oshino_shinobu, peaked_cap, planted, planted_sword, pointy_ears, solo, sword, uniform, weapon, white_dress, yellow_eyes",
+      "taglist": "1girl, bandaid, bandaid on knee, bandaid on leg, blonde hair, blush stickers, bracelet, coat, cosplay, crossed arms, dress, fang, fang out, hat, jacket, jacket on shoulders, jewelry, katana, long hair, looking at viewer, ootachi, oshino shinobu, peaked cap, planted, planted sword, pointy ears, solo, sword, uniform, weapon, white dress, yellow eyes",
       "general": {
         "1girl": 0.9985053539276123,
         "solo": 0.9844016432762146,
@@ -143,7 +142,6 @@
         "planted_sword": 0.2814612090587616,
         "planted": 0.2774193584918976,
         "white_dress": 0.26540401577949524,
-        "person": 1.0,
         "uniform": 0.2916370630264282
       },
       "character": {
@@ -227,8 +225,8 @@
   {
     "image_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestPic\\test4.png",
     "merged_tags": {
-      "caption": "1boy, 1girl, ^^^, ahoge, back, black_hair, blonde_hair, blue_shorts, blurry, blush_stickers, building, chair, crossed_arms, denim, depth_of_field, desk, dress, facing_away, from_behind, indian_style, indoors, letterboxed, long_hair, long_legs, looking_at_viewer, multicolored_hair, oshino_shinobu, outdoors, person, sandals, school_desk, short_hair, shorts, sitting, topless, topless_male, tree, white_dress, white_footwear, yellow_eyes",
-      "taglist": "1boy, 1girl, ^^^, ahoge, back, black hair, blonde hair, blue shorts, blurry, blush stickers, building, chair, crossed arms, denim, depth of field, desk, dress, facing away, from behind, indian style, indoors, letterboxed, long hair, long legs, looking at viewer, multicolored hair, oshino shinobu, outdoors, person, sandals, school desk, short hair, shorts, sitting, topless, topless male, tree, white dress, white footwear, yellow eyes",
+      "caption": "1boy, 1girl, ^^^, ahoge, back, black_hair, blonde_hair, blue_shorts, blurry, blush_stickers, building, chair, crossed_arms, denim, depth_of_field, desk, dress, facing_away, from_behind, indian_style, indoors, letterboxed, long_hair, long_legs, looking_at_viewer, multicolored_hair, oshino_shinobu, outdoors, sandals, school_desk, short_hair, shorts, sitting, topless, topless_male, tree, white_dress, white_footwear, yellow_eyes",
+      "taglist": "1boy, 1girl, ^^^, ahoge, back, black hair, blonde hair, blue shorts, blurry, blush stickers, building, chair, crossed arms, denim, depth of field, desk, dress, facing away, from behind, indian style, indoors, letterboxed, long hair, long legs, looking at viewer, multicolored hair, oshino shinobu, outdoors, sandals, school desk, short hair, shorts, sitting, topless, topless male, tree, white dress, white footwear, yellow eyes",
       "general": {
         "1boy": 0.9568275809288025,
         "from_behind": 0.8120372891426086,
@@ -250,7 +248,6 @@
         "multicolored_hair": 0.2767426371574402,
         "denim": 0.25973111391067505,
         "indoors": 0.25251305103302,
-        "person": 1.0,
         "long_hair": 0.8971065878868103,
         "yellow_eyes": 0.8892766237258911,
         "dress": 0.8828922510147095,
