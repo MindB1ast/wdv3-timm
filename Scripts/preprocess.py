@@ -45,7 +45,7 @@ def merge_tags_from_regions(image_result: Dict, detectors: List[DetectorConfig])
      "marble_background", "mosaic_background", "patterned_background", "plaid_background",
      "polka_dot_background", "spiral_background", "splatter_background", "striped_background", 
      "diagonal-striped_background", "sunburst_background", "triangle_background", "abstract_background", 
-     "blurry_background", "bright_background", "dark_background", "drama_layer"}
+     "blurry_background", "bright_background", "dark_background", "drama_layer", "border", "white_border", "black_border", "blurry", "blurry_background", "depth_of_field", "blurry_foreground", "pov", "pov_hands", "out_of_frame", "pov_hands", "feet_out_of_frame", "foot_out_of_frame"}
     
     # Инициализируем результирующие теги
     merged_general = {}
@@ -72,10 +72,18 @@ def merge_tags_from_regions(image_result: Dict, detectors: List[DetectorConfig])
             # Фильтруем теги области
             filtered_general = {}
             for tag, conf in region_general.items():
+                # Удаляем теги из region_general, если они в remove_tags_from_region
                 if tag in detector_config.remove_tags_from_region:
                     continue
-                if (tag in detector_config.exclude_from_region or tag in GLOBAL_EXCLUDED_REGION_TAGS) and tag not in full_tags_set:
+                
+                # Удаляем глобальные теги артефактов приближения - они должны браться только из полной картинки
+                if tag in GLOBAL_EXCLUDED_REGION_TAGS:
                     continue
+                
+                # Проверяем другие условия исключения для конкретного детектора
+                if tag in detector_config.exclude_from_region and tag not in full_tags_set:
+                    continue
+                    
                 filtered_general[tag] = conf
             
             # Обновляем merged_general

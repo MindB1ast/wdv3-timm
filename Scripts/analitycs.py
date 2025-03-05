@@ -1,0 +1,1022 @@
+import os
+import pandas as pd
+from typing import List, Dict, Set, Tuple
+from sklearn.metrics import precision_score, recall_score, f1_score
+import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.graph_objects as go
+from IPython.display import display, HTML
+
+def load_ground_truth_tags(txt_folder: str) -> Dict[str, Set[str]]:
+    """Загружает теги из txt файлов в указанной папке."""
+    ground_truth = {}
+    for txt_file in os.listdir(txt_folder):
+        if txt_file.endswith('.txt'):
+            img_name = os.path.splitext(txt_file)[0]
+            with open(os.path.join(txt_folder, txt_file), 'r', encoding='utf-8') as f:
+                tags = {tag.strip() for tag in f.read().replace('_', ' ').split(',')}
+                ground_truth[img_name] = tags
+    return ground_truth
+
+def load_model_tags(results, use_merged: bool = True) -> Dict[str, Set[str]]:
+    """Извлекает теги из результатов модели."""
+    model_tags = {}
+    
+    # Работаем с merged_tags или full_image
+    for result in results[1] if use_merged else results[0]:
+        img_name = os.path.splitext(os.path.basename(result['image_path']))[0]
+        
+        # Извлекаем теги
+        tags_str = result['merged_tags']['taglist'] if use_merged else result['full_image']['taglist']
+        tags = {tag.strip() for tag in tags_str.split(',')}
+        
+        model_tags[img_name] = tags
+    
+    return model_tags
+
+def filter_known_tags(tags: Set[str], model_labels_path: str) -> Set[str]:
+    """Фильтрует теги на основе известных модели тегов."""
+    model_labels = pd.read_csv(model_labels_path)
+    known_tags = set(model_labels['name'].str.replace('_', ' ').tolist())
+    
+    return {tag for tag in tags if tag in known_tags}
+
+def calculate_tag_metrics(ground_truth: Dict[str, Set[str]], 
+                         model_tags: Dict[str, Set[str]]) -> Dict[str, float]:
+    """Вычисляет метрики Precision, Recall и F1-score для тегов."""
+    # Находим общие изображения в ground truth и результатах модели
+    common_images = set(ground_truth.keys()) & set(model_tags.keys())
+    
+    # Подготавливаем списки для вычисления метрик
+    y_true, y_pred = [], []
+    
+    # Создаем словарь для всех уникальных тегов
+    all_tags = set()
+    for tags in ground_truth.values():
+        all_tags.update(tags)
+    for tags in model_tags.values():
+        all_tags.update(tags)
+    
+    # Преобразуем теги в бинарные векторы
+    for img in common_images:
+        img_true_tags = ground_truth[img]
+        img_pred_tags = model_tags[img]
+        
+        # Создаем бинарный вектор для каждого изображения
+        img_true_vec = [1 if tag in img_true_tags else 0 for tag in sorted(all_tags)]
+        img_pred_vec = [1 if tag in img_pred_tags else 0 for tag in sorted(all_tags)]
+        
+        y_true.append(img_true_vec)
+        y_pred.append(img_pred_vec)
+    
+    # Вычисляем метрики для каждого тега
+    precision = precision_score(y_true, y_pred, average='samples', zero_division=0)
+    recall = recall_score(y_true, y_pred, average='samples', zero_division=0)
+    f1 = f1_score(y_true, y_pred, average='samples', zero_division=0)
+    
+    return {
+        'Precision': precision,
+        'Recall': recall,
+        'F1-score': f1
+    }
+
+def analyze_tagging_errors(
+    ground_truth: Dict[str, Set[str]], 
+    model_tags: Dict[str, Set[str]],
+    output_file: str = None
+) -> pd.DataFrame:
+    """Analyzes tagging errors between ground truth and model predictions."""
+    # Find common images in ground truth and model results
+    common_images = set(ground_truth.keys()) & set(model_tags.keys())
+    
+    # Prepare data for analysis
+    results = []
+    
+    for img in common_images:
+        true_tags = ground_truth[img]
+        pred_tags = model_tags[img]
+        
+        # Find false positives (predicted but not in ground truth)
+        false_positives = pred_tags - true_tags
+        
+        # Find false negatives (in ground truth but not predicted)
+        false_negatives = true_tags - pred_tags
+        
+        # Find true positives (correctly predicted)
+        true_positives = true_tags & pred_tags
+        
+        # Calculate per-image metrics
+        precision = len(true_positives) / len(pred_tags) if pred_tags else 1.0
+        recall = len(true_positives) / len(true_tags) if true_tags else 1.0
+        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
+        
+        results.append({
+            'image': img,
+            'ground_truth_tags': ', '.join(sorted(true_tags)),
+            'predicted_tags': ', '.join(sorted(pred_tags)),
+            'correct_tags': ', '.join(sorted(true_positives)),
+            'false_positives': ', '.join(sorted(false_positives)),
+            'false_negatives': ', '.join(sorted(false_negatives)),
+            'num_false_positives': len(false_positives),
+            'num_false_negatives': len(false_negatives),
+            'precision': precision,
+            'recall': recall,
+            'f1_score': f1
+        })
+    
+    # Create DataFrame
+    df = pd.DataFrame(results)
+    
+    # Sort by F1 score (worst performing images first)
+    df = df.sort_values('f1_score')
+    
+    # Save to CSV if output file is specified
+    if output_file:
+        df.to_csv(output_file, index=False, encoding='utf-8')
+        print(f"Error analysis saved to {output_file}")
+    
+    return df
+
+def analyze_tag_performance(
+    ground_truth: Dict[str, Set[str]], 
+    model_tags: Dict[str, Set[str]],
+    output_file: str = None
+) -> pd.DataFrame:
+    """Analyzes performance of individual tags across all images."""
+    # Find common images
+    common_images = set(ground_truth.keys()) & set(model_tags.keys())
+    
+    # Get all unique tags
+    all_tags = set()
+    for img in common_images:
+        all_tags.update(ground_truth[img])
+        all_tags.update(model_tags[img])
+    
+    # Track metrics for each tag
+    tag_metrics = {}
+    
+    for tag in all_tags:
+        # Initialize counters
+        tp, fp, fn = 0, 0, 0
+        
+        for img in common_images:
+            # Tag is in ground truth
+            if tag in ground_truth[img]:
+                # Tag is also predicted (true positive)
+                if tag in model_tags[img]:
+                    tp += 1
+                # Tag is not predicted (false negative)
+                else:
+                    fn += 1
+            # Tag is not in ground truth but is predicted (false positive)
+            elif tag in model_tags[img]:
+                fp += 1
+        
+        # Calculate metrics
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
+        
+        # Store metrics
+        tag_metrics[tag] = {
+            'tag': tag,
+            'true_positives': tp,
+            'false_positives': fp,
+            'false_negatives': fn,
+            'precision': precision,
+            'recall': recall, 
+            'f1_score': f1,
+            'total_ground_truth': tp + fn,
+            'total_predicted': tp + fp
+        }
+    
+    # Create DataFrame
+    df = pd.DataFrame(list(tag_metrics.values()))
+    
+    # Sort by lowest F1 score (worst performing tags first)
+    df = df.sort_values('f1_score')
+    
+    # Save to CSV if output file is specified
+    if output_file:
+        df.to_csv(output_file, index=False, encoding='utf-8')
+        print(f"Tag performance analysis saved to {output_file}")
+    
+    return df
+
+def display_metrics_summary(metrics: Dict[str, Dict[str, float]]) -> pd.DataFrame:
+    """Отображает сводку метрик для всех методов в формате таблицы."""
+    # Создаем DataFrame для метрик
+    metrics_df = pd.DataFrame(metrics).T * 100  # Переводим в проценты для лучшей читаемости
+    metrics_df = metrics_df.round(2)  # Округляем до 2 знаков после запятой
+    
+    # Добавляем столбец сортировки и сортируем по F1-score
+    metrics_df = metrics_df.sort_values('F1-score', ascending=False)
+    
+    # Отображаем метрики с заголовком
+    display(HTML("<h2 style='color:#2c3e50;'>Сводка метрик (в %)</h2>"))
+    display(HTML(metrics_df.to_html(classes='table table-striped table-hover')))
+    
+    return metrics_df
+
+def create_interactive_image_metrics_chart(error_df: pd.DataFrame, method_name: str, n: int = 10) -> go.Figure:
+    worst_images = error_df.nsmallest(n, 'f1_score')
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=worst_images['image'],
+        y=worst_images['f1_score'],
+        name='F1 Score',
+        marker_color='#5DA5DA',
+        hovertemplate='<b>%{x}</b><br>F1: %{y:.3f}<extra></extra>'
+    ))
+    fig.add_trace(go.Bar(
+        x=worst_images['image'],
+        y=worst_images['precision'],
+        name='Precision',
+        marker_color='#FAA43A',
+        hovertemplate='<b>%{x}</b><br>Precision: %{y:.3f}<extra></extra>'
+    ))
+    fig.add_trace(go.Bar(
+        x=worst_images['image'],
+        y=worst_images['recall'],
+        name='Recall',
+        marker_color='#60BD68',
+        hovertemplate='<b>%{x}</b><br>Recall: %{y:.3f}<extra></extra>'
+    ))
+    
+    fig.update_layout(
+        title=f'Худшие {n} изображений: {method_name}',
+        xaxis_title='Изображение',
+        yaxis_title='Значение метрики',
+        barmode='group',
+        height=500,
+        hovermode='x unified',
+        updatemenus=[
+            dict(
+                type="buttons",
+                direction="right",
+                buttons=list([
+                    dict(args=[{"visible": [True, False, False]}], label="F1 Score", method="update"),
+                    dict(args=[{"visible": [False, True, False]}], label="Precision", method="update"),
+                    dict(args=[{"visible": [False, False, True]}], label="Recall", method="update"),
+                    dict(args=[{"visible": [True, True, True]}], label="All Metrics", method="update")
+                ]),
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.1,
+                xanchor="left",
+                y=1.1,
+                yanchor="top"
+            ),
+        ]
+    )
+    
+    for i, row in worst_images.iterrows():
+        fig.add_trace(go.Scatter(
+            x=[row['image']],
+            y=[row['f1_score']],
+            mode='markers',
+            marker=dict(size=0),
+            hoverinfo='text',
+            hovertext=f"""
+            <b>Изображение:</b> {row['image']}<br>
+            <b>F1 Score:</b> {row['f1_score']:.3f}<br>
+            <b>Precision:</b> {row['precision']:.3f}<br>
+            <b>Recall:</b> {row['recall']:.3f}<br>
+            <b>Правильные теги:</b> {wrap_text(row['correct_tags'], width=50)}<br>
+            <b>Ложноположительные теги:</b> {wrap_text(row['false_positives'], width=50)}<br>
+            <b>Ложноотрицательные теги:</b> {wrap_text(row['false_negatives'], width=50)}
+            """,
+            showlegend=False
+        ))
+    
+    return fig
+
+def create_interactive_tag_metrics_chart(tag_df: pd.DataFrame, method_name: str, n: int = 20) -> go.Figure:
+    """Создает интерактивный график с метриками для тегов с использованием Plotly."""
+    # Фильтруем теги, которые встречаются хотя бы 3 раза
+    filtered_df = tag_df[tag_df['total_ground_truth'] >= 3]
+    
+    # Получаем n худших тегов
+    worst_tags = filtered_df.nsmallest(n, 'f1_score')
+    
+    # Создаем фигуру с тремя метриками
+    fig = go.Figure()
+    
+    # Добавляем столбцы для каждой метрики
+    fig.add_trace(go.Bar(
+        y=worst_tags['tag'],
+        x=worst_tags['f1_score'],
+        name='F1 Score',
+        marker_color='#5DA5DA',
+        orientation='h',
+        hovertemplate='<b>%{y}</b><br>F1: %{x:.3f}<extra></extra>'
+    ))
+    
+    fig.add_trace(go.Bar(
+        y=worst_tags['tag'],
+        x=worst_tags['precision'],
+        name='Precision',
+        marker_color='#FAA43A',
+        orientation='h',
+        hovertemplate='<b>%{y}</b><br>Precision: %{x:.3f}<extra></extra>'
+    ))
+    
+    fig.add_trace(go.Bar(
+        y=worst_tags['tag'],
+        x=worst_tags['recall'],
+        name='Recall',
+        marker_color='#60BD68',
+        orientation='h',
+        hovertemplate='<b>%{y}</b><br>Recall: %{x:.3f}<extra></extra>'
+    ))
+    
+    # Настраиваем макет графика
+    fig.update_layout(
+        title=f'Худшие {n} тегов: {method_name} (мин. 3 вхождения)',
+        xaxis_title='Значение метрики',
+        yaxis_title='Тег',
+        barmode='group',
+        height=max(500, n*25),  # Динамическая высота в зависимости от количества тегов
+        hovermode='y unified'
+    )
+    
+    # Добавляем переключатель для метрик
+    fig.update_layout(
+        updatemenus=[
+            dict(
+                type="buttons",
+                direction="right",
+                buttons=list([
+                    dict(
+                        args=[{"visible": [True, False, False]}],
+                        label="F1 Score",
+                        method="update"
+                    ),
+                    dict(
+                        args=[{"visible": [False, True, False]}],
+                        label="Precision",
+                        method="update"
+                    ),
+                    dict(
+                        args=[{"visible": [False, False, True]}],
+                        label="Recall",
+                        method="update"
+                    ),
+                    dict(
+                        args=[{"visible": [True, True, True]}],
+                        label="All Metrics",
+                        method="update"
+                    )
+                ]),
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.1,
+                xanchor="left",
+                y=1.1,
+                yanchor="top"
+            ),
+        ]
+    )
+    
+    # Добавляем подсказки при наведении
+    for i, row in worst_tags.iterrows():
+        fig.add_trace(go.Scatter(
+            y=[row['tag']],
+            x=[row['f1_score']],
+            mode='markers',
+            marker=dict(size=0),
+            hoverinfo='text',
+            hovertext=f"""
+            <b>Тег:</b> {row['tag']}<br>
+            <b>F1 Score:</b> {row['f1_score']:.3f}<br>
+            <b>Precision:</b> {row['precision']:.3f}<br>
+            <b>Recall:</b> {row['recall']:.3f}<br>
+            <b>True Positives:</b> {row['true_positives']}<br>
+            <b>False Positives:</b> {row['false_positives']}<br>
+            <b>False Negatives:</b> {row['false_negatives']}<br>
+            <b>Всего в Ground Truth:</b> {row['total_ground_truth']}<br>
+            <b>Всего предсказано:</b> {row['total_predicted']}
+            """,
+            showlegend=False
+        ))
+    
+    return fig
+
+def display_tags_inline(tags_string):
+    """Отображает теги в строку без переносов на новую строку."""
+    if not tags_string:
+        return "Нет"
+    return tags_string
+
+def display_worst_performing_images(error_df: pd.DataFrame, method_name: str, n: int = 5) -> None:
+    """Отображает детальную информацию о худших изображениях в формате HTML таблицы."""
+    worst_images = error_df.nsmallest(n, 'f1_score')
+    
+    # Форматируем теги для вывода в строку
+    formatted_df = worst_images.copy()
+    
+    # Создаем HTML таблицу с метриками для каждого изображения
+    display(HTML(f"<h3 style='color:#2c3e50;'>Худшие {n} изображений: {method_name}</h3>"))
+    
+    # Выбираем и переименовываем колонки для отображения
+    display_cols = {
+        'image': 'Изображение', 
+        'f1_score': 'F1', 
+        'precision': 'Precision', 
+        'recall': 'Recall',
+        'num_false_positives': 'Кол-во FP', 
+        'num_false_negatives': 'Кол-во FN'
+    }
+    
+    metrics_df = formatted_df[display_cols.keys()].rename(columns=display_cols)
+    metrics_df[['F1', 'Precision', 'Recall']] = metrics_df[['F1', 'Precision', 'Recall']].map(lambda x: f"{x:.2f}")
+    
+    display(HTML(metrics_df.to_html(classes='table table-striped table-hover', index=False)))
+    
+    # Для каждого изображения создаем таблицу с тегами, но не разбиваем их на строки
+    for idx, row in formatted_df.iterrows():
+        display(HTML(f"<h4 style='color:#2c3e50;'>Изображение: {row['image']}</h4>"))
+        
+        # Создаем таблицу для тегов
+        tags_data = [
+            {"Категория": "Правильные теги", "Теги": display_tags_inline(row['correct_tags'])},
+            {"Категория": "Ложноположительные теги", "Теги": display_tags_inline(row['false_positives'])},
+            {"Категория": "Ложноотрицательные теги", "Теги": display_tags_inline(row['false_negatives'])}
+        ]
+        tags_df = pd.DataFrame(tags_data)
+        
+        # Задаем стиль для таблицы, чтобы теги не переносились
+        display(HTML("""
+        <style>
+        .tag-table td {
+            white-space: nowrap;
+            overflow: auto;
+            max-width: 500px;
+        }
+        </style>
+        """))
+        
+        display(HTML(tags_df.to_html(classes='table table-striped tag-table', index=False)))
+
+def wrap_text(text: str, width: int = 50) -> str:
+    import textwrap
+    return "<br>".join(textwrap.wrap(text, width=width))
+    
+
+def display_worst_performing_tags(tag_df: pd.DataFrame, method_name: str, n: int = 5) -> None:
+    """Отображает детальную информацию о худших тегах в формате HTML таблицы."""
+    # Фильтруем теги, которые встречаются хотя бы 3 раза
+    filtered_df = tag_df[tag_df['total_ground_truth'] >= 3]
+    worst_tags = filtered_df.nsmallest(n, 'f1_score')
+    
+    # Создаем HTML таблицу
+    display(HTML(f"<h3 style='color:#2c3e50;'>Худшие {n} тегов: {method_name} (мин. 3 вхождения)</h3>"))
+    
+    # Выбираем и переименовываем колонки для отображения
+    display_cols = {
+        'tag': 'Тег', 
+        'f1_score': 'F1', 
+        'precision': 'Precision', 
+        'recall': 'Recall',
+        'true_positives': 'TP', 
+        'false_positives': 'FP', 
+        'false_negatives': 'FN',
+        'total_ground_truth': 'Всего в GT', 
+        'total_predicted': 'Всего предсказано'
+    }
+    
+    display_df = worst_tags[display_cols.keys()].rename(columns=display_cols)
+    display_df[['F1', 'Precision', 'Recall']] = display_df[['F1', 'Precision', 'Recall']].map(lambda x: f"{x:.2f}")
+    
+    display(HTML(display_df.to_html(classes='table table-striped table-hover', index=False)))
+
+def create_combined_metrics_chart(metrics: Dict[str, Dict[str, float]]) -> go.Figure:
+    """Создает единый интерактивный график для сравнения метрик обоих методов."""
+    # Подготавливаем данные для графика
+    methods = list(metrics.keys())
+    metric_types = list(metrics[methods[0]].keys())
+    
+    fig = go.Figure()
+    
+    for metric in metric_types:
+        fig.add_trace(go.Bar(
+            x=methods,
+            y=[metrics[method][metric] * 100 for method in methods],  # переводим в проценты
+            name=metric,
+            marker_color={'Precision': '#FAA43A', 'Recall': '#60BD68', 'F1-score': '#5DA5DA'}[metric],
+            hovertemplate='<b>%{x}</b><br>%{y:.2f}%<extra></extra>'
+        ))
+    
+    fig.update_layout(
+        title='Сравнение методов тегирования',
+        xaxis_title='Метод',
+        yaxis_title='Значение (%)',
+        barmode='group',
+        height=500,
+        hovermode='x unified',
+        updatemenus=[
+            dict(
+                type="buttons",
+                direction="right",
+                buttons=list([
+                    dict(args=[{"visible": [True, False, False]}], label="Precision", method="update"),
+                    dict(args=[{"visible": [False, True, False]}], label="Recall", method="update"),
+                    dict(args=[{"visible": [False, False, True]}], label="F1 Score", method="update"),
+                    dict(args=[{"visible": [True, True, True]}], label="All Metrics", method="update")
+                ]),
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.1,
+                xanchor="left",
+                y=1.1,
+                yanchor="top"
+            ),
+        ]
+    )
+    
+    return fig
+
+def create_combined_image_metrics_chart(error_dfs: Dict[str, pd.DataFrame], n: int = 10) -> go.Figure:
+    """Создает единый интерактивный график для сравнения метрик изображений с возможностью переключения между методами."""
+    fig = go.Figure()
+    
+    # Получаем худшие изображения для каждого метода
+    methods = list(error_dfs.keys())
+    
+    # Добавляем следы для каждого метода
+    for method in methods:
+        worst_images = error_dfs[method].nsmallest(n, 'f1_score')
+        
+        # Добавляем F1 Score
+        fig.add_trace(go.Bar(
+            x=worst_images['image'],
+            y=worst_images['f1_score'],
+            name=f'F1 Score ({method})',
+            marker_color='#5DA5DA',
+            visible=(method == methods[0]),  # первый метод видимый по умолчанию
+            hovertemplate='<b>%{x}</b><br>F1: %{y:.3f}<extra></extra>'
+        ))
+        
+        # Добавляем Precision
+        fig.add_trace(go.Bar(
+            x=worst_images['image'],
+            y=worst_images['precision'],
+            name=f'Precision ({method})',
+            marker_color='#FAA43A',
+            visible=False,  # скрыты по умолчанию
+            hovertemplate='<b>%{x}</b><br>Precision: %{y:.3f}<extra></extra>'
+        ))
+        
+        # Добавляем Recall
+        fig.add_trace(go.Bar(
+            x=worst_images['image'],
+            y=worst_images['recall'],
+            name=f'Recall ({method})',
+            marker_color='#60BD68',
+            visible=False,  # скрыты по умолчанию
+            hovertemplate='<b>%{x}</b><br>Recall: %{y:.3f}<extra></extra>'
+        ))
+        
+        # Добавляем подсказки при наведении
+        for i, row in worst_images.iterrows():
+            fig.add_trace(go.Scatter(
+                x=[row['image']],
+                y=[row['f1_score']],
+                mode='markers',
+                marker=dict(size=0),
+                hoverinfo='text',
+                visible=(method == methods[0]),  # первый метод видимый по умолчанию
+                hovertext=f"""
+                <b>Изображение:</b> {row['image']}<br>
+                <b>Метод:</b> {method}<br>
+                <b>F1 Score:</b> {row['f1_score']:.3f}<br>
+                <b>Precision:</b> {row['precision']:.3f}<br>
+                <b>Recall:</b> {row['recall']:.3f}<br>
+                <b>Правильные теги:</b> {wrap_text(row['correct_tags'], width=50)}<br>
+                <b>Ложноположительные теги:</b> {wrap_text(row['false_positives'], width=50)}<br>
+                <b>Ложноотрицательные теги:</b> {wrap_text(row['false_negatives'], width=50)}
+                """,
+                showlegend=False
+            ))
+    
+    # Создаем кнопки для переключения между методами
+    method_buttons = []
+    for i, method in enumerate(methods):
+        # Вычисляем, какие следы должны быть видимыми для каждого метода
+        visibilities = []
+        for j in range(len(methods)):
+            # Для каждого метода у нас 4 следа (3 метрики + подсказки)
+            if j == i:
+                visibilities.extend([True, False, False] + [True] * len(error_dfs[method].nsmallest(n, 'f1_score')))
+            else:
+                visibilities.extend([False, False, False] + [False] * len(error_dfs[list(error_dfs.keys())[j]].nsmallest(n, 'f1_score')))
+        
+        method_buttons.append(
+            dict(args=[{"visible": visibilities}], label=method, method="update")
+        )
+    
+    # Создаем кнопки для переключения между метриками для активного метода
+    metric_buttons = []
+    
+    # F1 Score
+    f1_visibilities = []
+    for i, method in enumerate(methods):
+        # Для активного метода показываем только F1 Score
+        if i == 0:  # первый метод активен по умолчанию
+            f1_visibilities.extend([True, False, False] + [True] * len(error_dfs[method].nsmallest(n, 'f1_score')))
+        else:
+            f1_visibilities.extend([False, False, False] + [False] * len(error_dfs[method].nsmallest(n, 'f1_score')))
+    metric_buttons.append(dict(args=[{"visible": f1_visibilities}], label="F1 Score", method="update"))
+    
+    # Precision
+    prec_visibilities = []
+    for i, method in enumerate(methods):
+        if i == 0:  # первый метод активен по умолчанию
+            prec_visibilities.extend([False, True, False] + [True] * len(error_dfs[method].nsmallest(n, 'f1_score')))
+        else:
+            prec_visibilities.extend([False, False, False] + [False] * len(error_dfs[method].nsmallest(n, 'f1_score')))
+    metric_buttons.append(dict(args=[{"visible": prec_visibilities}], label="Precision", method="update"))
+    
+    # Recall
+    recall_visibilities = []
+    for i, method in enumerate(methods):
+        if i == 0:  # первый метод активен по умолчанию
+            recall_visibilities.extend([False, False, True] + [True] * len(error_dfs[method].nsmallest(n, 'f1_score')))
+        else:
+            recall_visibilities.extend([False, False, False] + [False] * len(error_dfs[method].nsmallest(n, 'f1_score')))
+    metric_buttons.append(dict(args=[{"visible": recall_visibilities}], label="Recall", method="update"))
+    
+    # All metrics
+    all_visibilities = []
+    for i, method in enumerate(methods):
+        if i == 0:  # первый метод активен по умолчанию
+            all_visibilities.extend([True, True, True] + [True] * len(error_dfs[method].nsmallest(n, 'f1_score')))
+        else:
+            all_visibilities.extend([False, False, False] + [False] * len(error_dfs[method].nsmallest(n, 'f1_score')))
+    metric_buttons.append(dict(args=[{"visible": all_visibilities}], label="All Metrics", method="update"))
+    
+    # Настраиваем макет
+    fig.update_layout(
+        title=f'Худшие {n} изображений по методам',
+        xaxis_title='Изображение',
+        yaxis_title='Значение метрики',
+        barmode='group',
+        height=500,
+        hovermode='x unified',
+        # Добавляем две группы кнопок
+        updatemenus=[
+            # Кнопки методов
+            dict(
+                type="buttons",
+                direction="right",
+                buttons=method_buttons,
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.1,
+                xanchor="left",
+                y=1.15,
+                yanchor="top"
+            ),
+            # Кнопки метрик
+            dict(
+                type="buttons",
+                direction="right",
+                buttons=metric_buttons,
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.5,
+                xanchor="left",
+                y=1.15,
+                yanchor="top"
+            ),
+        ],
+        annotations=[
+            dict(text="Выберите метод:", x=0.1, y=1.12, xref="paper", yref="paper",
+                 showarrow=False, font=dict(size=12)),
+            dict(text="Выберите метрику:", x=0.5, y=1.12, xref="paper", yref="paper",
+                 showarrow=False, font=dict(size=12))
+        ]
+    )
+    
+    return fig
+
+def create_combined_tag_metrics_chart(tag_dfs: Dict[str, pd.DataFrame], n: int = 20) -> go.Figure:
+    """Создает единый интерактивный график для сравнения метрик тегов с возможностью переключения между методами."""
+    fig = go.Figure()
+    
+    # Получаем методы
+    methods = list(tag_dfs.keys())
+    
+    # Для каждого метода
+    for method in methods:
+        # Фильтруем теги, которые встречаются хотя бы 3 раза
+        filtered_df = tag_dfs[method][tag_dfs[method]['total_ground_truth'] >= 3]
+        worst_tags = filtered_df.nsmallest(n, 'f1_score')
+        
+        # Добавляем F1 Score
+        fig.add_trace(go.Bar(
+            y=worst_tags['tag'],
+            x=worst_tags['f1_score'],
+            name=f'F1 Score ({method})',
+            marker_color='#5DA5DA',
+            orientation='h',
+            visible=(method == methods[0]),  # первый метод видимый по умолчанию
+            hovertemplate='<b>%{y}</b><br>F1: %{x:.3f}<extra></extra>'
+        ))
+        
+        # Добавляем Precision
+        fig.add_trace(go.Bar(
+            y=worst_tags['tag'],
+            x=worst_tags['precision'],
+            name=f'Precision ({method})',
+            marker_color='#FAA43A',
+            orientation='h',
+            visible=False,  # скрыты по умолчанию
+            hovertemplate='<b>%{y}</b><br>Precision: %{x:.3f}<extra></extra>'
+        ))
+        
+        # Добавляем Recall
+        fig.add_trace(go.Bar(
+            y=worst_tags['tag'],
+            x=worst_tags['recall'],
+            name=f'Recall ({method})',
+            marker_color='#60BD68',
+            orientation='h',
+            visible=False,  # скрыты по умолчанию
+            hovertemplate='<b>%{y}</b><br>Recall: %{x:.3f}<extra></extra>'
+        ))
+        
+        # Добавляем подсказки при наведении
+        for i, row in worst_tags.iterrows():
+            fig.add_trace(go.Scatter(
+                y=[row['tag']],
+                x=[row['f1_score']],
+                mode='markers',
+                marker=dict(size=0),
+                hoverinfo='text',
+                visible=(method == methods[0]),  # первый метод видимый по умолчанию
+                hovertext=f"""
+                <b>Тег:</b> {row['tag']}<br>
+                <b>Метод:</b> {method}<br>
+                <b>F1 Score:</b> {row['f1_score']:.3f}<br>
+                <b>Precision:</b> {row['precision']:.3f}<br>
+                <b>Recall:</b> {row['recall']:.3f}<br>
+                <b>True Positives:</b> {row['true_positives']}<br>
+                <b>False Positives:</b> {row['false_positives']}<br>
+                <b>False Negatives:</b> {row['false_negatives']}<br>
+                <b>Всего в Ground Truth:</b> {row['total_ground_truth']}<br>
+                <b>Всего предсказано:</b> {row['total_predicted']}
+                """,
+                showlegend=False
+            ))
+    
+    # Создаем кнопки для переключения между методами
+    method_buttons = []
+    for i, method in enumerate(methods):
+        filtered_df = tag_dfs[method][tag_dfs[method]['total_ground_truth'] >= 3]
+        worst_tags_count = len(filtered_df.nsmallest(n, 'f1_score'))
+        
+        # Вычисляем, какие следы должны быть видимыми для каждого метода
+        visibilities = []
+        for j, m in enumerate(methods):
+            filtered_df_j = tag_dfs[m][tag_dfs[m]['total_ground_truth'] >= 3]
+            worst_tags_count_j = len(filtered_df_j.nsmallest(n, 'f1_score'))
+            
+            # Для каждого метода у нас 4 следа (3 метрики + подсказки)
+            if j == i:
+                visibilities.extend([True, False, False] + [True] * worst_tags_count_j)
+            else:
+                visibilities.extend([False, False, False] + [False] * worst_tags_count_j)
+        
+        method_buttons.append(
+            dict(args=[{"visible": visibilities}], label=method, method="update")
+        )
+    
+    # Создаем кнопки для переключения между метриками для активного метода
+    metric_buttons = []
+    
+    # F1 Score (для первого метода по умолчанию)
+    f1_visibilities = []
+    for i, method in enumerate(methods):
+        filtered_df = tag_dfs[method][tag_dfs[method]['total_ground_truth'] >= 3]
+        worst_tags_count = len(filtered_df.nsmallest(n, 'f1_score'))
+        
+        if i == 0:  # первый метод активен по умолчанию
+            f1_visibilities.extend([True, False, False] + [True] * worst_tags_count)
+        else:
+            f1_visibilities.extend([False, False, False] + [False] * worst_tags_count)
+    
+    metric_buttons.append(dict(args=[{"visible": f1_visibilities}], label="F1 Score", method="update"))
+    
+    # Precision
+    prec_visibilities = []
+    for i, method in enumerate(methods):
+        filtered_df = tag_dfs[method][tag_dfs[method]['total_ground_truth'] >= 3]
+        worst_tags_count = len(filtered_df.nsmallest(n, 'f1_score'))
+        
+        if i == 0:  # первый метод активен по умолчанию
+            prec_visibilities.extend([False, True, False] + [True] * worst_tags_count)
+        else:
+            prec_visibilities.extend([False, False, False] + [False] * worst_tags_count)
+    
+    metric_buttons.append(dict(args=[{"visible": prec_visibilities}], label="Precision", method="update"))
+    
+    # Recall
+    recall_visibilities = []
+    for i, method in enumerate(methods):
+        filtered_df = tag_dfs[method][tag_dfs[method]['total_ground_truth'] >= 3]
+        worst_tags_count = len(filtered_df.nsmallest(n, 'f1_score'))
+        
+        if i == 0:  # первый метод активен по умолчанию
+            recall_visibilities.extend([False, False, True] + [True] * worst_tags_count)
+        else:
+            recall_visibilities.extend([False, False, False] + [False] * worst_tags_count)
+    
+    metric_buttons.append(dict(args=[{"visible": recall_visibilities}], label="Recall", method="update"))
+    
+    # All metrics
+    all_visibilities = []
+    for i, method in enumerate(methods):
+        filtered_df = tag_dfs[method][tag_dfs[method]['total_ground_truth'] >= 3]
+        worst_tags_count = len(filtered_df.nsmallest(n, 'f1_score'))
+        
+        if i == 0:  # первый метод активен по умолчанию
+            all_visibilities.extend([True, True, True] + [True] * worst_tags_count)
+        else:
+            all_visibilities.extend([False, False, False] + [False] * worst_tags_count)
+    
+    metric_buttons.append(dict(args=[{"visible": all_visibilities}], label="All Metrics", method="update"))
+    
+    # Настраиваем макет
+    fig.update_layout(
+        title=f'Худшие {n} тегов по методам (мин. 3 вхождения)',
+        xaxis_title='Значение метрики',
+        yaxis_title='Тег',
+        barmode='group',
+        height=max(500, n*25),  # Динамическая высота
+        hovermode='y unified',
+        # Добавляем две группы кнопок
+        updatemenus=[
+            # Кнопки методов
+            dict(
+                type="buttons",
+                direction="right",
+                buttons=method_buttons,
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.1,
+                xanchor="left",
+                y=1.05,
+                yanchor="top"
+            ),
+            # Кнопки метрик
+            dict(
+                type="buttons",
+                direction="right",
+                buttons=metric_buttons,
+                pad={"r": 10, "t": 10},
+                showactive=True,
+                x=0.5,
+                xanchor="left",
+                y=1.05,
+                yanchor="top"
+            ),
+        ],
+        annotations=[
+            dict(text="Выберите метод:", x=0.1, y=1.03, xref="paper", yref="paper",
+                 showarrow=False, font=dict(size=12)),
+            dict(text="Выберите метрику:", x=0.5, y=1.03, xref="paper", yref="paper",
+                 showarrow=False, font=dict(size=12))
+        ]
+    )
+    
+    return fig
+
+def compare_tagging_methods(
+    image_folder: str, 
+    txt_folder: str,
+    results: Tuple,
+    model_labels_path: str,
+    filter_tags: bool = True,
+    num_worst_examples: int = 5,
+    visualize: bool = True,
+    interactive: bool = True
+) -> Tuple[Dict[str, Dict[str, float]], Dict[str, pd.DataFrame], Dict[str, pd.DataFrame]]:
+    """
+    Сравнивает методы тегирования: полное изображение vs объединенные теги.
+    
+    Args:
+        image_folder (str): Путь к папке с изображениями
+        txt_folder (str): Путь к папке с txt файлами ground truth
+        results (tuple): Результаты BatchTagging
+        model_labels_path (str): Путь к CSV файлу с тегами модели
+        filter_tags (bool): Фильтровать теги по известным модели
+        num_worst_examples (int): Количество худших примеров для вывода
+        visualize (bool): Выполнять ли визуализацию результатов
+        interactive (bool): Использовать ли интерактивные графики Plotly
+    
+    Returns:
+        Tuple содержащий:
+        - Словарь с общими метриками для каждого метода
+        - Словарь с DataFrame ошибок для каждого метода
+        - Словарь с DataFrame производительности тегов для каждого метода
+    """
+    # Загружаем ground truth теги
+    ground_truth = load_ground_truth_tags(txt_folder)
+    
+    # Загружаем теги для полного изображения и объединенные теги
+    full_image_tags = load_model_tags(results, use_merged=False)
+    merged_tags = load_model_tags(results, use_merged=True)
+    
+    if filter_tags:
+        ground_truth = {
+            img: filter_known_tags(tags, model_labels_path) 
+            for img, tags in ground_truth.items()
+        }
+        full_image_tags = {
+            img: filter_known_tags(tags, model_labels_path) 
+            for img, tags in full_image_tags.items()
+        }
+        merged_tags = {
+            img: filter_known_tags(tags, model_labels_path) 
+            for img, tags in merged_tags.items()
+        }
+    
+    # Подготавливаем словари для хранения результатов
+    metrics = {}
+    error_dfs = {}
+    tag_perf_dfs = {}
+    
+    # Начинаем анализ
+    display(HTML("<h1 style='color:#1a5276;'>Сравнение методов тегирования</h1>"))
+    
+    # Обрабатываем метод полного изображения
+    full_image_metrics = calculate_tag_metrics(ground_truth, full_image_tags)
+    metrics["Полное изображение"] = full_image_metrics
+    
+    # Обрабатываем метод объединенных тегов
+    merged_metrics = calculate_tag_metrics(ground_truth, merged_tags)
+    metrics["Объединенные теги"] = merged_metrics
+    
+    # Отображаем сводку метрик
+    metrics_df = display_metrics_summary(metrics)
+    
+    # Анализ ошибок для обоих методов
+    full_image_errors = analyze_tagging_errors(
+        ground_truth, 
+        full_image_tags,
+        "full_image_errors.csv"
+    )
+    error_dfs["Полное изображение"] = full_image_errors
+    
+    merged_tags_errors = analyze_tagging_errors(
+        ground_truth, 
+        merged_tags,
+        "merged_tags_errors.csv"
+    )
+    error_dfs["Объединенные теги"] = merged_tags_errors
+    
+    # Анализ производительности тегов для обоих методов
+    full_image_tag_perf = analyze_tag_performance(
+        ground_truth, 
+        full_image_tags,
+        "full_image_tag_performance.csv"
+    )
+    tag_perf_dfs["Полное изображение"] = full_image_tag_perf
+    
+    merged_tags_tag_perf = analyze_tag_performance(
+        ground_truth, 
+        merged_tags,
+        "merged_tags_tag_performance.csv"
+    )
+    tag_perf_dfs["Объединенные теги"] = merged_tags_tag_perf
+    
+    # Выводим информацию о методах по отдельности
+    display(HTML("<h2 style='color:#1a5276;'>Подробный анализ метода полного изображения</h2>"))
+    display_worst_performing_images(full_image_errors, "Метод полного изображения", num_worst_examples)
+    display_worst_performing_tags(full_image_tag_perf, "Метод полного изображения", num_worst_examples)
+    
+    display(HTML("<h2 style='color:#1a5276;'>Подробный анализ метода объединенных тегов</h2>"))
+    display_worst_performing_images(merged_tags_errors, "Метод объединенных тегов", num_worst_examples)
+    display_worst_performing_tags(merged_tags_tag_perf, "Метод объединенных тегов", num_worst_examples)
+    
+    # Визуализация с комбинированными графиками
+    if visualize and interactive:
+        display(HTML("<h2 style='color:#1a5276;'>Интерактивные графики для сравнения методов</h2>"))
+        
+        # 1. Общий график сравнения метрик обоих методов
+        fig_metrics = create_combined_metrics_chart(metrics)
+        display(HTML("<h3 style='color:#2c3e50;'>Сравнение общих метрик</h3>"))
+        fig_metrics.show()
+        
+        # 2. Комбинированный график для изображений
+        fig_images = create_combined_image_metrics_chart(error_dfs, num_worst_examples)
+        display(HTML("<h3 style='color:#2c3e50;'>Сравнение по худшим изображениям</h3>"))
+        fig_images.show()
+        
+        # 3. Комбинированный график для тегов
+        fig_tags = create_combined_tag_metrics_chart(tag_perf_dfs, 20)  # показываем больше тегов в комбинированном графике
+        display(HTML("<h3 style='color:#2c3e50;'>Сравнение по худшим тегам</h3>"))
+        fig_tags.show()
+    
+    return metrics, error_dfs, tag_perf_dfs

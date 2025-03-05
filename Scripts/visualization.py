@@ -133,11 +133,6 @@ def view_image_results(results, image_index, visualize=True, save_visualization=
     
     image_path = image_result["image_path"]
 
-    if verbose==True:
-        # Выводим информацию
-        print(f"Информация о изображении #{image_index + 1}: {image_path}")
-        print("\nОбъединенные теги:")
-        print(merged_result["merged_tags"]["taglist"])
     
     # Визуализируем результаты детекции, если требуется
     if visualize:
@@ -146,6 +141,27 @@ def view_image_results(results, image_index, visualize=True, save_visualization=
             output_path = os.path.splitext(image_path)[0] + "_detection.jpg"
         
         visualize_detection_results(image_path, image_result, output_path)
+
+    if verbose == True:
+        # Выводим основную информацию
+        print(f"Информация о изображении #{image_index + 1}: {image_path}")
+        
+        print("\nОбъединенные теги:")
+        print(merged_result["merged_tags"]["taglist"])
+        print()
+        print("Теги без включения yolo моделей:")
+        print(image_result["full_image"]["taglist"])
+        
+        # Преобразуем строки тегов в списки, убирая лишние пробелы
+        merged_tags = [tag.strip() for tag in merged_result["merged_tags"]["taglist"].split(',')]
+        yolo_excluded_tags = [tag.strip() for tag in image_result["full_image"]["taglist"].split(',')]
+        
+        # Вычисляем разницу: теги, присутствующие в объединённых, но отсутствующие в yolo
+        diff_tags = set(merged_tags) - set(yolo_excluded_tags)
+        
+        print("\nРазница тегов (присутствуют в объединенных, но отсутствуют в тегах без yolo):")
+        print(', '.join(sorted(diff_tags)))
+
     """
     return {
         "original_result": image_result,
