@@ -27,7 +27,25 @@ def merge_tags_from_regions(image_result: Dict, detectors: List[DetectorConfig])
     # Глобальный список запрещённых тегов
     # Удаляет теги которые появились в обнаруженой области если они есть
     #Для артефактов приближения определяя данные теги из полного изображения
-    GLOBAL_EXCLUDED_REGION_TAGS = {"close-up", "cowboy_shot", "portrait", "upper_body", "full_body", "eye_focus", "1girl", "2girls", "3girls", "4girls", "5girls", "6+girls", "solo", "solo_focus", "1boy", "2boys", "3boys", "4boys", "5boys", "6+boys", "male_focus", "other_focus",  "1other", "2others", "3others", "4others", "5others", "6+others", "ass_focus",  "animal_focus", "foot_focus", "text_focus", " hip_focus", " vehicle_focus", "food_focus", "mecha_focus", "pokemon_focus", "reflection_focus",  "breast_focus", "back_focus", "hand_focus", "object_focus", "crotch_focus", "pectoral_focus", "weapon_focus", "armpit_focus", "monster_focus", "pussy_focus", "creature_focus", "flower_focus", "hair_focus", "footwear_focus", "navel_focus", "sky_focus", "plant_focus", "thigh_focus", "mouth_focus", "leg_focus", "ear_focus", "kanji_focus", "neck_focus", "penis_focus"}
+    GLOBAL_EXCLUDED_REGION_TAGS = {"close-up", "cowboy_shot", "portrait", "upper_body", "full_body", "eye_focus", "1girl", "2girls", "3girls", "4girls", "5girls", "6+girls", "solo", "solo_focus", "1boy",
+    "2boys", "3boys", "4boys", "5boys", "6+boys", "male_focus", "other_focus",  "1other", "2others",
+    "3others","4others", "5others", "6+others", "ass_focus",  "animal_focus", "foot_focus", "text_focus",
+    "hip_focus", "vehicle_focus", "food_focus", "mecha_focus", "pokemon_focus", "reflection_focus", 
+    "breast_focus", "back_focus", "hand_focus", "object_focus", "crotch_focus", "pectoral_focus",
+    "weapon_focus","armpit_focus", "monster_focus", "pussy_focus", "creature_focus", "flower_focus", 
+    "hair_focus","footwear_focus", "navel_focus", "sky_focus", "plant_focus", "thigh_focus", "mouth_focus", 
+    "leg_focus",
+    "ear_focus", "kanji_focus", "neck_focus", "penis_focus", "simple_background", "white_background",
+    "blue_background", "aqua_background", "black_background", "brown_background", "green_background", 
+    "grey_background", "orange_background", "pink_background", "purple_background", "red_background",
+    "colorful_background", "gradient_background", "halftone_background", "monochrome_background", 
+     "rainbow_background", "heaven_condition", "two-tone_background", "argyle_background",
+     "checkered_background", "cross_background", "dithered_background", "sky", "blue_sky", "night", 
+     "night_sky", "dotted_background", "grid_background", "honeycomb_background", "lace_background",
+     "marble_background", "mosaic_background", "patterned_background", "plaid_background",
+     "polka_dot_background", "spiral_background", "splatter_background", "striped_background", 
+     "diagonal-striped_background", "sunburst_background", "triangle_background", "abstract_background", 
+     "blurry_background", "bright_background", "dark_background", "drama_layer"}
     
     # Инициализируем результирующие теги
     merged_general = {}
