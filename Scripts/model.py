@@ -24,19 +24,25 @@ def ensure_model_folder(folder_path: Path) -> Path:
 
 
 def download_model_files(repo_id: str, model_folder: Path) -> Dict[str, Path]:
-    """Загружает файлы модели в локальную папку."""
+    """Загружает файлы модели wd1.4 в локальную папку."""
     # Создаем подпапку для конкретной модели (например models/wd-vit-tagger-v3)
     model_name = repo_id.split('/')[-1]
     model_specific_folder = model_folder / model_name
     ensure_model_folder(model_specific_folder)
     
+    # Проверяем, есть ли уже safetensors
+    has_safetensors = (model_specific_folder / "model.safetensors").exists()
+    
     # Файлы, которые нужно загрузить
     files_to_download = [
-        "pytorch_model.bin",
         "config.json",
-        "model.safetensors",  # Если используется safetensors
         "selected_tags.csv",  # Для тегов
     ]
+    
+    # Добавляем pytorch_model.bin только если нет safetensors
+    if not has_safetensors:
+        files_to_download.append("pytorch_model.bin")
+        files_to_download.append("model.safetensors")  # Пробуем загрузить safetensors, если нет локально
     
     downloaded_files = {}
     for file in files_to_download:

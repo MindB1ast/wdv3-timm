@@ -248,8 +248,7 @@ $RECYCLE.BIN/
 # but keep examples
 !*.example
 
-# input images and heatmap outputs
-/images/
+#heatmap outputs
 /heatmaps/
 
 # Папки
@@ -259,3 +258,6 @@ $RECYCLE.BIN/
 
 # Файлы
 *.pt
+*.csv
+result.json
+results_merged.json
