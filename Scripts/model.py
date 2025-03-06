@@ -131,6 +131,8 @@ def load_labels_local_or_remote(repo_id: str, model_folder: Path) -> LabelData:
     
     return labels
 
+from huggingface_hub import hf_hub_download
+
 def load_yolo_model(model_path: str, yolo_model_dir: Path) -> YOLO:
     """
     Loads a YOLO model from a specified path, prioritizing custom models.
@@ -162,12 +164,25 @@ def load_yolo_model(model_path: str, yolo_model_dir: Path) -> YOLO:
                 print(f"Loading YOLO model from local directory: {potential_path}")
                 return YOLO(str(potential_path))
     
-    # If not found locally, try downloading only if it's a standard model
+    # If not found locally, try downloading depending on the model source
     standard_models = ['yolov8n', 'yolov8s', 'yolov8m', 'yolov8l', 'yolov8x',
                      'yolov5n', 'yolov5s', 'yolov5m', 'yolov5l', 'yolov5x']
     
+    # Словарь известных моделей и их URL
+    known_models = {
+        # Модели YOLOv8-face
+        "hand_yolov9c.pt": "https://huggingface.co/Bingsu/adetailer/resolve/main/hand_yolov9c.pt",
+        "face_yolov9c.pt": "https://huggingface.co/Bingsu/adetailer/resolve/main/face_yolov9c.pt",
+        "person_yolov8m-seg.pt": "https://huggingface.co/Bingsu/adetailer/resolve/main/person_yolov8m-seg.pt",
+        #"face_yolov8l.pt": "https://huggingface.co/Bingsu/adetailer/resolve/main/face_yolov8l.pt",
+        # Другие известные модели
+       # "hand_yolov8s.pt": "https://huggingface.co/Bingsu/adetailer/resolve/main/hand_yolov8s.pt",
+        # Можно добавить и другие модели
+    }
+    
+    # Check if it's a standard model (from ultralytics)
     if any(model_path.startswith(model) for model in standard_models):
-        print(f"Model {model_path} not found locally. Attempting to download...")
+        print(f"Standard model {model_path} not found locally. Attempting to download...")
         try:
             # Try to load the model from the cloud (ultralytics)
             model = YOLO(model_path)
@@ -177,9 +192,53 @@ def load_yolo_model(model_path: str, yolo_model_dir: Path) -> YOLO:
             print(f"Model saved to {save_path}")
             return model
         except Exception as e:
-            print(f"Error loading YOLO model {model_path}: {e}")
-    else:
-        print(f"Custom model {model_path} not found in {yolo_model_dir}")
-        print("Please ensure your custom model is placed in the specified directory.")
+            print(f"Error loading standard YOLO model {model_path}: {e}")
     
-    raise FileNotFoundError(f"Could not find or download model: {model_path}")
+    # Проверяем, есть ли модель в нашем словаре известных моделей
+    elif model_path in known_models:
+        import requests
+        
+        print(f"Downloading {model_path} from known source...")
+        save_path = yolo_model_dir / model_path
+        
+        try:
+            response = requests.get(known_models[model_path], stream=True)
+            response.raise_for_status()
+            
+            with open(save_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            
+            print(f"Model saved to {save_path}")
+            return YOLO(str(save_path))
+        except Exception as e:
+            print(f"Error downloading known model {model_path}: {e}")
+    
+    # Для моделей Hugging Face со специфическим форматом ('repo_id/filename')
+    elif '/' in model_path:
+        try:
+            # Разбираем путь на репозиторий и имя файла
+            parts = model_path.split('/')
+            repo_id = '/'.join(parts[:-1])  # все, кроме последней части
+            filename = parts[-1]            # последняя часть
+            
+            print(f"Attempting to download model from Hugging Face: repo={repo_id}, file={filename}")
+            
+            # Создаем директорию для сохранения
+            ensure_model_folder(yolo_model_dir)
+            
+            # Загружаем модель из Hugging Face
+            downloaded_file = hf_hub_download(
+                repo_id=repo_id,
+                filename=filename,
+                local_dir=str(yolo_model_dir),
+                local_files_only=False
+            )
+            
+            print(f"Model downloaded to {downloaded_file}")
+            return YOLO(downloaded_file)
+        except Exception as e:
+            print(f"Error downloading model from Hugging Face {model_path}: {e}")
+    
+    raise FileNotFoundError(f"Could not find or download model: {model_path}. "
+                           f"Please place the model file manually in {yolo_model_dir}")

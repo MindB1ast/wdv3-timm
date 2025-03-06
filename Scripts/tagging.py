@@ -62,7 +62,7 @@ def process_image_with_multiple_detectors(
     transform: Callable, 
     labels: LabelData,
     detectors: List[DetectorConfig],
-    yolo_models: Dict[str, YOLO],
+    yolo_models: Dict[str, YOLO], 
     gen_threshold: float,  # Из ScriptOptions
     char_threshold: float,  # Из ScriptOptions
     torch_device: torch.device

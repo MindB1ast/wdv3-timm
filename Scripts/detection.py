@@ -7,6 +7,8 @@ from PIL import Image
 from ultralytics import YOLO
 from .configs import DetectorConfig
 
+
+
 def load_detectors_config(config_path: str) -> List[DetectorConfig]:
     if not os.path.exists(config_path):
         print(f"Файл конфигурации детекторов не найден: {config_path}")
