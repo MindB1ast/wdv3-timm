@@ -1,84 +1,123 @@
-# wdv3-timm
+# WD Tagger with Region Detection
 
-small example thing showing how to use `timm` to run the WD Tagger V3 models.
+## Overview
 
-## How To Use
+This project is an image tagging tool that enhances tag accuracy by using region detection techniques. It's designed to improve tagging for machine learning models, based on Waifu Diffusion (WD) models, by addressing limitations in latent space resolution.
 
-1. clone the repository and enter the directory:
-```sh
-git clone https://github.com/neggles/wdv3-timm.git
-cd wd3-timm
+## Key Features
+
+- Support for multiple pre-trained models:
+  - ViT 
+  - SwinV2
+  - ConvNeXT
+  - EVA02 Large
+
+- Flexible region detection with YOLO models
+- Customizable tag thresholds
+- Ability to add or remove tags for specific regions
+- Batch processing
+- Optional text file output for tags
+- Solves the problem with wrong tags caused by detection (for example tags close-up, portrait when using face detection)
+
+## Installation
+
+```bash
+git clone https://github.com/MindB1ast/wdv3-timm.git
+cd wdv3-timm
 ```
 
-2. Create a virtual environment and install the Python requirements.
+### Install Dependencies
 
-If you're using Linux, you can use the provided script:
-```sh
-bash setup.sh
+```bash
+pip install -r requirements.txt
 ```
 
-Or if you're on Windows (or just want to do it manually), you can do the following:
-```sh
-# Create virtual environment
-python3.10 -m venv .venv
-# Activate it
-source .venv/bin/activate
-# Upgrade pip/setuptools/wheel
-python -m pip install -U pip setuptools wheel
-# At this point, optionally you can install PyTorch manually (e.g. if you are not using an nVidia GPU)
-python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-# Install requirements
-python -m pip install -r requirements.txt
+## Usage
+Usage example in BatchWork.ipynb
+
+### Basic Example
+
+```python
+from Scripts import ScriptOptions, BatchTagging
+
+params = ScriptOptions(
+    ImageFolder="./TestPic/",
+    model='big',  # Options: convnext, swinv2, big, vit
+    gen_threshold=0.35,  # Confidence for general tags (confidence when tagging full picture, for threshold when tagging detected area change config)
+    char_threshold=0.75,  
+    batch=2, 
+    recursive=False, 
+    save_txt=True,   
+    append_txt=True  
+)
+
+result = BatchTagging(params)
 ```
 
-3. Run the example script, picking one of the 3 models to use:
-```sh
-python wdv3_timm.py <swinv2|convnext|vit> path/to/image.png
+### Configuration Options 
+
+#### ScriptOptions Parameters
+
+- `ImageFolder`: Path to the directory containing images
+- `model`: Tagging model to use (vit, swinv2, convnext, big)
+- `gen_threshold`: Confidence threshold for general tags (default: 0.35)
+- `char_threshold`: Confidence threshold for character tags (default: 0.75)
+- `batch`: Number of images to process simultaneously
+- `recursive`: Process images in subdirectories
+- `save_txt`: Save tags to text files
+- `append_txt`: Append tags to existing text files
+
+### Custom Models and Detectors
+
+1. Place yours Yolo models in the `models/` directory
+2. Configure detectors in `detectors.json`
+
+#### Detector Configuration Example
+
+```json
+[
+  {
+    "name": "person_detector", 
+    "model_path": "person_yolov8s-seg.pt",
+    "confidence": 0.35,
+    "classes": [0],
+    "remove_tags_from_full": ["tag1", "tag2"],
+    "remove_tags_from_region": [],
+    "add_tags_to_region": {},
+    "exclude_from_region": [],
+    "region_gen_threshold": 0.25,
+    "region_char_threshold": 0.8
+  }
+]
 ```
 
-Example output from `python wdv3_timm.py vit a_picture_of_ganyu.png`:
-```sh
-Loading model 'vit' from 'SmilingWolf/wd-vit-tagger-v3'...
-Loading tag list...
-Creating data transform...
-Loading image and preprocessing...
-Running inference...
-Processing results...
---------
-Caption: 1girl, horns, solo, bell, ahoge, colored_skin, blue_skin, neck_bell, looking_at_viewer, purple_eyes, upper_body, blonde_hair, long_hair, goat_horns, blue_hair, off_shoulder, sidelocks, bare_shoulders, alternate_costume, shirt, black_shirt, cowbell, ganyu_(genshin_impact)
---------
-Tags: 1girl, horns, solo, bell, ahoge, colored skin, blue skin, neck bell, looking at viewer, purple eyes, upper body, blonde hair, long hair, goat horns, blue hair, off shoulder, sidelocks, bare shoulders, alternate costume, shirt, black shirt, cowbell, ganyu \(genshin impact\)
---------
-Ratings:
-  general: 0.827
-  sensitive: 0.199
-  questionable: 0.001
-  explicit: 0.001
---------
-Character tags (threshold=0.75):
-  ganyu_(genshin_impact): 0.991
---------
-General tags (threshold=0.35):
-  1girl: 0.996
-  horns: 0.950
-  solo: 0.947
-  bell: 0.918
-  ahoge: 0.897
-  colored_skin: 0.881
-  blue_skin: 0.872
-  neck_bell: 0.854
-  looking_at_viewer: 0.817
-  purple_eyes: 0.734
-  upper_body: 0.615
-  blonde_hair: 0.609
-  long_hair: 0.607
-  goat_horns: 0.524
-  blue_hair: 0.496
-  off_shoulder: 0.472
-  sidelocks: 0.470
-  bare_shoulders: 0.464
-  alternate_costume: 0.437
-  shirt: 0.427
-  black_shirt: 0.417
-  cowbell: 0.415
+## Advanced Usage
+
+### Visualization
+
+You can use the `view_image_results()` function to visualize detection results:
+
+```python
+from Scripts.visualization import view_image_results
+
+view_image_results(result, image_index=0, visualize=True)
 ```
+
+![изображение](https://github.com/user-attachments/assets/a67ced19-8c70-4ed0-87da-100f5b5a0545)
+
+
+
+
+Сводка метрик (в %) для 12 изображений
+| Метод              | Precision | Recall  | F1-score |
+|--------------------|-----------|---------|----------|
+| Объединенные теги(c yolo) | 72.72     | 71.75   | 70.09    |
+| Полное изображение(без yolo) | 76.23     | 60.31   | 62.89    |
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
