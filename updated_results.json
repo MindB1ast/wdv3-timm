@@ -1,0 +1,157 @@
+[
+  {
+    "image_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestTagPic\\tag_managing4.jpg",
+    "merged_tags": {
+      "caption": "1girl, animal_nose, blonde_hair, bridge, chromatic_aberration, dress, from_side, furry, furry_female, hair_ribbon, long_hair, looking_at_viewer, mary_janes, no_mouth, orange_theme, pokemon_(creature), profile, red_dress, red_footwear, ribbon, shoes, sideways_mouth, sketch, slit_pupils, solo, standing, test1, test2, very_long_hair, white_hair, yellow_eyes",
+      "taglist": "1girl, animal nose, blonde hair, bridge, chromatic aberration, dress, from side, furry, furry female, hair ribbon, long hair, looking at viewer, mary janes, no mouth, orange theme, pokemon (creature), profile, red dress, red footwear, ribbon, shoes, sideways mouth, sketch, slit pupils, solo, standing, test1, test2, very long hair, white hair, yellow eyes",
+      "general": {
+        "profile": 0.8801091313362122,
+        "blonde_hair": 0.8314460515975952,
+        "yellow_eyes": 0.7645789980888367,
+        "pokemon_(creature)": 0.7165924906730652,
+        "slit_pupils": 0.6573228240013123,
+        "looking_at_viewer": 0.6076622009277344,
+        "sideways_mouth": 0.5859763622283936,
+        "from_side": 0.567729651927948,
+        "sketch": 0.5355974435806274,
+        "furry": 0.531568169593811,
+        "long_hair": 0.935384213924408,
+        "chromatic_aberration": 0.5161328911781311,
+        "furry_female": 0.47778570652008057,
+        "animal_nose": 0.4747970402240753,
+        "orange_theme": 0.4657214283943176,
+        "1girl": 0.9944683313369751,
+        "solo": 0.9517666101455688,
+        "dress": 0.7630000114440918,
+        "very_long_hair": 0.7242096066474915,
+        "shoes": 0.6578237414360046,
+        "red_dress": 0.6500886082649231,
+        "red_footwear": 0.5126639604568481,
+        "standing": 0.4825253188610077,
+        "white_hair": 0.4756130576133728,
+        "no_mouth": 0.4359194040298462,
+        "mary_janes": 0.4099798798561096,
+        "hair_ribbon": 0.39884451031684875,
+        "bridge": 0.39036092162132263,
+        "ribbon": 0.3771117031574249
+      },
+      "character": {},
+      "ratings": {
+        "general": 0.3914046585559845,
+        "sensitive": 0.6582909226417542,
+        "questionable": 0.0017009329749271274,
+        "explicit": 0.001091413083486259
+      }
+    },
+    "txt_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestTagPic\\tag_managing4.txt"
+  },
+  {
+    "image_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestTagPic\\tag_managing1.png",
+    "merged_tags": {
+      "caption": "1girl, blonde_hair, blush_stickers, computer, cup, explosion, fire, laptop, long_hair, mug, pointy_ears, smile, solo, t-shirt, test1, test2, yellow_eyes",
+      "taglist": "1girl, blonde hair, blush stickers, computer, cup, explosion, fire, laptop, long hair, mug, pointy ears, smile, solo, t-shirt, test1, test2, yellow eyes",
+      "general": {
+        "computer": 0.9762024283409119,
+        "blonde_hair": 0.9812909364700317,
+        "laptop": 0.9755668640136719,
+        "blush_stickers": 0.936081051826477,
+        "long_hair": 0.9438993334770203,
+        "cup": 0.8640246391296387,
+        "pointy_ears": 0.7671586871147156,
+        "smile": 0.6790281534194946,
+        "explosion": 0.7550747394561768,
+        "yellow_eyes": 0.5809350609779358,
+        "t-shirt": 0.5095243453979492,
+        "1girl": 0.9969363212585449,
+        "solo": 0.9727989435195923,
+        "mug": 0.467577189207077,
+        "fire": 0.404737263917923
+      },
+      "character": {},
+      "ratings": {
+        "general": 0.3501344621181488,
+        "sensitive": 0.681073784828186,
+        "questionable": 0.0022599126677960157,
+        "explicit": 0.0004477332695387304
+      }
+    },
+    "txt_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestTagPic\\tag_managing1.txt"
+  },
+  {
+    "image_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestTagPic\\tag_managing2.png",
+    "merged_tags": {
+      "caption": "1girl, blonde_hair, close-up, eye_focus, eye_reflection, eyelashes, looking_at_viewer, reflection, solo, symbol-shaped_pupils, test1, test2, yellow_eyes",
+      "taglist": "1girl, blonde hair, close-up, eye focus, eye reflection, eyelashes, looking at viewer, reflection, solo, symbol-shaped pupils, test1, test2, yellow eyes",
+      "general": {
+        "eye_reflection": 0.9769743084907532,
+        "yellow_eyes": 0.9279202818870544,
+        "reflection": 0.8862656354904175,
+        "blonde_hair": 0.8428143858909607,
+        "looking_at_viewer": 0.6178038716316223,
+        "eyelashes": 0.5421724915504456,
+        "eye_focus": 0.9993595480918884,
+        "close-up": 0.9191734790802002,
+        "solo": 0.827316164970398,
+        "1girl": 0.7606308460235596,
+        "symbol-shaped_pupils": 0.46444085240364075
+      },
+      "character": {},
+      "ratings": {
+        "general": 0.9913002848625183,
+        "sensitive": 0.01386147178709507,
+        "questionable": 0.0014618949498981237,
+        "explicit": 0.0017665866762399673
+      }
+    },
+    "txt_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestTagPic\\tag_managing2.txt"
+  },
+  {
+    "image_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestTagPic\\tag_managing3.png",
+    "merged_tags": {
+      "caption": "1girl, :d, blonde_hair, blush_stickers, bow, bowtie, dress, dual_wielding, fang, foreshortening, holding, holding_sword, holding_weapon, katana, long_hair, looking_at_viewer, open_mouth, oshino_shinobu, pointy_ears, red_bow, red_bowtie, skin_fang, sky, smile, solo, star_(sky), sword, test1, test2, very_long_hair, weapon, yellow_dress, yellow_eyes",
+      "taglist": "1girl, :d, blonde hair, blush stickers, bow, bowtie, dress, dual wielding, fang, foreshortening, holding, holding sword, holding weapon, katana, long hair, looking at viewer, open mouth, oshino shinobu, pointy ears, red bow, red bowtie, skin fang, sky, smile, solo, star (sky), sword, test1, test2, very long hair, weapon, yellow dress, yellow eyes",
+      "general": {
+        "sword": 0.9873265624046326,
+        "weapon": 0.985236406326294,
+        "long_hair": 0.9834712147712708,
+        "blush_stickers": 0.9795476198196411,
+        "blonde_hair": 0.9935061931610107,
+        "yellow_eyes": 0.9861885905265808,
+        "katana": 0.9058491587638855,
+        "dress": 0.8984330296516418,
+        "fang": 0.9645864367485046,
+        "holding": 0.8740806579589844,
+        "open_mouth": 0.9136950969696045,
+        "holding_sword": 0.8249411582946777,
+        "yellow_dress": 0.810354471206665,
+        "holding_weapon": 0.7408416867256165,
+        "looking_at_viewer": 0.7894499897956848,
+        "dual_wielding": 0.6402791738510132,
+        "bow": 0.8946607708930969,
+        "very_long_hair": 0.5635126829147339,
+        "foreshortening": 0.5480201244354248,
+        "star_(sky)": 0.45989367365837097,
+        "red_bow": 0.7632929682731628,
+        "pointy_ears": 0.7432562112808228,
+        "skin_fang": 0.7332663536071777,
+        "smile": 0.665660560131073,
+        "bowtie": 0.6304894685745239,
+        "red_bowtie": 0.5613830089569092,
+        ":d": 0.47914353013038635,
+        "1girl": 0.9987469911575317,
+        "solo": 0.9445748925209045,
+        "sky": 0.44008684158325195
+      },
+      "character": {
+        "oshino_shinobu": 0.9967249035835266
+      },
+      "ratings": {
+        "general": 0.35339441895484924,
+        "sensitive": 0.7408556342124939,
+        "questionable": 0.0008142797742038965,
+        "explicit": 0.0005281369667500257
+      }
+    },
+    "txt_path": "C:\\Users\\liali\\YoloWdTagger\\wdv3-timm\\TestTagPic\\tag_managing3.txt"
+  }
+]

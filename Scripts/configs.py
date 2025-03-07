@@ -83,5 +83,8 @@ class ScriptOptions:
     output_file: str = sp_field(default="results.json")
     save_txt: bool = sp_field(default=True)      # Сохранять ли теги в TXT файлы
     append_txt: bool = sp_field(default=True)    # Добавлять ли теги к существующим TXT файлам
+    add_tags_before: str = sp_field(default="")  # Теги для добавления в начало
+    add_tags_after: str = sp_field(default="")   # Теги для добавления в конец
+    remove_tags: str = sp_field(default="")      # Теги для удаления
 
 

@@ -83,6 +83,11 @@ def BatchTagging(opts: ScriptOptions):
     
     print(f"Всего изображений для обработки: {total_images}")
     
+    # Подготавливаем списки для управления тегами
+    add_tags_before = opts.add_tags_before.strip()
+    add_tags_after = opts.add_tags_after.strip()
+    remove_tags = [tag.strip() for tag in opts.remove_tags.split(',')] if opts.remove_tags else []
+    
     for i, img_path in enumerate(image_files):
         print(f"\nОбработка изображения {i+1}/{total_images}: {img_path}")
         
@@ -104,6 +109,46 @@ def BatchTagging(opts: ScriptOptions):
             
             # Объединяем теги из всех источников
             merged_tags = merge_tags_from_regions(result, detectors)
+            
+            # Дополнительная обработка тегов: удаление и добавление
+            if remove_tags:
+                # Удаляем указанные теги
+                tags_list = merged_tags["taglist"].split(", ")
+                caption_list = merged_tags["caption"].split(", ")
+                
+                # Фильтруем теги в taglist (с пробелами)
+                filtered_tags = [tag for tag in tags_list if tag.lower() not in [t.lower() for t in remove_tags]]
+                # Фильтруем теги в caption (с подчёркиваниями)
+                filtered_caption = [tag for tag in caption_list if tag.lower() not in [t.lower().replace(' ', '_') for t in remove_tags]]
+                
+                merged_tags["taglist"] = ", ".join(filtered_tags)
+                merged_tags["caption"] = ", ".join(filtered_caption)
+            
+            # Добавляем теги в начало и конец
+            if add_tags_before or add_tags_after:
+                # Обработка для taglist: просто чистим лишние пробелы и оставляем как есть
+                before_tags = ', '.join([s.strip() for s in add_tags_before.split(',') if s.strip()])
+                after_tags = ', '.join([s.strip() for s in add_tags_after.split(',') if s.strip()])
+                
+                # Обработка для caption: заменяем пробелы на подчёркивания в каждом теге
+                caption_before = ', '.join([s.strip().replace(' ', '_') for s in add_tags_before.split(',') if s.strip()])
+                caption_after = ', '.join([s.strip().replace(' ', '_') for s in add_tags_after.split(',') if s.strip()])
+                
+                # Обновляем taglist
+                new_taglist = merged_tags['taglist']
+                if before_tags:
+                    new_taglist = before_tags + ", " + new_taglist
+                if after_tags:
+                    new_taglist = new_taglist + ", " + after_tags
+                merged_tags['taglist'] = new_taglist.strip(', ')
+                
+                # Обновляем caption
+                new_caption = merged_tags['caption']
+                if caption_before:
+                    new_caption = caption_before + ", " + new_caption
+                if caption_after:
+                    new_caption = new_caption + ", " + caption_after
+                merged_tags['caption'] = new_caption.strip(', ')
             
             # Добавляем информацию о результатах для текущего изображения
             merged_result = {
