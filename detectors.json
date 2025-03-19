@@ -20,7 +20,7 @@
     "remove_tags_from_region": [],
     "add_tags_to_region": {},
     "exclude_from_region": [],
-    "region_gen_threshold": 0.45,
+    "region_gen_threshold": 0.35,
     "region_char_threshold": 0.85
   }
 ]

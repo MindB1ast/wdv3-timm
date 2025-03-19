@@ -2,7 +2,7 @@ import os
 
 # Процесс сохранения результатов в txt файл, отдельный файл потому что вероятно добавлю сортировку/другие штуки для сохранения тегов
 
-def save_tags_to_txt(image_path, merged_tags, append_tags=True):
+def save_tags_to_txt(image_path, merged_tags, append_tags=True, add_tags_before="", add_tags_after=""):
     """
     Сохраняет объединенные теги в TXT файл рядом с изображением.
     
@@ -10,6 +10,8 @@ def save_tags_to_txt(image_path, merged_tags, append_tags=True):
         image_path: Путь к изображению
         merged_tags: Словарь с объединенными тегами
         append_tags: Если True, добавляет новые теги к существующим; иначе перезаписывает
+        add_tags_before: Теги для добавления в начало (игнорируя append_tags)
+        add_tags_after: Теги для добавления в конец (после всех существующих тегов)
         
     Returns:
         str: Путь к созданному/обновленному TXT файлу
@@ -20,6 +22,10 @@ def save_tags_to_txt(image_path, merged_tags, append_tags=True):
     # Получаем список тегов из объединенных результатов
     # Используем taglist, где теги разделены пробелами (без подчеркиваний)
     tags_to_save = merged_tags["taglist"].split(", ")
+    
+    # Подготавливаем теги для добавления в начало и конец
+    before_tags = [tag.strip() for tag in add_tags_before.split(',') if tag.strip()]
+    after_tags = [tag.strip() for tag in add_tags_after.split(',') if tag.strip()]
     
     # Если нужно добавить к существующим тегам
     if append_tags and os.path.exists(txt_path):
@@ -40,30 +46,50 @@ def save_tags_to_txt(image_path, merged_tags, append_tags=True):
             existing_tags_set = set(existing_tags)
             new_tags = [tag for tag in tags_to_save if tag not in existing_tags_set]
             
-            # Если есть новые теги для добавления
+            # Комбинируем все теги в нужном порядке
+            all_tags = []
+            
+            # Сначала добавляем before_tags, если они есть
+            if before_tags:
+                all_tags.extend([tag for tag in before_tags if tag not in existing_tags_set])
+            
+            # Затем добавляем существующие теги
+            all_tags.extend(existing_tags)
+            
+            # Затем добавляем новые теги
             if new_tags:
-                all_tags = existing_tags + new_tags
-                # Сортируем теги для удобства
-                all_tags.sort()
-                
-                # Сохраняем обновленный список
-                with open(txt_path, 'w', encoding='utf-8') as f:
-                    f.write(", ".join(all_tags))
-                
-                print(f"Добавлено {len(new_tags)} новых тегов в {txt_path}")
-            else:
-                print(f"Новых тегов не обнаружено для {txt_path}")
-                
+                all_tags.extend(new_tags)
+            
+            # В конце добавляем after_tags, если они есть
+            if after_tags:
+                all_tags.extend([tag for tag in after_tags if tag not in existing_tags_set and tag not in all_tags])
+            
+            # Убираем дубликаты, сохраняя порядок
+            final_tags = []
+            seen = set()
+            for tag in all_tags:
+                if tag not in seen:
+                    final_tags.append(tag)
+                    seen.add(tag)
+            
+            # Сохраняем обновленный список
+            with open(txt_path, 'w', encoding='utf-8') as f:
+                f.write(", ".join(final_tags))
+            
+            print(f"Обновлено {len(new_tags)} новых тегов в {txt_path}")
+            
         except Exception as e:
             print(f"Ошибка при добавлении тегов к {txt_path}: {e}")
             # В случае ошибки создадим новый файл с тегами
+            all_tags = before_tags + tags_to_save + after_tags
             with open(txt_path, 'w', encoding='utf-8') as f:
-                f.write(", ".join(tags_to_save))
+                f.write(", ".join(all_tags))
             print(f"Создан новый файл с тегами: {txt_path}")
     else:
         # Просто создаем новый файл с тегами
+        all_tags = before_tags + tags_to_save + after_tags
         with open(txt_path, 'w', encoding='utf-8') as f:
-            f.write(", ".join(tags_to_save))
+            f.write(", ".join(all_tags))
         print(f"Создан файл с тегами: {txt_path}")
     
     return txt_path

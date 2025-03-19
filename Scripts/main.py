@@ -16,9 +16,76 @@ from .savingProc import save_tags_to_txt
 
 
 
-# Фукнция для тегирования изображений
-# Для параметров ввода посотри файл configs.py
 def BatchTagging(opts: ScriptOptions):
+    """
+    Выполняет тегирование пакета изображений с использованием моделей тегирования и детекции.
+    
+    Args:
+        opts (ScriptOptions): Параметры для выполнения тегирования. См. configs.py для деталей.
+    
+    Returns:
+        tuple: Кортеж из двух списков (all_results, all_merged_results)
+        
+        1. all_results: Список с детальной информацией о каждом изображении
+           [
+               {
+                   "image_path": str,      # Путь к обработанному изображению
+                   "full_image": {         # Теги для всего изображения
+                       "caption": str,     # Теги через запятую с подчеркиваниями
+                       "taglist": str,     # Теги через запятую с пробелами
+                       "general": list,    # Значения уверенности для общих тегов
+                       "character": list,  # Значения уверенности для тегов персонажей
+                       "ratings": list     # Значения уверенности для рейтинговых тегов
+                   },
+                   "detectors": {          # Результаты от каждого детектора
+                       "detector_name": [  # Список областей, найденных детектором
+                           {
+                               "region_id": int,      # ID области (нумерация с 0)
+                               "bbox": [x, y, w, h],  # Координаты области
+                               "caption": str,        # Теги области с подчеркиваниями
+                               "taglist": str,        # Теги области с пробелами
+                               "general": list,       # Значения уверенности (общие)
+                               "character": list,     # Значения уверенности (персонажи)
+                               "ratings": list        # Значения уверенности (рейтинги)
+                           },
+                           # ... другие области
+                       ],
+                       # ... другие детекторы
+                   }
+               },
+               # ... другие изображения
+           ]
+        
+        2. all_merged_results: Список с объединенными тегами для каждого изображения
+           [
+               {
+                   "image_path": str,      # Путь к обработанному изображению
+                   "merged_tags": {        # Объединенные теги со всех детекторов
+                       "caption": str,     # Теги через запятую с подчеркиваниями
+                       "taglist": str,     # Теги через запятую с пробелами
+                       "general": list,    # Значения уверенности для общих тегов
+                       "character": list,  # Значения уверенности для тегов персонажей
+                       "ratings": list     # Значения уверенности для рейтинговых тегов
+                   },
+                   "txt_path": str         # Путь к сохраненному TXT файлу (если save_txt=True)
+               },
+               # ... другие изображения
+           ]
+    
+    Примеры использования:
+        # Получение пути к 5-му изображению
+        image_path = result[0][4]["image_path"]
+        
+        # Получение тегов для всего 3-го изображения
+        full_image_tags = result[0][2]["full_image"]["taglist"]
+        
+        # Получение объединенных тегов для 7-го изображения
+        merged_tags = result[1][6]["merged_tags"]["taglist"]
+        merged_caption = result[1][6]["merged_tags"]["caption"]
+        
+        # Получение областей, обнаруженных детектором "face" в 1-м изображении
+        face_regions = result[0][0]["detectors"].get("face", [])
+    """
     if opts.model not in MODEL_REPO_MAP:
         print(f"Доступные модели: {list(MODEL_REPO_MAP.keys())}")
         raise ValueError(f"Неизвестная модель: {opts.model}")
@@ -162,7 +229,9 @@ def BatchTagging(opts: ScriptOptions):
                 txt_path = save_tags_to_txt(
                     result["image_path"], 
                     merged_tags, 
-                    append_tags=opts.append_txt
+                    append_tags=opts.append_txt,
+                    add_tags_before=opts.add_tags_before,
+                    add_tags_after=opts.add_tags_after
                 )
                 # Добавляем путь к TXT файлу в результаты
                 merged_result["txt_path"] = txt_path
