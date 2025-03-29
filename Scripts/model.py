@@ -180,9 +180,6 @@ def load_yolo_model(model_path: str, yolo_model_dir: Path) -> YOLO:
         "hand_yolov9c.pt": "https://huggingface.co/Bingsu/adetailer/resolve/main/hand_yolov9c.pt",
         "face_yolov9c.pt": "https://huggingface.co/Bingsu/adetailer/resolve/main/face_yolov9c.pt",
         "person_yolov8m-seg.pt": "https://huggingface.co/Bingsu/adetailer/resolve/main/person_yolov8m-seg.pt",
-        #"face_yolov8l.pt": "https://huggingface.co/Bingsu/adetailer/resolve/main/face_yolov8l.pt",
-        # Другие известные модели
-       # "hand_yolov8s.pt": "https://huggingface.co/Bingsu/adetailer/resolve/main/hand_yolov8s.pt",
         # Можно добавить и другие модели
     }
     

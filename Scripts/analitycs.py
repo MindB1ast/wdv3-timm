@@ -72,7 +72,8 @@ def calculate_tag_metrics(ground_truth: Dict[str, Set[str]],
     # Вычисляем метрики для каждого тега
     precision = precision_score(y_true, y_pred, average='samples', zero_division=0)
     recall = recall_score(y_true, y_pred, average='samples', zero_division=0)
-    f1 = f1_score(y_true, y_pred, average='samples', zero_division=0)
+    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+    #f1 = f1_score(y_true, y_pred, average='samples', zero_division=0) #убрал потому что почему то не корректно считал
     
     return {
         'Precision': precision,
@@ -892,6 +893,187 @@ def create_combined_tag_metrics_chart(tag_dfs: Dict[str, pd.DataFrame], n: int =
     
     return fig
 
+def calculate_average_tag_count(tags_dict: Dict[str, Set[str]]) -> Dict[str, float]:
+    """
+    Вычисляет среднее, минимальное и максимальное количество тегов в словаре тегов.
+    
+    Args:
+        tags_dict: Словарь, где ключи - имена изображений, а значения - множества тегов
+        
+    Returns:
+        Словарь со статистикой по количеству тегов
+    """
+    if not tags_dict:
+        return {"avg": 0, "min": 0, "max": 0, "median": 0}
+    
+    # Собираем количество тегов для каждого изображения
+    tag_counts = [len(tags) for tags in tags_dict.values()]
+    
+    # Вычисляем статистику
+    avg_count = sum(tag_counts) / len(tag_counts)
+    min_count = min(tag_counts)
+    max_count = max(tag_counts)
+    median_count = sorted(tag_counts)[len(tag_counts) // 2]
+    
+    return {
+        "avg": avg_count,
+        "min": min_count,
+        "max": max_count,
+        "median": median_count
+    }
+
+def display_tag_count_statistics(ground_truth: Dict[str, Set[str]], 
+                                method_tags: Dict[str, Dict[str, Set[str]]]) -> None:
+    """
+    Отображает статистику по количеству тегов для ground truth и каждого метода.
+    
+    Args:
+        ground_truth: Словарь с эталонными тегами
+        method_tags: Словарь с тегами для каждого метода
+    """
+    # Вычисляем статистику для ground truth
+    gt_stats = calculate_average_tag_count(ground_truth)
+    
+    # Вычисляем статистику для каждого метода
+    method_stats = {
+        method: calculate_average_tag_count(tags)
+        for method, tags in method_tags.items()
+    }
+    
+    # Подготавливаем DataFrame для отображения
+    stats_data = []
+    
+    # Добавляем строку для ground truth
+    stats_data.append({
+        "Метод": "Ground Truth",
+        "Среднее кол-во тегов": f"{gt_stats['avg']:.2f}",
+        "Медиана": f"{gt_stats['median']}",
+        "Минимум": f"{gt_stats['min']}",
+        "Максимум": f"{gt_stats['max']}"
+    })
+    
+    # Добавляем строки для каждого метода
+    for method, stats in method_stats.items():
+        stats_data.append({
+            "Метод": method,
+            "Среднее кол-во тегов": f"{stats['avg']:.2f}",
+            "Медиана": f"{stats['median']}",
+            "Минимум": f"{stats['min']}",
+            "Максимум": f"{stats['max']}"
+        })
+    
+    # Создаем и отображаем таблицу
+    stats_df = pd.DataFrame(stats_data)
+    display(HTML("<h3 style='color:#2c3e50;'>Статистика по количеству тегов</h3>"))
+    display(HTML(stats_df.to_html(classes='table table-striped table-hover', index=False)))
+    
+    # Создаем столбчатую диаграмму для среднего количества тегов
+    methods = [row["Метод"] for row in stats_data]
+    avg_counts = [float(row["Среднее кол-во тегов"]) for row in stats_data]
+    
+    plt.figure(figsize=(10, 6))
+    bars = plt.bar(methods, avg_counts, color=['#3498db', '#2ecc71', '#e74c3c'])
+    plt.title('Среднее количество тегов по методам', fontsize=14)
+    plt.ylabel('Количество тегов', fontsize=12)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    
+    # Добавляем значения над столбцами
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2., height + 0.1,
+                f'{height:.2f}', ha='center', fontsize=11)
+    
+    plt.tight_layout()
+    plt.show()
+
+def create_interactive_tag_count_chart(ground_truth: Dict[str, Set[str]], 
+                                     method_tags: Dict[str, Dict[str, Set[str]]]) -> go.Figure:
+    """
+    Создает интерактивный график для сравнения количества тегов в разных методах.
+    
+    Args:
+        ground_truth: Словарь с эталонными тегами
+        method_tags: Словарь с тегами для каждого метода
+        
+    Returns:
+        Plotly фигуру с графиком
+    """
+    # Вычисляем статистику для ground truth
+    gt_stats = calculate_average_tag_count(ground_truth)
+    
+    # Вычисляем статистику для каждого метода
+    method_stats = {
+        method: calculate_average_tag_count(tags)
+        for method, tags in method_tags.items()
+    }
+    
+    # Подготавливаем данные для графика
+    methods = ["Ground Truth"] + list(method_stats.keys())
+    avg_counts = [gt_stats["avg"]] + [stats["avg"] for stats in method_stats.values()]
+    median_counts = [gt_stats["median"]] + [stats["median"] for stats in method_stats.values()]
+    min_counts = [gt_stats["min"]] + [stats["min"] for stats in method_stats.values()]
+    max_counts = [gt_stats["max"]] + [stats["max"] for stats in method_stats.values()]
+    
+    # Создаем фигуру
+    fig = go.Figure()
+    
+    # Добавляем столбцы для среднего
+    fig.add_trace(go.Bar(
+        x=methods,
+        y=avg_counts,
+        name="Среднее",
+        marker_color="#3498db",
+        hovertemplate="<b>%{x}</b><br>Среднее: %{y:.2f}<extra></extra>"
+    ))
+    
+    # Добавляем столбцы для медианы
+    fig.add_trace(go.Bar(
+        x=methods,
+        y=median_counts,
+        name="Медиана",
+        marker_color="#2ecc71",
+        hovertemplate="<b>%{x}</b><br>Медиана: %{y}<extra></extra>"
+    ))
+    
+    # Добавляем scatter points для минимума и максимума
+    fig.add_trace(go.Scatter(
+        x=methods,
+        y=min_counts,
+        mode="markers",
+        name="Минимум",
+        marker=dict(
+            symbol="triangle-down",
+            size=12,
+            color="#e74c3c"
+        ),
+        hovertemplate="<b>%{x}</b><br>Минимум: %{y}<extra></extra>"
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=methods,
+        y=max_counts,
+        mode="markers",
+        name="Максимум",
+        marker=dict(
+            symbol="triangle-up",
+            size=12,
+            color="#9b59b6"
+        ),
+        hovertemplate="<b>%{x}</b><br>Максимум: %{y}<extra></extra>"
+    ))
+    
+    # Настраиваем макет
+    fig.update_layout(
+        title="Статистика по количеству тегов",
+        xaxis_title="Метод",
+        yaxis_title="Количество тегов",
+        barmode="group",
+        height=500,
+        hovermode="x unified"
+    )
+    
+    return fig
+
 def compare_tagging_methods(
     image_folder: str, 
     txt_folder: str,
@@ -949,6 +1131,19 @@ def compare_tagging_methods(
     
     # Начинаем анализ
     display(HTML("<h1 style='color:#1a5276;'>Сравнение методов тегирования</h1>"))
+    
+    # Отображаем статистику по количеству тегов
+    method_tags_dict = {
+        "Полное изображение": full_image_tags,
+        "Объединенные теги": merged_tags
+    }
+    display_tag_count_statistics(ground_truth, method_tags_dict)
+    
+    if interactive:
+        # Создаем интерактивный график для количества тегов
+        fig_tag_counts = create_interactive_tag_count_chart(ground_truth, method_tags_dict)
+        display(HTML("<h3 style='color:#2c3e50;'>Интерактивная статистика по количеству тегов</h3>"))
+        fig_tag_counts.show()
     
     # Обрабатываем метод полного изображения
     full_image_metrics = calculate_tag_metrics(ground_truth, full_image_tags)

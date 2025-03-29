@@ -255,9 +255,12 @@ $RECYCLE.BIN/
 **/models/
 **/.ipynb_checkpoints/
 **/.vscode/
+**/Tests/
+**/TestTagPic/
 
 # Файлы
 *.pt
 *.csv
 result.json
 results_merged.json
+

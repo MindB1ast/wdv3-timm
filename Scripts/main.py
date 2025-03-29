@@ -113,8 +113,9 @@ def BatchTagging(opts: ScriptOptions):
     labels = load_labels_local_or_remote(repo_id, model_folder)
     
     print("Создание трансформации данных...")
+    #Тест новой трансформации данных
     transform = create_transform(**resolve_data_config(tagger_model.pretrained_cfg, model=tagger_model))
-    
+
     # Загружаем конфигурацию детекторов
     print(f"Загрузка конфигурации детекторов из {opts.detectors_config}...")
     detectors = load_detectors_config(opts.detectors_config)
