@@ -6,6 +6,7 @@ from pathlib import Path
 from PIL import Image
 from ultralytics import YOLO
 from .configs import DetectorConfig
+import numpy as np
 
 
 
@@ -36,7 +37,8 @@ def load_detectors_config(config_path: str) -> List[DetectorConfig]:
                 exclude_from_region=item.get("exclude_from_region", []),
                 #specific_excluded_tags=item.get("specific_excluded_tags", []),
                 region_gen_threshold=item.get("region_gen_threshold"),
-                region_char_threshold=item.get("region_char_threshold")
+                region_char_threshold=item.get("region_char_threshold"),
+                use_min_side=item.get("use_min_side", False)
             )
             detectors.append(detector)
         except KeyError as e:
@@ -47,82 +49,90 @@ def load_detectors_config(config_path: str) -> List[DetectorConfig]:
     return detectors
 
 
-def extract_regions_with_detector(img_path: str, detector: DetectorConfig, yolo_model: YOLO) -> List[Tuple[Image.Image, List[float], str]]:
+def extract_regions_with_detector(image, detector, detector_config):
     """
-    Использует YOLO для детектирования объектов и вырезает квадратные области в исходном разрешении.
-    
+    Извлекает регионы из изображения с помощью YOLO детектора.
+
     Args:
-        img_path: Путь к изображению
-        detector: Конфигурация детектора
-        yolo_model: Загруженная модель YOLO
-        
+        image: PIL Image или путь к изображению
+        detector: YOLO модель
+        detector_config: Конфигурация детектора
+
     Returns:
-        List of tuples (cropped_image, bbox, detector_name)
+        List[Dict]: Список словарей с информацией о регионах
     """
-    # Загрузка изображения
-    img = Image.open(img_path)
-    img_width, img_height = img.size
-    
-    # Запускаем YOLO детекцию с параметрами из конфигурации детектора
-    results = yolo_model(img_path, conf=detector.confidence, classes=detector.classes)
-    
-    # Извлекаем обнаруженные области
+    # Убеждаемся, что у нас есть объект PIL.Image
+    if isinstance(image, str):
+        image = Image.open(image).convert('RGB')
+    elif not isinstance(image, Image.Image):
+        raise TypeError("image должен быть путем к файлу или объектом PIL.Image")
+
+    # Получаем предсказания
+    # Для моделей сегментации используем только параметр classes
+    if hasattr(detector, 'model') and hasattr(detector.model, 'task') and detector.model.task == 'segment':
+        results = detector(image, classes=detector_config.classes)[0]
+    else:
+        # Для обычных моделей детекции используем все параметры
+        results = detector(image, conf=detector_config.confidence, classes=detector_config.classes)[0]
+
+    print(f"Детектор {detector_config.name}: найдено {len(results.boxes)} объектов")
+    if len(results.boxes) == 0:
+        print(f"Параметры детекции: confidence={detector_config.confidence}, classes={detector_config.classes}")
+
     regions = []
-    
-    # Проверяем, есть ли какие-либо результаты
-    if len(results) > 0 and hasattr(results[0], 'boxes'):
-        # Извлекаем боксы из результатов YOLO
-        for result in results:
-            boxes = result.boxes
-            for box in boxes:
-                # Получаем координаты бокса
-                x1, y1, x2, y2 = box.xyxy[0].tolist()
-                
-                # Преобразуем прямоугольник в квадрат, сохраняя центр обнаруженного объекта
-                box_width = x2 - x1
-                box_height = y2 - y1
-                
-                # Определяем размер квадрата по большей стороне
-                square_size = max(box_width, box_height)
-                
-                # Вычисляем центр бокса
-                center_x = (x1 + x2) / 2
-                center_y = (y1 + y2) / 2
-                
-                # Вычисляем новые координаты для квадратного бокса
-                new_x1 = center_x - square_size / 2
-                new_y1 = center_y - square_size / 2
-                new_x2 = center_x + square_size / 2
-                new_y2 = center_y + square_size / 2
-                
-                # Убеждаемся, что квадрат не выходит за границы изображения
-                new_x1 = max(0, new_x1)
-                new_y1 = max(0, new_y1)
-                new_x2 = min(img_width, new_x2)
-                new_y2 = min(img_height, new_y2)
-                
-                # Корректируем размер, если квадрат оказался за границами изображения
-                current_width = new_x2 - new_x1
-                current_height = new_y2 - new_y1
-                
-                # Если после обрезки по границе изображения получился не квадрат, 
-                # подгоняем размер по минимальной стороне
-                if current_width != current_height:
-                    min_side = min(current_width, current_height)
-                    
-                    if current_width > min_side:
-                        diff = current_width - min_side
-                        new_x1 += diff / 2
-                        new_x2 -= diff / 2
-                    elif current_height > min_side:
-                        diff = current_height - min_side
-                        new_y1 += diff / 2
-                        new_y2 -= diff / 2
-                
-                # Обрезаем изображение по новым координатам
-                cropped_img = img.crop((new_x1, new_y1, new_x2, new_y2))
-                
-                # Добавляем обрезанное изображение, координаты и имя детектора в список
-                regions.append((cropped_img, [new_x1, new_y1, new_x2, new_y2], detector.name))
-    
+    for box in results.boxes:
+        # Получаем координаты бокса
+        x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+
+        # Получаем уверенность и класс
+        if hasattr(box, 'conf'):
+            confidence = float(box.conf[0])
+        else:
+            # Для моделей сегментации используем значение из конфига
+            confidence = detector_config.confidence
+
+        if hasattr(box, 'cls'):
+            class_id = int(box.cls[0])
+        else:
+            class_id = 0  # Для моделей сегментации используем класс по умолчанию
+
+        # Определяем размер квадрата для кропа
+        width = x2 - x1
+        height = y2 - y1
+        if detector_config.use_min_side:
+            size = min(width, height)
+        else:
+            size = max(width, height)
+
+        # Вычисляем центр бокса
+        center_x = (x1 + x2) / 2
+        center_y = (y1 + y2) / 2
+
+        # Вычисляем координаты квадратного региона
+        half_size = size / 2
+        square_x1 = max(0, center_x - half_size)
+        square_y1 = max(0, center_y - half_size)
+        square_x2 = min(image.width, center_x + half_size)
+        square_y2 = min(image.height, center_y + half_size)
+
+        # Корректируем размер, если вышли за границы
+        if square_x1 == 0:
+            square_x2 = min(image.width, size)
+        if square_y1 == 0:
+            square_y2 = min(image.height, size)
+        if square_x2 == image.width:
+            square_x1 = max(0, image.width - size)
+        if square_y2 == image.height:
+            square_y1 = max(0, image.height - size)
+
+        # Вырезаем регион
+        region = image.crop((square_x1, square_y1, square_x2, square_y2))
+
+        regions.append({
+            'region': np.array(region),
+            'confidence': confidence,
+            'class_id': class_id,
+            'bbox': [x1, y1, x2, y2]
+        })
+
     return regions

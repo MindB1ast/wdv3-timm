@@ -9,7 +9,8 @@
     "add_tags_to_region": {},
     "exclude_from_region": [],
     "region_gen_threshold": 0.45,
-    "region_char_threshold": 0.8
+    "region_char_threshold": 0.8,
+    "use_min_side": false
   },
   {
     "name": "face_detector",
@@ -21,6 +22,7 @@
     "add_tags_to_region": {},
     "exclude_from_region": [],
     "region_gen_threshold": 0.35,
-    "region_char_threshold": 0.85
+    "region_char_threshold": 0.85,
+    "use_min_side": true
   }
 ]

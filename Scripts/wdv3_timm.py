@@ -53,8 +53,8 @@ class LabelData:
     character: list[np.int64]
 
 """
-Скачивает csv файл с тегами и получаем LabekData с листами 
-всех тегов, 
+Скачивает csv файл с тегами и получаем LabekData с листами
+всех тегов,
 Ratings: general, sensitive, questionable, explicit
 Список обычных тегов general
 и список персонажей
@@ -118,7 +118,7 @@ def get_tags(
 
     # Convert to a string suitable for use as a training caption
     caption = ", ".join(combined_names)
-    taglist = caption.replace("_", " ").replace("(", "\(").replace(")", "\)")
+    taglist = caption.replace("_", " ").replace("(", r"\(").replace(")", r"\)")
 
     return caption, taglist, rating_labels, char_labels, gen_labels
 
