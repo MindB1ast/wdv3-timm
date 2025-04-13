@@ -261,7 +261,7 @@ $RECYCLE.BIN/
 # Файлы
 *.pt
 *.csv
-result.json
+results.json
 results_merged.json
 =
 

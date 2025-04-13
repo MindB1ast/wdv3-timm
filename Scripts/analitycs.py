@@ -1142,7 +1142,7 @@ def analyze_tag_improvements(
     improvements_df = improvements_df.sort_values('combined_improvement', ascending=False)
 
     # Display results
-    display(HTML("<h2 style='color:#1a5276;'>Теги с наибольшим изменением метрик (объединенные vs полное изображение)</h2>"))
+    display(HTML("<h2 style='color:#1a5276;'>Теги с наибольшим улучшением метрик (объединенные vs полное изображение)</h2>"))
 
     # Format for display
     display_df = improvements_df.head(top_n).copy()
@@ -1285,6 +1285,218 @@ def analyze_tag_improvements(
 
     return improvements_df
 
+def analyze_tag_deteriorations(
+    full_image_tag_perf: pd.DataFrame,
+    merged_tags_tag_perf: pd.DataFrame,
+    top_n: int = 20,
+    min_occurrences: int = 3,
+    interactive: bool = True
+) -> pd.DataFrame:
+    """
+    Analyzes which tags deteriorated the most when using merged tags compared to full image method.
+
+    Args:
+        full_image_tag_perf: DataFrame with tag performance for full image method
+        merged_tags_tag_perf: DataFrame with tag performance for merged tags method
+        top_n: Number of top deteriorated tags to show
+        min_occurrences: Minimum number of occurrences in ground truth to consider
+        interactive: Whether to display interactive charts
+
+    Returns:
+        DataFrame with tag deteriorations
+    """
+    # Set index for joining
+    full_df = full_image_tag_perf.set_index('tag')
+    merged_df = merged_tags_tag_perf.set_index('tag')
+
+    # Find common tags with minimum occurrences
+    common_tags = set(full_df.index) & set(merged_df.index)
+
+    # Create list to store deterioration data
+    deteriorations = []
+
+    for tag in common_tags:
+        # Get metrics for both methods
+        full_metrics = full_df.loc[tag]
+        merged_metrics = merged_df.loc[tag]
+
+        # Only consider tags that appear at least min_occurrences times in ground truth
+        if full_metrics['total_ground_truth'] < min_occurrences:
+            continue
+
+        # Calculate changes (negative values indicate deterioration)
+        precision_change = merged_metrics['precision'] - full_metrics['precision']
+        recall_change = merged_metrics['recall'] - full_metrics['recall']
+        f1_change = merged_metrics['f1_score'] - full_metrics['f1_score']
+
+        # Calculate combined change (average of the three)
+        combined_change = (precision_change + recall_change + f1_change) / 3
+
+        # Store deterioration data
+        deteriorations.append({
+            'tag': tag,
+            'precision_change': precision_change,
+            'recall_change': recall_change,
+            'f1_change': f1_change,
+            'combined_change': combined_change,
+            'full_precision': full_metrics['precision'],
+            'full_recall': full_metrics['recall'],
+            'full_f1': full_metrics['f1_score'],
+            'merged_precision': merged_metrics['precision'],
+            'merged_recall': merged_metrics['recall'],
+            'merged_f1': merged_metrics['f1_score'],
+            'occurrences': full_metrics['total_ground_truth']
+        })
+
+    # Create DataFrame and sort by combined change (ascending to get worst deterioration first)
+    deteriorations_df = pd.DataFrame(deteriorations)
+    deteriorations_df = deteriorations_df.sort_values('combined_change', ascending=True)
+
+    # Display results
+    display(HTML("<h2 style='color:#922B21;'>Теги с наибольшим ухудшением метрик (объединенные vs полное изображение)</h2>"))
+
+    # Format for display
+    display_df = deteriorations_df.head(top_n).copy()
+
+    # Convert to percentage for better readability
+    display_cols = ['precision_change', 'recall_change', 'f1_change', 'combined_change']
+    percentage_cols = ['full_precision', 'full_recall', 'full_f1', 'merged_precision', 'merged_recall', 'merged_f1']
+
+    for col in display_cols:
+        display_df[col] = display_df[col].map(lambda x: f"{x*100:+.2f}%")
+
+    for col in percentage_cols:
+        display_df[col] = display_df[col].map(lambda x: f"{x*100:.2f}%")
+
+    # Rename columns for display
+    column_mapping = {
+        'tag': 'Тег',
+        'precision_change': 'Изменение Precision',
+        'recall_change': 'Изменение Recall',
+        'f1_change': 'Изменение F1',
+        'combined_change': 'Среднее изменение',
+        'full_precision': 'Precision (полное)',
+        'full_recall': 'Recall (полное)',
+        'full_f1': 'F1 (полное)',
+        'merged_precision': 'Precision (объединенные)',
+        'merged_recall': 'Recall (объединенные)',
+        'merged_f1': 'F1 (объединенные)',
+        'occurrences': 'Вхождений в GT'
+    }
+
+    display_df = display_df.rename(columns=column_mapping)
+    display_cols_order = [
+        'Тег', 'Среднее изменение', 'Изменение Precision', 'Изменение Recall', 'Изменение F1',
+        'Precision (полное)', 'Recall (полное)', 'F1 (полное)',
+        'Precision (объединенные)', 'Recall (объединенные)', 'F1 (объединенные)',
+        'Вхождений в GT'
+    ]
+    display_df = display_df[display_cols_order]
+
+    display(HTML(display_df.to_html(classes='table table-striped table-hover', index=False)))
+
+    # Create interactive visualization if requested
+    if interactive:
+        # Create data for top N deteriorated tags
+        top_deteriorated = deteriorations_df.head(top_n)
+
+        # Create figure
+        fig = go.Figure()
+
+        # Add traces for each change metric
+        fig.add_trace(go.Bar(
+            y=top_deteriorated['tag'],
+            x=top_deteriorated['precision_change'] * 100,  # Convert to percentage
+            name='Изменение Precision',
+            marker_color='#E74C3C',  # Red for deterioration
+            orientation='h',
+            hovertemplate='<b>%{y}</b><br>Изменение Precision: %{x:.2f}%<extra></extra>'
+        ))
+
+        fig.add_trace(go.Bar(
+            y=top_deteriorated['tag'],
+            x=top_deteriorated['recall_change'] * 100,  # Convert to percentage
+            name='Изменение Recall',
+            marker_color='#EC7063',  # Lighter red for recall
+            orientation='h',
+            hovertemplate='<b>%{y}</b><br>Изменение Recall: %{x:.2f}%<extra></extra>'
+        ))
+
+        fig.add_trace(go.Bar(
+            y=top_deteriorated['tag'],
+            x=top_deteriorated['f1_change'] * 100,  # Convert to percentage
+            name='Изменение F1',
+            marker_color='#F1948A',  # Even lighter red for F1
+            orientation='h',
+            hovertemplate='<b>%{y}</b><br>Изменение F1: %{x:.2f}%<extra></extra>'
+        ))
+
+        # Add hover info for each tag
+        for i, row in top_deteriorated.iterrows():
+            fig.add_trace(go.Scatter(
+                y=[row['tag']],
+                x=[row['combined_change'] * 100],  # Use combined change for positioning
+                mode='markers',
+                marker=dict(size=0),
+                hoverinfo='text',
+                hovertext=f"""
+                <b>Тег:</b> {row['tag']}<br>
+                <b>Вхождений в GT:</b> {row['occurrences']}<br>
+                <b>Изменение Precision:</b> {row['precision_change']*100:.2f}%<br>
+                <b>Изменение Recall:</b> {row['recall_change']*100:.2f}%<br>
+                <b>Изменение F1:</b> {row['f1_change']*100:.2f}%<br>
+                <b>Среднее Изменение:</b> {row['combined_change']*100:.2f}%<br>
+                <hr>
+                <b>Полное изображение:</b><br>
+                Precision: {row['full_precision']*100:.2f}%<br>
+                Recall: {row['full_recall']*100:.2f}%<br>
+                F1: {row['full_f1']*100:.2f}%<br>
+                <hr>
+                <b>Объединенные теги:</b><br>
+                Precision: {row['merged_precision']*100:.2f}%<br>
+                Recall: {row['merged_recall']*100:.2f}%<br>
+                F1: {row['merged_f1']*100:.2f}%
+                """,
+                showlegend=False
+            ))
+
+        # Update layout
+        fig.update_layout(
+            title=f'Топ {top_n} тегов с наибольшим ухудшением метрик',
+            xaxis_title='Изменение в %',
+            yaxis_title='Тег',
+            barmode='group',
+            height=max(500, top_n*25),
+            hovermode='y unified'
+        )
+
+        # Add buttons to switch between metrics
+        fig.update_layout(
+            updatemenus=[
+                dict(
+                    type="buttons",
+                    direction="right",
+                    buttons=list([
+                        dict(args=[{"visible": [True, False, False]}], label="Precision", method="update"),
+                        dict(args=[{"visible": [False, True, False]}], label="Recall", method="update"),
+                        dict(args=[{"visible": [False, False, True]}], label="F1", method="update"),
+                        dict(args=[{"visible": [True, True, True]}], label="All Metrics", method="update")
+                    ]),
+                    pad={"r": 10, "t": 10},
+                    showactive=True,
+                    x=0.1,
+                    xanchor="left",
+                    y=1.1,
+                    yanchor="top"
+                )
+            ]
+        )
+
+        fig.show()
+
+    return deteriorations_df
+
+
 
 def compare_tagging_methods(
     image_folder: str,
@@ -1293,10 +1505,11 @@ def compare_tagging_methods(
     model_labels_path: str,
     filter_tags: bool = True,
     num_worst_examples: int = 5,
-    num_top_improved: int = 20,  # Added parameter for top improved tags
+    num_top_improved: int = 20,  # Параметр для топ улучшенных тегов
+    num_top_deteriorated: int = 20,  # Добавленный параметр для топ ухудшенных тегов
     visualize: bool = True,
     interactive: bool = True
-) -> Tuple[Dict[str, Dict[str, float]], Dict[str, pd.DataFrame], Dict[str, pd.DataFrame]]:
+) -> Tuple[Dict[str, Dict[str, float]], Dict[str, pd.DataFrame], Dict[str, pd.DataFrame], pd.DataFrame, pd.DataFrame]:
     """
     Сравнивает методы тегирования: полное изображение vs объединенные теги.
 
@@ -1307,7 +1520,8 @@ def compare_tagging_methods(
         model_labels_path (str): Путь к CSV файлу с тегами модели
         filter_tags (bool): Фильтровать теги по известным модели
         num_worst_examples (int): Количество худших примеров для вывода
-        num_top_improved (int): Количество тегов с наибольшим изменением для отображения
+        num_top_improved (int): Количество тегов с наибольшим улучшением для отображения
+        num_top_deteriorated (int): Количество тегов с наибольшим ухудшением для отображения
         visualize (bool): Выполнять ли визуализацию результатов
         interactive (bool): Использовать ли интерактивные графики Plotly
 
@@ -1316,6 +1530,8 @@ def compare_tagging_methods(
         - Словарь с общими метриками для каждого метода
         - Словарь с DataFrame ошибок для каждого метода
         - Словарь с DataFrame производительности тегов для каждого метода
+        - DataFrame с улучшенными тегами
+        - DataFrame с ухудшенными тегами
     """
     # Загружаем ground truth теги
     ground_truth = load_ground_truth_tags(txt_folder)
@@ -1428,7 +1644,7 @@ def compare_tagging_methods(
         display(HTML("<h3 style='color:#2c3e50;'>Сравнение по худшим тегам</h3>"))
         fig_tags.show()
 
-    # NEW ADDITION: Analyze and display tags with the most improvement
+   # Analyze and display tags with the most improvement
     tag_improvements = analyze_tag_improvements(
         full_image_tag_perf=full_image_tag_perf,
         merged_tags_tag_perf=merged_tags_tag_perf,
@@ -1437,4 +1653,13 @@ def compare_tagging_methods(
         interactive=interactive
     )
 
-    return metrics, error_dfs, tag_perf_dfs, tag_improvements
+    # Analyze and display tags with the most deterioration
+    tag_deteriorations = analyze_tag_deteriorations(
+        full_image_tag_perf=full_image_tag_perf,
+        merged_tags_tag_perf=merged_tags_tag_perf,
+        top_n=num_top_deteriorated,
+        min_occurrences=3,
+        interactive=interactive
+    )
+
+    return metrics, error_dfs, tag_perf_dfs, tag_improvements, tag_deteriorations
