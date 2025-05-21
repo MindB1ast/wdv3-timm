@@ -45,7 +45,9 @@ def merge_tags_from_regions(image_result: Dict, detectors: List[DetectorConfig])
      "marble_background", "mosaic_background", "patterned_background", "plaid_background",
      "polka_dot_background", "spiral_background", "splatter_background", "striped_background",
      "diagonal-striped_background", "sunburst_background", "triangle_background", "abstract_background",
-     "blurry_background", "bright_background", "dark_background", "drama_layer", "border", "white_border", "black_border", "blurry", "blurry_background", "depth_of_field", "blurry_foreground", "pov", "pov_hands", "out_of_frame", "pov_hands", "feet_out_of_frame", "foot_out_of_frame", "film_grain", "meme", "parody",}
+     "blurry_background", "bright_background", "dark_background", "drama_layer", "border", "white_border",
+     "black_border", "blurry", "blurry_background", "depth_of_field", "blurry_foreground", "pov", "pov_hands",
+     "out_of_frame", "pov_hands", "feet_out_of_frame", "foot_out_of_frame", "film_grain", "meme", "parody", "oekaki", }
 
     # Инициализируем результирующие теги
     merged_general = {}
