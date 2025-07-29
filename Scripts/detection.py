@@ -1,8 +1,7 @@
 #yolo funcs
 import os
 import json
-from typing import List, Tuple, Dict
-from pathlib import Path
+from typing import List, Tuple, Union
 from PIL import Image
 from ultralytics import YOLO
 from .configs import DetectorConfig
@@ -47,40 +46,54 @@ def load_detectors_config(config_path: str) -> List[DetectorConfig]:
     return detectors
 
 
-def extract_regions_with_detector(img_path: str, detector: DetectorConfig, yolo_model: YOLO) -> List[Tuple[Image.Image, List[float], str]]:
-    """
-    Использует YOLO для детектирования объектов и вырезает области в исходном разрешении.
-    
-    Args:
-        img_path: Путь к изображению
-        detector: Конфигурация детектора
-        yolo_model: Загруженная модель YOLO
-        
-    Returns:
-        List of tuples (cropped_image, bbox, detector_name)
-    """
-    # Загрузка изображения
+def extract_regions_with_detector(
+    img_path: str,
+    detector: DetectorConfig,
+    yolo_model: YOLO,
+    make_square: bool = True,
+    padding: Union[int, float] = 0  # int = пиксели, float = доля от размера bbox (например, 0.1 = 10%)
+) -> List[Tuple[Image.Image, List[float], str]]:
+    from PIL import ImageOps
+
     img = Image.open(img_path)
-    
-    # Запускаем YOLO детекцию с параметрами из конфигурации детектора
+    width, height = img.size
+
     results = yolo_model(img_path, conf=detector.confidence, classes=detector.classes)
-    
-    # Извлекаем обнаруженные области
     regions = []
-    
-    # Проверяем, есть ли какие-либо результаты
+
     if len(results) > 0 and hasattr(results[0], 'boxes'):
-        # Извлекаем боксы из результатов YOLO
         for result in results:
-            boxes = result.boxes
-            for box in boxes:
-                # Получаем координаты бокса
+            for box in result.boxes:
                 x1, y1, x2, y2 = box.xyxy[0].tolist()
-                
-                # Обрезаем изображение по координатам бокса
-                cropped_img = img.crop((x1, y1, x2, y2))
-                
-                # Добавляем обрезанное изображение, координаты и имя детектора в список
-                regions.append((cropped_img, [x1, y1, x2, y2], detector.name))
-    
+                box_width = x2 - x1
+                box_height = y2 - y1
+
+                # ─── 📌 Добавление padding ─────
+                if isinstance(padding, float):
+                    pad_x = box_width * padding
+                    pad_y = box_height * padding
+                else:
+                    pad_x = pad_y = padding
+
+                x1_pad = max(0, int(x1 - pad_x))
+                y1_pad = max(0, int(y1 - pad_y))
+                x2_pad = min(width, int(x2 + pad_x))
+                y2_pad = min(height, int(y2 + pad_y))
+
+                cropped_img = img.crop((x1_pad, y1_pad, x2_pad, y2_pad))
+
+                # ─── 📌 Приведение к квадрату ─────
+                if make_square:
+                    crop_w, crop_h = cropped_img.size
+                    side = max(crop_w, crop_h)
+                    delta_w = side - crop_w
+                    delta_h = side - crop_h
+                    padding_tuple = (
+                        delta_w // 2, delta_h // 2,
+                        delta_w - (delta_w // 2), delta_h - (delta_h // 2)
+                    )
+                    cropped_img = ImageOps.expand(cropped_img, padding_tuple, fill=(0, 0, 0))  # Чёрный фон
+
+                regions.append((cropped_img, [x1_pad, y1_pad, x2_pad, y2_pad], detector.name))
+
     return regions

@@ -227,6 +227,7 @@ def create_interactive_image_metrics_chart(error_df: pd.DataFrame, method_name: 
         y=worst_images['f1_score'],
         name='F1 Score',
         marker_color='#5DA5DA',
+        marker_pattern_shape="/",
         hovertemplate='<b>%{x}</b><br>F1: %{y:.3f}<extra></extra>'
     ))
     fig.add_trace(go.Bar(
@@ -234,6 +235,7 @@ def create_interactive_image_metrics_chart(error_df: pd.DataFrame, method_name: 
         y=worst_images['precision'],
         name='Precision',
         marker_color='#FAA43A',
+        marker_pattern_shape=".",
         hovertemplate='<b>%{x}</b><br>Precision: %{y:.3f}<extra></extra>'
     ))
     fig.add_trace(go.Bar(
@@ -241,6 +243,7 @@ def create_interactive_image_metrics_chart(error_df: pd.DataFrame, method_name: 
         y=worst_images['recall'],
         name='Recall',
         marker_color='#60BD68',
+        marker_pattern_shape="x",
         hovertemplate='<b>%{x}</b><br>Recall: %{y:.3f}<extra></extra>'
     ))
 
@@ -309,6 +312,7 @@ def create_interactive_tag_metrics_chart(tag_df: pd.DataFrame, method_name: str,
         x=worst_tags['f1_score'],
         name='F1 Score',
         marker_color='#5DA5DA',
+        marker_pattern_shape="/",
         orientation='h',
         hovertemplate='<b>%{y}</b><br>F1: %{x:.3f}<extra></extra>'
     ))
@@ -318,6 +322,7 @@ def create_interactive_tag_metrics_chart(tag_df: pd.DataFrame, method_name: str,
         x=worst_tags['precision'],
         name='Precision',
         marker_color='#FAA43A',
+        marker_pattern_shape=".",
         orientation='h',
         hovertemplate='<b>%{y}</b><br>Precision: %{x:.3f}<extra></extra>'
     ))
@@ -327,6 +332,7 @@ def create_interactive_tag_metrics_chart(tag_df: pd.DataFrame, method_name: str,
         x=worst_tags['recall'],
         name='Recall',
         marker_color='#60BD68',
+        marker_pattern_shape="x",
         orientation='h',
         hovertemplate='<b>%{y}</b><br>Recall: %{x:.3f}<extra></extra>'
     ))
@@ -337,7 +343,7 @@ def create_interactive_tag_metrics_chart(tag_df: pd.DataFrame, method_name: str,
         xaxis_title='Значение метрики',
         yaxis_title='Тег',
         barmode='group',
-        height=max(500, n*25),  # Динамическая высота в зависимости от количества тегов
+        height=max(600, n * 35),  # Увеличена высота для лучшего разрешения
         hovermode='y unified'
     )
 
@@ -497,6 +503,9 @@ def create_combined_metrics_chart(metrics: Dict[str, Dict[str, float]]) -> go.Fi
     methods = list(metrics.keys())
     metric_types = list(metrics[methods[0]].keys())
 
+    patterns = {"Precision": ".", "Recall": "x", "F1-score": "/"}
+    colors = {'Precision': '#FAA43A', 'Recall': '#60BD68', 'F1-score': '#5DA5DA'}
+
     fig = go.Figure()
 
     for metric in metric_types:
@@ -504,7 +513,8 @@ def create_combined_metrics_chart(metrics: Dict[str, Dict[str, float]]) -> go.Fi
             x=methods,
             y=[metrics[method][metric] * 100 for method in methods],  # переводим в проценты
             name=metric,
-            marker_color={'Precision': '#FAA43A', 'Recall': '#60BD68', 'F1-score': '#5DA5DA'}[metric],
+            marker_color=colors[metric],
+            marker_pattern_shape=patterns[metric],
             hovertemplate='<b>%{x}</b><br>%{y:.2f}%<extra></extra>'
         ))
 
@@ -554,6 +564,7 @@ def create_combined_image_metrics_chart(error_dfs: Dict[str, pd.DataFrame], n: i
             y=worst_images['f1_score'],
             name=f'F1 Score ({method})',
             marker_color='#5DA5DA',
+            marker_pattern_shape="/",
             visible=(method == methods[0]),  # первый метод видимый по умолчанию
             hovertemplate='<b>%{x}</b><br>F1: %{y:.3f}<extra></extra>'
         ))
@@ -564,6 +575,7 @@ def create_combined_image_metrics_chart(error_dfs: Dict[str, pd.DataFrame], n: i
             y=worst_images['precision'],
             name=f'Precision ({method})',
             marker_color='#FAA43A',
+            marker_pattern_shape=".",
             visible=False,  # скрыты по умолчанию
             hovertemplate='<b>%{x}</b><br>Precision: %{y:.3f}<extra></extra>'
         ))
@@ -574,6 +586,7 @@ def create_combined_image_metrics_chart(error_dfs: Dict[str, pd.DataFrame], n: i
             y=worst_images['recall'],
             name=f'Recall ({method})',
             marker_color='#60BD68',
+            marker_pattern_shape="x",
             visible=False,  # скрыты по умолчанию
             hovertemplate='<b>%{x}</b><br>Recall: %{y:.3f}<extra></extra>'
         ))
@@ -720,6 +733,7 @@ def create_combined_tag_metrics_chart(tag_dfs: Dict[str, pd.DataFrame], n: int =
             x=worst_tags['f1_score'],
             name=f'F1 Score ({method})',
             marker_color='#5DA5DA',
+            marker_pattern_shape="/",
             orientation='h',
             visible=(method == methods[0]),  # первый метод видимый по умолчанию
             hovertemplate='<b>%{y}</b><br>F1: %{x:.3f}<extra></extra>'
@@ -731,6 +745,7 @@ def create_combined_tag_metrics_chart(tag_dfs: Dict[str, pd.DataFrame], n: int =
             x=worst_tags['precision'],
             name=f'Precision ({method})',
             marker_color='#FAA43A',
+            marker_pattern_shape=".",
             orientation='h',
             visible=False,  # скрыты по умолчанию
             hovertemplate='<b>%{y}</b><br>Precision: %{x:.3f}<extra></extra>'
@@ -742,6 +757,7 @@ def create_combined_tag_metrics_chart(tag_dfs: Dict[str, pd.DataFrame], n: int =
             x=worst_tags['recall'],
             name=f'Recall ({method})',
             marker_color='#60BD68',
+            marker_pattern_shape="x",
             orientation='h',
             visible=False,  # скрыты по умолчанию
             hovertemplate='<b>%{y}</b><br>Recall: %{x:.3f}<extra></extra>'
@@ -854,7 +870,7 @@ def create_combined_tag_metrics_chart(tag_dfs: Dict[str, pd.DataFrame], n: int =
         xaxis_title='Значение метрики',
         yaxis_title='Тег',
         barmode='group',
-        height=max(500, n*25),  # Динамическая высота
+        height=max(600, n * 35),  # Увеличена высота для лучшего разрешения
         hovermode='y unified',
         # Добавляем две группы кнопок
         updatemenus=[
@@ -970,9 +986,16 @@ def display_tag_count_statistics(ground_truth: Dict[str, Set[str]],
     # Создаем столбчатую диаграмму для среднего количества тегов
     methods = [row["Метод"] for row in stats_data]
     avg_counts = [float(row["Среднее кол-во тегов"]) for row in stats_data]
+    colors = ['#3498db', '#2ecc71', '#e74c3c']
+    patterns = ['/', '.', 'x']
 
     plt.figure(figsize=(10, 6))
-    bars = plt.bar(methods, avg_counts, color=['#3498db', '#2ecc71', '#e74c3c'])
+    bars = plt.bar(methods, avg_counts, color=colors[:len(methods)])
+
+    # Добавляем паттерны для монохромной печати
+    for bar, pattern in zip(bars, patterns):
+        bar.set_hatch(pattern)
+
     plt.title('Среднее количество тегов по методам', fontsize=14)
     plt.ylabel('Количество тегов', fontsize=12)
     plt.grid(axis='y', linestyle='--', alpha=0.7)
@@ -1023,6 +1046,7 @@ def create_interactive_tag_count_chart(ground_truth: Dict[str, Set[str]],
         y=avg_counts,
         name="Среднее",
         marker_color="#3498db",
+        marker_pattern_shape="/",
         hovertemplate="<b>%{x}</b><br>Среднее: %{y:.2f}<extra></extra>"
     ))
 
@@ -1032,6 +1056,7 @@ def create_interactive_tag_count_chart(ground_truth: Dict[str, Set[str]],
         y=median_counts,
         name="Медиана",
         marker_color="#2ecc71",
+        marker_pattern_shape=".",
         hovertemplate="<b>%{x}</b><br>Медиана: %{y}<extra></extra>"
     ))
 
@@ -1089,7 +1114,7 @@ def analyze_tag_improvements(
     full_df = full_image_tag_perf.set_index('tag')
     merged_df = merged_tags_tag_perf.set_index('tag')
 
-    # Find common tags with minimum occurrences
+    # Find common tags
     common_tags = set(full_df.index) & set(merged_df.index)
 
     # Create list to store improvement data
@@ -1190,6 +1215,7 @@ def analyze_tag_improvements(
             x=top_improved['found_tags_improvement'],
             name='Найдено пропущенных тегов',
             marker_color='#4CAF50',  # Green for improvement
+            marker_pattern_shape="+",
             orientation='h',
             hovertemplate='<b>%{y}</b><br>Найдено пропущенных тегов: %{x}<extra></extra>'
         ))
@@ -1200,6 +1226,7 @@ def analyze_tag_improvements(
             x=top_improved['precision_change'] * 100,  # Convert to percentage
             name='Изменение Precision',
             marker_color='#FAA43A',
+            marker_pattern_shape=".",
             orientation='h',
             visible='legendonly',  # Hide by default
             hovertemplate='<b>%{y}</b><br>Изменение Precision: %{x:.2f}%<extra></extra>'
@@ -1210,6 +1237,7 @@ def analyze_tag_improvements(
             x=top_improved['recall_change'] * 100,  # Convert to percentage
             name='Изменение Recall',
             marker_color='#60BD68',
+            marker_pattern_shape="x",
             orientation='h',
             visible='legendonly',  # Hide by default
             hovertemplate='<b>%{y}</b><br>Изменение Recall: %{x:.2f}%<extra></extra>'
@@ -1252,7 +1280,7 @@ def analyze_tag_improvements(
             title=f'Топ {top_n} тегов с наибольшим числом найденных пропущенных тегов',
             xaxis_title='Количество найденных пропущенных тегов',
             yaxis_title='Тег',
-            height=max(500, top_n*25),
+            height=max(600, top_n * 35), # Увеличена высота для лучшего разрешения
             hovermode='y unified'
         )
 
@@ -1275,7 +1303,7 @@ def analyze_tag_deteriorations(
     full_df = full_image_tag_perf.set_index('tag')
     merged_df = merged_tags_tag_perf.set_index('tag')
 
-    # Find common tags with minimum occurrences
+    # Find common tags
     common_tags = set(full_df.index) & set(merged_df.index)
 
     # Create list to store deterioration data
@@ -1376,6 +1404,7 @@ def analyze_tag_deteriorations(
             x=top_deteriorated['added_incorrect_tags'],
             name='Добавлено некорректных тегов',
             marker_color='#E74C3C',  # Red for deterioration
+            marker_pattern_shape="-",
             orientation='h',
             hovertemplate='<b>%{y}</b><br>Добавлено некорректных тегов: %{x}<extra></extra>'
         ))
@@ -1386,6 +1415,7 @@ def analyze_tag_deteriorations(
             x=top_deteriorated['precision_change'] * 100,  # Convert to percentage
             name='Изменение Precision',
             marker_color='#EC7063',
+            marker_pattern_shape=".",
             orientation='h',
             visible='legendonly',  # Hide by default
             hovertemplate='<b>%{y}</b><br>Изменение Precision: %{x:.2f}%<extra></extra>'
@@ -1396,6 +1426,7 @@ def analyze_tag_deteriorations(
             x=top_deteriorated['recall_change'] * 100,  # Convert to percentage
             name='Изменение Recall',
             marker_color='#F1948A',
+            marker_pattern_shape="x",
             orientation='h',
             visible='legendonly',  # Hide by default
             hovertemplate='<b>%{y}</b><br>Изменение Recall: %{x:.2f}%<extra></extra>'
@@ -1438,7 +1469,7 @@ def analyze_tag_deteriorations(
             title=f'Топ {top_n} тегов с наибольшим числом добавленных некорректных тегов',
             xaxis_title='Количество добавленных некорректных тегов',
             yaxis_title='Тег',
-            height=max(500, top_n*25),
+            height=max(600, top_n * 35), # Увеличена высота для лучшего разрешения
             hovermode='y unified'
         )
 
