@@ -1,0 +1,80 @@
+[
+  {
+  "instruction": "ringed eyes",
+  "input": "",
+  "output": "Eyes in which the pupil and iris are composed of one or several rings or circles, usually concentric to the pupil. Eyes composed of many of these rings are frequently used to give a crazed appearance."
+},
+
+{
+  "instruction": "aqua eyes",
+  "input": "",
+  "output": "A character with blue-green colored eyes. Due to the subjective nature of color judgment and other factors (such as the lighting on the characters) there is an overlap between this tag, the blue eyes, and the green eyes tags."
+
+},
+{
+
+  "instruction": "black eyes",
+  "input": "",
+  "output": "A character with black colored eyes. See bruised eye for eyes that are bruised, also known as a black eye. Also see solid circle pupils for eyes with irises that are completely flat black to the point of being indistinct from the pupil."
+
+},
+
+{
+
+  "instruction": "blue eyes",
+  "input": "",
+  "output": "A character with blue colored eyes.Due to the subjective nature of color judgment and other factors (such as the lighting on the characters), there is an overlap between this tag and the aqua eyes tags."
+
+},
+
+{
+  "instruction": "brown eyes",
+  "input": "",
+  "output": "A character with brown colored eyes.Due to the subjective nature of color judgment and other factors (such as the lighting on the characters), there is an overlap between this tag and the black eyes, orange eyes, and red eyes tags."
+},
+
+{
+  "instruction": "green eyes",
+  "input": "",
+  "output": "A character with green colored eyes.Due to the subjective nature of color judgment and other factors (such as the lighting on the characters), there is an overlap between this tag and the aqua eyes tag."
+
+},
+
+{
+  "instruction": "orange eyes",
+  "input": "",
+  "output": "A character with orange colored eyes.Due to the subjective nature of color judgment and other factors (such as the lighting on the characters), there is an overlap between this tag and the yellow eyes, red eyes, and brown eyes tags."
+},
+{
+  "instruction": "purple eyes",
+  "input": "",
+  "output": "A character with purple colored eyes.Due to the subjective nature of color judgment and other factors (such as the lighting on the characters), there is an overlap between this tag and the blue eyes and pink eyes tags."
+},
+
+{
+  "instruction": "pink eyes",
+  "input": "",
+  "output": "A character with pink colored eyes.Due to the subjective nature of color judgment and other factors (such as the lighting on the characters), there is an overlap between this tag and the purple eyes and red eyes tags."
+},
+{
+  "instruction": "red eyes",
+  "input": "",
+  "output": "A character with red colored eyes.Due to the subjective nature of color judgment and other factors (such as the lighting on the characters), there is an overlap between this tag and the orange eyes and brown eyes tags.See bloodshot eyes for eyes that are red from irritation."
+},
+{
+  "instruction": "white eyes",
+  "input": "",
+  "output": "A character with white colored eyes.Due to the subjective nature of color judgment and other factors (such as the lighting on the characters), there is an overlap between this tag and the grey eyes tag.Not to be confused with blank eyes, where the entire eye is solid white."
+
+},
+{
+  "instruction": "yellow eyes",
+  "input": "",
+  "output": "A character with yellow colored eyes.Due to the subjective nature of color judgment and other factors (such as the lighting on the characters), there is an overlap between this tag and the orange eyes tag."
+
+}
+
+
+
+
+]
