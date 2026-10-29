@@ -1,0 +1,31 @@
+{
+  "include": [
+    "Scripts/types.py",
+    "Scripts/tag_utils.py",
+    "Scripts/preprocess.py",
+    "Scripts/configs.py",
+    "Scripts/wdv3_timm.py",
+    "Scripts/model.py",
+    "Scripts/detection.py",
+    "Scripts/tagging.py",
+    "Scripts/main.py",
+    "Scripts/savingProc.py",
+    "Scripts/visualization.py",
+    "Scripts/evaluation.py",
+    "Scripts/analitycs.py",
+    "Scripts/analytics_charts.py",
+    "audit/typecheck/positive.py"
+  ],
+  "exclude": [
+    ".venv",
+    "temp",
+    "models",
+    "audit/typecheck/negative.py"
+  ],
+  "strict": [
+    "Scripts/types.py",
+    "audit/typecheck/positive.py"
+  ],
+  "typeCheckingMode": "standard",
+  "pythonVersion": "3.11"
+}

@@ -9,7 +9,7 @@ import requests
 import safetensors.torch
 import timm
 from huggingface_hub import hf_hub_download
-from huggingface_hub.utils import HfHubHTTPError
+from huggingface_hub.errors import HfHubHTTPError
 from torch import nn
 from ultralytics import YOLO
 
@@ -156,7 +156,7 @@ _KNOWN_YOLO_MODELS = {
 }
 
 
-def _local_yolo_path(model_path, model_directory):
+def _local_yolo_path(model_path: str, model_directory: Path) -> Path | None:
     """Resolve existing custom weights before attempting network access."""
     if os.path.isfile(model_path):
         return Path(model_path)
@@ -170,7 +170,7 @@ def _local_yolo_path(model_path, model_directory):
     return None
 
 
-def _download_known_yolo(model_path, model_directory):
+def _download_known_yolo(model_path: str, model_directory: Path) -> YOLO:
     """Download known weights with a bounded timeout and closed HTTP response."""
     destination = model_directory / model_path
     print(f"Downloading {model_path} from known source...")
@@ -183,7 +183,7 @@ def _download_known_yolo(model_path, model_directory):
     return YOLO(str(destination))
 
 
-def _remote_yolo_model(model_path, model_directory):
+def _remote_yolo_model(model_path: str, model_directory: Path) -> YOLO | None:
     """Resolve the explicitly supported standard, known-URL, and Hub backends."""
     if any(model_path.startswith(name) for name in _STANDARD_YOLO_MODELS):
         print(f"Standard model {model_path} not found locally. Attempting to download...")

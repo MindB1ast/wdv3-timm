@@ -3,27 +3,26 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import List, cast
 
 import torch
 #from timm.data import create_transform, resolve_data_config
 from timm.data.config import resolve_data_config
 from timm.data.transforms_factory import create_transform
+from ultralytics import YOLO
 
-from .configs import ScriptOptions, DetectorConfig
+from .configs import DetectorConfig, ScriptOptions
 from .detection import load_detectors_config
-from .model import (
-    download_model_files,
-    ensure_model_folder,
-    load_labels_local_or_remote,
-    load_model_local_or_remote,
-    load_yolo_model,
-)
+from .model import (download_model_files, ensure_model_folder,
+                    load_labels_local_or_remote, load_model_local_or_remote,
+                    load_yolo_model)
 from .preprocess import merge_tags_from_regions, save_results_to_json
 from .savingProc import save_tags_to_txt
 from .tag_utils import apply_tag_rules
 from .tagging import process_image_with_multiple_detectors
-from .wdv3_timm import MODEL_REPO_MAP
+from .types import (BatchResult, DetailedResult, ImageTransform, MergedResult,
+                    PathInput)
+from .wdv3_timm import MODEL_REPO_MAP, LabelData
 
 
 @dataclass
@@ -31,14 +30,16 @@ class _BatchResources:
     """Loaded resources shared by all images in one batch."""
 
     model: torch.nn.Module
-    transform: object
-    labels: object
-    detectors: list
-    yolo_models: dict
-    device: object = None
+    transform: ImageTransform
+    labels: LabelData
+    detectors: list[DetectorConfig]
+    yolo_models: dict[str, YOLO]
+    device: torch.device | None = None
 
 
-def _load_yolo_models(detectors:List[DetectorConfig], model_directory:Path):
+def _load_yolo_models(
+    detectors: List[DetectorConfig], model_directory: Path,
+) -> dict[str, YOLO]:
     """Load each model once and report expected resource failures per detector."""
     models = {}
     for detector in detectors:
@@ -53,7 +54,7 @@ def _load_yolo_models(detectors:List[DetectorConfig], model_directory:Path):
     return models
 
 
-def _load_batch_resources(opts:ScriptOptions):
+def _load_batch_resources(opts: ScriptOptions) -> _BatchResources:
     """Load model resources independently of file iteration and output formatting."""
     repo_id = MODEL_REPO_MAP[opts.model]
     model_folder = ensure_model_folder(Path(opts.model_folder))
@@ -64,7 +65,8 @@ def _load_batch_resources(opts:ScriptOptions):
     print("Загрузка списка тегов...")
     labels = load_labels_local_or_remote(repo_id, model_folder)
     print("Создание трансформации данных...")
-    transform = create_transform(**resolve_data_config(model.pretrained_cfg, model=model))
+    transform = cast(ImageTransform, create_transform(
+        **resolve_data_config(model.pretrained_cfg, model=model)))
     print(f"Загрузка конфигурации детекторов из {opts.detectors_config}...")
     detectors = load_detectors_config(opts.detectors_config)
     return _BatchResources(
@@ -72,7 +74,9 @@ def _load_batch_resources(opts:ScriptOptions):
     )
 
 
-def _process_image(image_path:Path, resources:_BatchResources, opts:ScriptOptions):
+def _process_image(
+    image_path: Path, resources: _BatchResources, opts: ScriptOptions,
+) -> tuple[DetailedResult, MergedResult] | None:
     """Run inference and postprocess a single image using unchanged public APIs."""
     result = process_image_with_multiple_detectors(
         str(image_path),
@@ -97,7 +101,7 @@ def _process_image(image_path:Path, resources:_BatchResources, opts:ScriptOption
         after=opts.add_tags_after.strip(),
         character_names=character_names,
     )
-    combined = {"image_path": result["image_path"], "merged_tags": merged}
+    combined: MergedResult = {"image_path": result["image_path"], "merged_tags": merged}
     if opts.save_txt:
         combined["txt_path"] = save_tags_to_txt(
             result["image_path"],
@@ -109,7 +113,10 @@ def _process_image(image_path:Path, resources:_BatchResources, opts:ScriptOption
     return result, combined
 
 
-def _save_batch_results(results, merged_results, output_file):
+def _save_batch_results(
+    results: list[DetailedResult], merged_results: list[MergedResult],
+    output_file: PathInput | None,
+) -> None:
     """Keep detailed and merged JSON exports separate."""
     if output_file:
         save_results_to_json(results, output_file)
@@ -119,7 +126,7 @@ def _save_batch_results(results, merged_results, output_file):
 
 # Preserve the existing notebook calling convention.
 # pylint: disable-next=C0103
-def BatchTagging(opts: ScriptOptions):
+def BatchTagging(opts: ScriptOptions) -> BatchResult | None:
     """Run a batch, retaining the legacy public name and two-list result."""
     if opts.model not in MODEL_REPO_MAP:
         print(f"Доступные модели: {list(MODEL_REPO_MAP.keys())}")
@@ -135,7 +142,8 @@ def BatchTagging(opts: ScriptOptions):
         return None
     resources.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     resources.model = resources.model.to(resources.device)
-    results, merged_results = [], []
+    results: list[DetailedResult] = []
+    merged_results: list[MergedResult] = []
     print(f"Всего изображений для обработки: {len(image_files)}")
     for index, image_path in enumerate(image_files):
         print(f"\nОбработка изображения {index + 1}/{len(image_files)}: {image_path}")
@@ -150,7 +158,9 @@ def BatchTagging(opts: ScriptOptions):
     return results, merged_results
 
 
-def _report_image(result, merged_result, opts):
+def _report_image(
+    result: DetailedResult, merged_result: MergedResult, opts: ScriptOptions,
+) -> None:
     """Print the same full-image, regional and merged notebook summary."""
     merged_tags = merged_result["merged_tags"]
     print("--------")
@@ -172,7 +182,7 @@ def _report_image(result, merged_result, opts):
     print(f"Теги: {merged_tags['taglist']}")
     if opts.save_txt:
         if opts.append_txt:
-            print(f"Теги добавлены/обновлены в: {merged_result['txt_path']}")
+            print(f"Теги добавлены/обновлены в: {merged_result.get('txt_path')}")
         else:
-            print(f"Теги сохранены в: {merged_result['txt_path']}")
+            print(f"Теги сохранены в: {merged_result.get('txt_path')}")
     print("--------")

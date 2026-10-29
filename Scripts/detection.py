@@ -3,15 +3,16 @@
 # yolo funcs
 import json
 import os
-from typing import List, Tuple
+from typing import List
 
 from PIL import Image
 from ultralytics import YOLO
 
 from .configs import DetectorConfig
+from .types import Crop, PathInput
 
 
-def load_detectors_config(config_path: str) -> List[DetectorConfig]:
+def load_detectors_config(config_path: PathInput) -> List[DetectorConfig]:
     """Read independent detector settings, reporting malformed entries."""
     if not os.path.exists(config_path):
         print(f"Файл конфигурации детекторов не найден: {config_path}")
@@ -51,8 +52,8 @@ def load_detectors_config(config_path: str) -> List[DetectorConfig]:
 
 
 def extract_regions_with_detector(
-    img_path: str, detector: DetectorConfig, yolo_model: YOLO
-) -> List[Tuple[Image.Image, List[float], str]]:
+    img_path: PathInput, detector: DetectorConfig, yolo_model: YOLO
+) -> list[Crop]:
     """
     Использует YOLO для детектирования объектов и вырезает области в исходном разрешении.
 

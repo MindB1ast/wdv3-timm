@@ -1,28 +1,30 @@
 """Notebook evaluation, tables, and compatible chart exports."""
 
 from dataclasses import dataclass
-from typing import Dict, Set, Tuple
+from typing import Dict, Literal, Set, Tuple, overload
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from IPython.display import HTML, display
+from IPython.core.display import HTML
+from IPython.display import display
 
-from .analytics_changes import analyze_tag_deteriorations, analyze_tag_improvements
-from .analytics_charts import (
-    create_combined_metrics_chart,
-    create_interactive_image_metrics_chart,
-    create_interactive_tag_count_chart,
-    create_interactive_tag_metrics_chart,
-)
-from .analytics_comparison_charts import (
-    create_combined_image_metrics_chart,
-    create_combined_tag_metrics_chart,
-)
+from .analytics_changes import (analyze_tag_deteriorations,
+                                analyze_tag_improvements)
+from .analytics_charts import (create_combined_metrics_chart,
+                               create_interactive_image_metrics_chart,
+                               create_interactive_tag_count_chart,
+                               create_interactive_tag_metrics_chart)
+from .analytics_comparison_charts import (create_combined_image_metrics_chart,
+                                          create_combined_tag_metrics_chart)
 from .analytics_stats import calculate_average_tag_count
 from .analytics_text import wrap_text
-from .evaluation import aligned_samples, ground_truth_tags
+from .evaluation import (F1_DEFINITION, METRIC_EPSILON, METRIC_POLICY_VERSION,
+                         aligned_samples, ground_truth_tags,
+                         metrics_from_counts)
 from .evaluation import model_tags as extract_model_tags
 from .evaluation import tag_metrics as evaluate_tags
+from .types import (BatchResult, MetricDiagnostics, Metrics, PathInput,
+                    TagSamples, TagSets)
 
 __all__ = [
     "load_ground_truth_tags",
@@ -50,17 +52,21 @@ __all__ = [
 ]
 
 
-def load_ground_truth_tags(txt_folder, recursive=False, image_root=None):
+def load_ground_truth_tags(
+    txt_folder: PathInput, recursive: bool = False, image_root: PathInput | None = None,
+) -> TagSets:
     """Load labels, optionally preserving recursive dataset identities."""
     return ground_truth_tags(txt_folder, recursive=recursive, image_root=image_root)
 
 
-def load_model_tags(results, use_merged=True, image_root=None):
+def load_model_tags(
+    results: BatchResult, use_merged: bool = True, image_root: PathInput | None = None,
+) -> TagSets:
     """Extract predictions without silently overwriting duplicate basenames."""
     return extract_model_tags(results, use_merged=use_merged, image_root=image_root)
 
 
-def filter_known_tags(tags: Set[str], model_labels_path: str) -> Set[str]:
+def filter_known_tags(tags: Set[str], model_labels_path: PathInput) -> Set[str]:
     """Фильтрует теги на основе известных модели тегов."""
     model_labels = pd.read_csv(model_labels_path)
     known_tags = set(model_labels["name"].str.replace("_", " ").tolist())
@@ -68,13 +74,34 @@ def filter_known_tags(tags: Set[str], model_labels_path: str) -> Set[str]:
     return {tag for tag in tags if tag in known_tags}
 
 
-def calculate_tag_metrics(ground_truth, model_tags, *, return_diagnostics=False):
+@overload
+def calculate_tag_metrics(
+    ground_truth: TagSamples, model_tags: TagSamples, *,
+    return_diagnostics: Literal[False] = False,
+) -> Metrics: ...
+
+
+@overload
+def calculate_tag_metrics(
+    ground_truth: TagSamples, model_tags: TagSamples, *, return_diagnostics: Literal[True],
+) -> tuple[Metrics, MetricDiagnostics]: ...
+
+
+@overload
+def calculate_tag_metrics(
+    ground_truth: TagSamples, model_tags: TagSamples, *, return_diagnostics: bool,
+) -> Metrics | tuple[Metrics, MetricDiagnostics]: ...
+
+
+def calculate_tag_metrics(
+    ground_truth: TagSamples, model_tags: TagSamples, *, return_diagnostics: bool = False,
+) -> Metrics | tuple[Metrics, MetricDiagnostics]:
     """Evaluate all labels; optionally return coverage and the F1 definition."""
     return evaluate_tags(ground_truth, model_tags, return_diagnostics=return_diagnostics)
 
 
 def analyze_tagging_errors(
-    ground_truth: Dict[str, Set[str]], model_tags: Dict[str, Set[str]], output_file: str = None
+    ground_truth: TagSamples, model_tags: TagSamples, output_file: PathInput | None = None
 ) -> pd.DataFrame:
     """Analyzes tagging errors between ground truth and model predictions."""
     # Find common images in ground truth and model results
@@ -98,9 +125,8 @@ def analyze_tagging_errors(
         true_positives = true_tags & pred_tags
 
         # Calculate per-image metrics
-        precision = len(true_positives) / len(pred_tags) if pred_tags else 1.0
-        recall = len(true_positives) / len(true_tags) if true_tags else 1.0
-        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
+        sample = metrics_from_counts(
+            len(true_positives), len(false_positives), len(false_negatives))
 
         results.append(
             {
@@ -112,9 +138,9 @@ def analyze_tagging_errors(
                 "false_negatives": ", ".join(sorted(false_negatives)),
                 "num_false_positives": len(false_positives),
                 "num_false_negatives": len(false_negatives),
-                "precision": precision,
-                "recall": recall,
-                "f1_score": f1,
+                "precision": sample["precision"],
+                "recall": sample["recall"],
+                "f1_score": sample["f1_score"],
             }
         )
 
@@ -134,7 +160,7 @@ def analyze_tagging_errors(
 
 
 def analyze_tag_performance(
-    ground_truth: Dict[str, Set[str]], model_tags: Dict[str, Set[str]], output_file: str = None
+    ground_truth: TagSamples, model_tags: TagSamples, output_file: PathInput | None = None
 ) -> pd.DataFrame:
     """Analyzes performance of individual tags across all images."""
     # Find common images
@@ -168,9 +194,7 @@ def analyze_tag_performance(
                 fp += 1
 
         # Calculate metrics
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
+        sample = metrics_from_counts(tp, fp, fn)
 
         # Store metrics
         tag_metrics[tag] = {
@@ -178,9 +202,9 @@ def analyze_tag_performance(
             "true_positives": tp,
             "false_positives": fp,
             "false_negatives": fn,
-            "precision": precision,
-            "recall": recall,
-            "f1_score": f1,
+            "precision": sample["precision"],
+            "recall": sample["recall"],
+            "f1_score": sample["f1_score"],
             "total_ground_truth": tp + fn,
             "total_predicted": tp + fp,
         }
@@ -200,7 +224,7 @@ def analyze_tag_performance(
     return df
 
 
-def display_metrics_summary(metrics: Dict[str, Dict[str, float]]) -> pd.DataFrame:
+def display_metrics_summary(metrics: Dict[str, Metrics]) -> pd.DataFrame:
     """Отображает сводку метрик для всех методов в формате таблицы."""
     # Создаем DataFrame для метрик
     metrics_df = pd.DataFrame(metrics).T * 100  # Переводим в проценты для лучшей читаемости
@@ -216,7 +240,7 @@ def display_metrics_summary(metrics: Dict[str, Dict[str, float]]) -> pd.DataFram
     return metrics_df
 
 
-def display_tags_inline(tags_string):
+def display_tags_inline(tags_string: str) -> str:
     """Отображает теги в строку без переносов на новую строку."""
     if not tags_string:
         return "Нет"
@@ -393,10 +417,10 @@ def display_tag_count_statistics(
 # Preserve the existing notebook calling convention.
 # pylint: disable-next=R0913,R0917
 def compare_tagging_methods(
-    image_folder: str,
-    txt_folder: str,
-    results: Tuple,
-    model_labels_path: str,
+    image_folder: PathInput,
+    txt_folder: PathInput,
+    results: BatchResult,
+    model_labels_path: PathInput,
     filter_tags: bool = True,
     num_worst_examples: int = 5,
     num_top_improved: int = 20,
@@ -404,7 +428,7 @@ def compare_tagging_methods(
     visualize: bool = True,
     interactive: bool = True,
 ) -> Tuple[
-    Dict[str, Dict[str, float]],
+    Dict[str, Metrics],
     Dict[str, pd.DataFrame],
     Dict[str, pd.DataFrame],
     pd.DataFrame,
@@ -428,10 +452,10 @@ def compare_tagging_methods(
 class _ComparisonInput:
     """Dataset paths and predictions for one notebook comparison."""
 
-    image_folder: str
-    txt_folder: str
-    results: tuple
-    labels_path: str
+    image_folder: PathInput
+    txt_folder: PathInput
+    results: BatchResult
+    labels_path: PathInput
 
 
 @dataclass(frozen=True)
@@ -446,9 +470,12 @@ class _ComparisonOptions:
     interactive: bool
 
 
-def _comparison_intro(truth, methods, interactive):
+def _comparison_intro(
+    truth: TagSets, methods: dict[str, TagSets], interactive: bool,
+) -> None:
     """Show tag counts and the explicit historical F1 definition."""
-    print("F1-score: harmonic mean of samples-averaged Precision and Recall")
+    print(f"Metric policy: {METRIC_POLICY_VERSION}; epsilon={METRIC_EPSILON:g}")
+    print("F1-score: " + F1_DEFINITION)
     display(HTML("<h1 style='color:#1a5276;'>Сравнение методов тегирования</h1>"))
     display_tag_count_statistics(truth, methods)
     if interactive:
@@ -458,7 +485,9 @@ def _comparison_intro(truth, methods, interactive):
         create_interactive_tag_count_chart(truth, methods).show()
 
 
-def _evaluate_comparison_method(truth, predictions, prefix):
+def _evaluate_comparison_method(
+    truth: TagSamples, predictions: TagSamples, prefix: str,
+) -> tuple[Metrics, pd.DataFrame, pd.DataFrame]:
     """Evaluate every labelled sample and write method-specific CSV tables."""
     metrics, diagnostics = calculate_tag_metrics(truth, predictions, return_diagnostics=True)
     label = "Full-image" if prefix == "full_image" else "Merged"
@@ -468,7 +497,9 @@ def _evaluate_comparison_method(truth, predictions, prefix):
     return metrics, errors, performance
 
 
-def _comparison_details(errors, performance, count):
+def _comparison_details(
+    errors: dict[str, pd.DataFrame], performance: dict[str, pd.DataFrame], count: int,
+) -> None:
     """Render the same per-image and per-tag details for both methods."""
     names = {"Полное изображение": "полного изображения", "Объединенные теги": "объединенных тегов"}
     for method, suffix in names.items():
@@ -477,7 +508,10 @@ def _comparison_details(errors, performance, count):
         display_worst_performing_tags(performance[method], "Метод " + suffix, count)
 
 
-def _comparison_charts(metrics, errors, performance, options):
+def _comparison_charts(
+    metrics: dict[str, Metrics], errors: dict[str, pd.DataFrame],
+    performance: dict[str, pd.DataFrame], options: _ComparisonOptions,
+) -> None:
     """Show optional combined figures without growing the evaluation function."""
     if not (options.visualize and options.interactive):
         return
@@ -494,7 +528,10 @@ def _comparison_charts(metrics, errors, performance, options):
         figure.show()
 
 
-def _compare_methods(inputs, options):
+def _compare_methods(
+    inputs: _ComparisonInput, options: _ComparisonOptions,
+) -> tuple[dict[str, Metrics], dict[str, pd.DataFrame], dict[str, pd.DataFrame],
+           pd.DataFrame, pd.DataFrame]:
     """Compose validated loading, evaluation, presentation and change analysis."""
     truth = load_ground_truth_tags(
         inputs.txt_folder, recursive=True, image_root=inputs.image_folder

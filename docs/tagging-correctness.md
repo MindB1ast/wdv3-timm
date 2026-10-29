@@ -28,7 +28,11 @@ calculate_tag_metrics(..., return_diagnostics=True) возвращает (metric
 с coverage, missing_ids, TP/FP/FN и точной формулой F1. Обычный вызов сохраняет
 три исторических ключа, выдавая RuntimeWarning при пропусках.
 F1-score — гармоническое среднее samples-averaged Precision и Recall;
-это не samples-averaged F1. Формула сохранена для совместимости.
+это не samples-averaged F1. Порядок агрегации сохранён для совместимости.
+Текущая политика complete-labels-epsilon-v1 добавляет 1e-8 к знаменателям
+P/R/F1 во всех таблицах и сводке; обе пустые стороны дают нули. Diagnostics
+содержит metric_policy_version и epsilon. Точные формулы и правила сравнения
+версий описаны в [typed-tagging.md](typed-tagging.md).
 Loaders принимают image_root; идентификатор относительно корня не содержит
 расширения. Несколько изображений на один TXT, дубли ID и выход за корень
 отклоняются. Без корня прежние stem-ключи остаются для одного каталога;

@@ -1,0 +1,97 @@
+[
+  {
+    "module": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\baseline\\Scripts\\evaluation.py",
+    "run": 8,
+    "failures": [],
+    "errors": [],
+    "skipped": 0,
+    "case": "baseline",
+    "exit": 0,
+    "expected_failure": null
+  },
+  {
+    "module": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py",
+    "run": 8,
+    "failures": [
+      {
+        "test": "test_typed_contracts.StableMetricContracts.test_one_correct_tag_uses_epsilon_in_all_denominators",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 56, in test_one_correct_tag_uses_epsilon_in_all_denominators\n    self.assert_metrics(calculate_tag_metrics({'a': {'x'}}, {'a': {'x'}}), expected_metrics(1, 0, 0))\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 53, in assert_metrics\n    self.assertAlmostEqual(actual[key], value, delta=1e-12)\nAssertionError: 1.0 != 0.9999999900000001 within 1e-12 delta (9.99999993922529e-09 difference)\n"
+      },
+      {
+        "test": "test_typed_contracts.StableMetricContracts.test_per_tag_counts_and_stabilization",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 79, in test_per_tag_counts_and_stabilization\n    self.assertAlmostEqual(row[key], value, delta=1e-12)\nAssertionError: 0.5 != 0.4999999975 within 1e-12 delta (2.4999999848063226e-09 difference)\n"
+      },
+      {
+        "test": "test_typed_contracts.StableMetricContracts.test_summary_keeps_historical_order_of_aggregation",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 88, in test_summary_keeps_historical_order_of_aggregation\n    self.assert_metrics(metrics, expected)\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 53, in assert_metrics\n    self.assertAlmostEqual(actual[key], value, delta=1e-12)\nAssertionError: 0.55 != 0.5499999949500001 within 1e-12 delta (5.049999973749664e-09 difference)\n"
+      },
+      {
+        "test": "test_typed_contracts.StableMetricContracts.test_tp_fp_fn_and_empty_agree_across_image_tables (counts=(1, 0, 0))",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 67, in test_tp_fp_fn_and_empty_agree_across_image_tables\n    self.assert_metrics(metrics, expected)\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 53, in assert_metrics\n    self.assertAlmostEqual(actual[key], value, delta=1e-12)\nAssertionError: 1.0 != 0.9999999900000001 within 1e-12 delta (9.99999993922529e-09 difference)\n"
+      },
+      {
+        "test": "test_typed_contracts.StableMetricContracts.test_tp_fp_fn_and_empty_agree_across_image_tables (counts=(1, 1, 1))",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 67, in test_tp_fp_fn_and_empty_agree_across_image_tables\n    self.assert_metrics(metrics, expected)\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 53, in assert_metrics\n    self.assertAlmostEqual(actual[key], value, delta=1e-12)\nAssertionError: 0.5 != 0.4999999975 within 1e-12 delta (2.4999999848063226e-09 difference)\n"
+      }
+    ],
+    "errors": [
+      {
+        "test": "test_typed_contracts.StableMetricContracts.test_missing_predictions_and_policy_diagnostics",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 92, in test_missing_predictions_and_policy_diagnostics\n    metrics, evidence = calculate_tag_metrics({'a': {'x'}, 'b': {'y'}}, {'a': {'x'}}, return_diagnostics=True)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\analitycs.py\", line 100, in calculate_tag_metrics\n    return evaluate_tags(ground_truth, model_tags, return_diagnostics=return_diagnostics)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py\", line 149, in tag_metrics\n    samples = [_sample_metrics(values, predicted[key]) for key, values in truth.items()]\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py\", line 121, in _sample_metrics\n    return metrics_from_counts(\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py\", line 111, in metrics_from_counts\n    precision = tp / (tp + fp + METRIC_EPSILON)\n                ~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~\nZeroDivisionError: float division by zero\n"
+      },
+      {
+        "test": "test_typed_contracts.StableMetricContracts.test_tp_fp_fn_and_empty_agree_across_image_tables (counts=(0, 0, 0))",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 64, in test_tp_fp_fn_and_empty_agree_across_image_tables\n    metrics, evidence = calculate_tag_metrics({'a': truth}, {'a': predicted}, return_diagnostics=True)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\analitycs.py\", line 100, in calculate_tag_metrics\n    return evaluate_tags(ground_truth, model_tags, return_diagnostics=return_diagnostics)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py\", line 149, in tag_metrics\n    samples = [_sample_metrics(values, predicted[key]) for key, values in truth.items()]\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py\", line 121, in _sample_metrics\n    return metrics_from_counts(\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py\", line 111, in metrics_from_counts\n    precision = tp / (tp + fp + METRIC_EPSILON)\n                ~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~\nZeroDivisionError: float division by zero\n"
+      },
+      {
+        "test": "test_typed_contracts.StableMetricContracts.test_tp_fp_fn_and_empty_agree_across_image_tables (counts=(0, 1, 0))",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 64, in test_tp_fp_fn_and_empty_agree_across_image_tables\n    metrics, evidence = calculate_tag_metrics({'a': truth}, {'a': predicted}, return_diagnostics=True)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\analitycs.py\", line 100, in calculate_tag_metrics\n    return evaluate_tags(ground_truth, model_tags, return_diagnostics=return_diagnostics)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py\", line 149, in tag_metrics\n    samples = [_sample_metrics(values, predicted[key]) for key, values in truth.items()]\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py\", line 121, in _sample_metrics\n    return metrics_from_counts(\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py\", line 112, in metrics_from_counts\n    recall = tp / (tp + fn + METRIC_EPSILON)\n             ~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~\nZeroDivisionError: float division by zero\n"
+      },
+      {
+        "test": "test_typed_contracts.StableMetricContracts.test_tp_fp_fn_and_empty_agree_across_image_tables (counts=(0, 0, 1))",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\audit\\test_typed_contracts.py\", line 64, in test_tp_fp_fn_and_empty_agree_across_image_tables\n    metrics, evidence = calculate_tag_metrics({'a': truth}, {'a': predicted}, return_diagnostics=True)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\analitycs.py\", line 100, in calculate_tag_metrics\n    return evaluate_tags(ground_truth, model_tags, return_diagnostics=return_diagnostics)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py\", line 149, in tag_metrics\n    samples = [_sample_metrics(values, predicted[key]) for key, values in truth.items()]\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py\", line 121, in _sample_metrics\n    return metrics_from_counts(\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\epsilon-zero\\Scripts\\evaluation.py\", line 111, in metrics_from_counts\n    precision = tp / (tp + fp + METRIC_EPSILON)\n                ~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~\nZeroDivisionError: float division by zero\n"
+      }
+    ],
+    "skipped": 0,
+    "case": "epsilon-zero",
+    "exit": 1,
+    "expected_failure": "test_one_correct_tag_uses_epsilon_in_all_denominators",
+    "detected_by_behavior_assertion": true
+  },
+  {
+    "module": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\empty-one\\Scripts\\evaluation.py",
+    "run": 8,
+    "failures": [
+      {
+        "test": "test_typed_contracts.StableMetricContracts.test_tp_fp_fn_and_empty_agree_across_image_tables (counts=(0, 0, 0))",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\empty-one\\audit\\test_typed_contracts.py\", line 67, in test_tp_fp_fn_and_empty_agree_across_image_tables\n    self.assert_metrics(metrics, expected)\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\empty-one\\audit\\test_typed_contracts.py\", line 53, in assert_metrics\n    self.assertAlmostEqual(actual[key], value, delta=1e-12)\nAssertionError: 1.0 != 0.0 within 1e-12 delta (1.0 difference)\n"
+      }
+    ],
+    "errors": [],
+    "skipped": 0,
+    "case": "empty-one",
+    "exit": 1,
+    "expected_failure": "test_tp_fp_fn_and_empty_agree_across_image_tables",
+    "detected_by_behavior_assertion": true
+  },
+  {
+    "module": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\mean-sample-f1\\Scripts\\evaluation.py",
+    "run": 8,
+    "failures": [
+      {
+        "test": "test_typed_contracts.StableMetricContracts.test_missing_predictions_and_policy_diagnostics",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\mean-sample-f1\\audit\\test_typed_contracts.py\", line 100, in test_missing_predictions_and_policy_diagnostics\n    self.assert_metrics(metrics, (p, p, 2 * p * p / (2 * p + 1e-8)))\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\mean-sample-f1\\audit\\test_typed_contracts.py\", line 53, in assert_metrics\n    self.assertAlmostEqual(actual[key], value, delta=1e-12)\nAssertionError: 0.4999999925000001 != 0.4999999900000001 within 1e-12 delta (2.4999999848063226e-09 difference)\n"
+      },
+      {
+        "test": "test_typed_contracts.StableMetricContracts.test_summary_keeps_historical_order_of_aggregation",
+        "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\mean-sample-f1\\audit\\test_typed_contracts.py\", line 88, in test_summary_keeps_historical_order_of_aggregation\n    self.assert_metrics(metrics, expected)\n  File \"C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\typed-mutations-f8b0c046\\mean-sample-f1\\audit\\test_typed_contracts.py\", line 53, in assert_metrics\n    self.assertAlmostEqual(actual[key], value, delta=1e-12)\nAssertionError: 0.42424241880624425 != 0.6346153741346154 within 1e-12 delta (0.2103729553283712 difference)\n"
+      }
+    ],
+    "errors": [],
+    "skipped": 0,
+    "case": "mean-sample-f1",
+    "exit": 1,
+    "expected_failure": "test_summary_keeps_historical_order_of_aggregation",
+    "detected_by_behavior_assertion": true
+  }
+]

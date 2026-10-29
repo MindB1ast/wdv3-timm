@@ -1,0 +1,22 @@
+{
+  "kernel_python": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\.venv\\Scripts\\python.exe",
+  "device": "cpu",
+  "actual_notebook_cells": [
+    "ManagingTags:0,1",
+    "Analitycs:2,3,4,6"
+  ],
+  "overrides": "Disposable dataset, existing local WD ViT and detector configuration, presentation flags only",
+  "result_lengths": [
+    4,
+    4
+  ],
+  "comparison_tuple_length": 5,
+  "baseline_predictions_scores_provenance_geometry_unchanged": true,
+  "txt_json_saved": true,
+  "static_formats": [
+    "PNG",
+    "JPEG"
+  ],
+  "metric_policy_version": "complete-labels-epsilon-v1",
+  "epsilon": 1e-08
+}

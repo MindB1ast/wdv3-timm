@@ -1,15 +1,19 @@
 """Run tagging inference on full images and detector crops."""
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Callable, Dict
 
 import torch
 from PIL import Image
 from torch import nn
 from torch.nn import functional as F
+from ultralytics import YOLO
 
+from .configs import DetectorConfig
 from .detection import extract_regions_with_detector
 from .tag_utils import apply_tag_rules, format_result
+from .types import (Crop, DetailedResult, ImageTransform, PathInput,
+                    RegionResult, WDTagResult)
 from .wdv3_timm import LabelData, get_tags, pil_ensure_rgb, pil_pad_square
 
 
@@ -18,12 +22,12 @@ from .wdv3_timm import LabelData, get_tags, pil_ensure_rgb, pil_pad_square
 def tag_image(
     img: Image.Image,
     model: nn.Module,
-    transform: Callable,
+    transform: ImageTransform,
     labels: LabelData,
     gen_threshold: float,
     char_threshold: float,
-    torch_device: torch.device,
-) -> Dict:
+    torch_device: torch.device | None,
+) -> WDTagResult:
     """
     Тегирует изображение с помощью модели.
 
@@ -50,22 +54,25 @@ def tag_image(
     tagged = get_tags(
         probs=output[0], labels=labels, gen_threshold=gen_threshold, char_threshold=char_threshold
     )
-    return dict(zip(("caption", "taglist", "ratings", "character", "general"), tagged))
+    return {"caption": tagged[0], "taglist": tagged[1], "ratings": tagged[2],
+            "character": tagged[3], "general": tagged[4]}
 
 
 @dataclass(frozen=True)
 class _TaggingRuntime:
     """Shared tagging dependencies and fallback thresholds for regional inference."""
 
-    model: object
-    transform: object
-    labels: object
+    model: nn.Module
+    transform: ImageTransform
+    labels: LabelData
     gen_threshold: float
     char_threshold: float
-    torch_device: object
+    torch_device: torch.device | None
 
 
-def _tag_detector_regions(regions, detector, runtime):
+def _tag_detector_regions(
+    regions: list[Crop], detector: DetectorConfig, runtime: _TaggingRuntime,
+) -> list[RegionResult]:
     """Tag detached crops and close them even when inference fails."""
     gen_threshold = (
         detector.region_gen_threshold
@@ -77,7 +84,7 @@ def _tag_detector_regions(regions, detector, runtime):
         if detector.region_char_threshold is not None
         else runtime.char_threshold
     )
-    results = []
+    results: list[RegionResult] = []
     character_names = [runtime.labels.names[index] for index in runtime.labels.character]
     try:
         for index, (image, bbox, _) in enumerate(regions):
@@ -103,9 +110,12 @@ def _tag_detector_regions(regions, detector, runtime):
     return results
 
 
-def _tag_all_regions(img_path, runtime, detectors, yolo_models):
+def _tag_all_regions(
+    img_path: PathInput, runtime: _TaggingRuntime, detectors: Sequence[DetectorConfig],
+    yolo_models: Mapping[str, YOLO],
+) -> dict[str, list[RegionResult]]:
     """Run each available detector with its own regional thresholds."""
-    results = {}
+    results: dict[str, list[RegionResult]] = {}
     for detector in detectors:
         yolo_model = yolo_models.get(detector.model_path)
         if yolo_model is None:
@@ -118,16 +128,16 @@ def _tag_all_regions(img_path, runtime, detectors, yolo_models):
 # Preserve the existing notebook calling convention.
 # pylint: disable-next=R0913,R0917
 def process_image_with_multiple_detectors(
-    img_path,
-    tagger_model,
-    transform,
-    labels,
-    detectors,
-    yolo_models,
-    gen_threshold,
-    char_threshold,
-    torch_device,
-):
+    img_path: PathInput,
+    tagger_model: nn.Module,
+    transform: ImageTransform,
+    labels: LabelData,
+    detectors: Sequence[DetectorConfig],
+    yolo_models: Mapping[str, YOLO],
+    gen_threshold: float,
+    char_threshold: float,
+    torch_device: torch.device | None,
+) -> DetailedResult:
     """Tag the full image and independent crops, always closing owned images."""
     runtime = _TaggingRuntime(
         tagger_model, transform, labels, gen_threshold, char_threshold, torch_device

@@ -1,0 +1,27 @@
+************* Module Scripts.analitycs
+Scripts\analitycs.py:107:0: R0914: Too many local variables (16/15) (too-many-locals)
+Scripts\analitycs.py:167:0: R0914: Too many local variables (16/15) (too-many-locals)
+Scripts\analitycs.py:8:0: C0411: third party import "matplotlib.pyplot" should be placed before local import "types.BatchResult" (wrong-import-order)
+Scripts\analitycs.py:9:0: C0411: third party import "pandas" should be placed before local import "types.BatchResult" (wrong-import-order)
+Scripts\analitycs.py:10:0: C0411: third party import "IPython.core.display.HTML" should be placed before local import "types.BatchResult" (wrong-import-order)
+Scripts\analitycs.py:11:0: C0411: third party import "IPython.display.display" should be placed before local import "types.BatchResult" (wrong-import-order)
+************* Module Scripts.configs
+Scripts\configs.py:9:0: C0411: third party import "simple_parsing.field" should be placed before local import "types.PathInput" (wrong-import-order)
+************* Module Scripts.evaluation
+Scripts\evaluation.py:19:0: C0413: Import "from .tag_utils import parse_tags" should be placed at the top of the module (wrong-import-position)
+************* Module Scripts.main
+Scripts\main.py:12:0: C0411: third party import "torch" should be placed before local import "types.BatchResult" (wrong-import-order)
+Scripts\main.py:14:0: C0411: third party import "timm.data.config.resolve_data_config" should be placed before local import "types.BatchResult" (wrong-import-order)
+Scripts\main.py:15:0: C0411: third party import "timm.data.transforms_factory.create_transform" should be placed before local import "types.BatchResult" (wrong-import-order)
+************* Module Scripts.preprocess
+Scripts\preprocess.py:245:30: E1120: No value for argument 'value' in constructor call (no-value-for-parameter)
+Scripts\preprocess.py:14:0: C0411: third party import "numpy" should be placed before local imports "configs.DetectorConfig", "types.CATEGORIES" (wrong-import-order)
+************* Module Scripts.tagging
+Scripts\tagging.py:22:0: R0914: Too many local variables (17/15) (too-many-locals)
+************* Module Scripts.visualization
+Scripts\visualization.py:11:0: C0411: third party import "numpy" should be placed before local import "types.BatchResult" (wrong-import-order)
+Scripts\visualization.py:12:0: C0411: third party import "plotly.express" should be placed before local import "types.BatchResult" (wrong-import-order)
+Scripts\visualization.py:13:0: C0411: third party import "PIL.Image" should be placed before local import "types.BatchResult" (wrong-import-order)
+
+-----------------------------------
+Your code has been rated at 9.85/10

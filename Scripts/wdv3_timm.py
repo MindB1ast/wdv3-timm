@@ -8,9 +8,11 @@ import numpy as np
 import pandas as pd
 import torch
 from huggingface_hub import hf_hub_download
-from huggingface_hub.utils import HfHubHTTPError
+from huggingface_hub.errors import HfHubHTTPError
 from PIL import Image
 from torch import Tensor
+
+from .types import PathInput, Scores
 
 torch_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 MODEL_REPO_MAP = {
@@ -52,9 +54,9 @@ class LabelData:
     """Names and category indices from a model label dictionary."""
 
     names: list[str]
-    rating: list[np.int64]
-    general: list[np.int64]
-    character: list[np.int64]
+    rating: list[int | np.int64]
+    general: list[int | np.int64]
+    character: list[int | np.int64]
 
 
 def load_labels_hf(
@@ -76,22 +78,24 @@ def get_tags(
     labels: LabelData,
     gen_threshold: float,
     char_threshold: float,
-):
+) -> tuple[str, str, Scores, Scores, Scores]:
     # Convert indices+probs to labels
     """Select model probabilities and format thresholded tag categories."""
-    probs = list(zip(labels.names, probs.numpy()))
+    probabilities = list(zip(labels.names, probs.numpy()))
 
     # First 4 labels are actually ratings
-    rating_labels = dict(probs[index] for index in labels.rating)
+    rating_labels = dict(probabilities[index] for index in labels.rating)
 
     # General labels, pick any where prediction confidence > threshold
-    gen_labels = [probs[i] for i in labels.general]
-    gen_labels = {name: score for name, score in gen_labels if score > gen_threshold}
+    general_candidates = [probabilities[i] for i in labels.general]
+    gen_labels: Scores = {name: score for name, score in general_candidates
+                          if score > gen_threshold}
     gen_labels = dict(sorted(gen_labels.items(), key=lambda item: item[1], reverse=True))
 
     # Character labels, pick any where prediction confidence > threshold
-    char_labels = [probs[i] for i in labels.character]
-    char_labels = {name: score for name, score in char_labels if score > char_threshold}
+    character_candidates = [probabilities[i] for i in labels.character]
+    char_labels: Scores = {name: score for name, score in character_candidates
+                           if score > char_threshold}
     char_labels = dict(sorted(char_labels.items(), key=lambda item: item[1], reverse=True))
 
     # Combine general and character labels, sort by confidence
@@ -105,7 +109,7 @@ def get_tags(
     return caption, taglist, rating_labels, char_labels, gen_labels
 
 
-def load_labels_csv(csv_path):
+def load_labels_csv(csv_path: PathInput) -> LabelData:
     """Read one label dictionary consistently for local and Hub loaders."""
     df: pd.DataFrame = pd.read_csv(csv_path, usecols=["name", "category"])
     tag_data = LabelData(

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "tests_run": 8,
+  "passed": 3,
+  "failures": 8,
+  "errors": 1,
+  "skipped": 0,
+  "tests": [
+    {
+      "test": "test_typed_contracts.StableMetricContracts.test_invalid_dataset_and_unknown_ids_still_fail",
+      "status": "passed"
+    },
+    {
+      "test": "test_typed_contracts.StableMetricContracts.test_missing_predictions_and_policy_diagnostics",
+      "status": "error",
+      "reason": "KeyError: 'epsilon'"
+    },
+    {
+      "test": "test_typed_contracts.StableMetricContracts.test_one_correct_tag_uses_epsilon_in_all_denominators",
+      "status": "failed",
+      "reason": "1.0 != 0.9999999900000001 within 1e-12 delta (9.99999993922529e-09 difference)"
+    },
+    {
+      "test": "test_typed_contracts.StableMetricContracts.test_per_tag_counts_and_stabilization",
+      "status": "failed",
+      "reason": "0.5 != 0.4999999975 within 1e-12 delta (2.4999999848063226e-09 difference)"
+    },
+    {
+      "test": "test_typed_contracts.StableMetricContracts.test_summary_keeps_historical_order_of_aggregation",
+      "status": "failed",
+      "reason": "0.55 != 0.5499999949500001 within 1e-12 delta (5.049999973749664e-09 difference)"
+    },
+    {
+      "test": "test_typed_contracts.TypedRuntimeContracts.test_existing_path_and_none_configuration",
+      "status": "passed"
+    },
+    {
+      "test": "test_typed_contracts.TypedRuntimeContracts.test_plain_dictionary_round_trip_and_extra_region_fields",
+      "status": "passed"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "tests_per_python": 63,
+  "python_versions": [
+    "3.11.17",
+    "3.12.15"
+  ],
+  "pylint": "10.00/10 in both environments",
+  "pyright_files": 15,
+  "pyright_errors": 0,
+  "intentional_negative_errors": 3,
+  "mutations_detected": 3,
+  "api_calling_conventions_unchanged": 66,
+  "protected_files_unchanged": 76,
+  "csv_columns_unchanged": true,
+  "editor_configuration_portable_and_trackable": true,
+  "notebook": {
+    "kernel_python": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\.venv\\Scripts\\python.exe",
+    "device": "cpu",
+    "actual_notebook_cells": [
+      "ManagingTags:0,1",
+      "Analitycs:2,3,4,6"
+    ],
+    "overrides": "Disposable dataset, existing local WD ViT and detector configuration, presentation flags only",
+    "result_lengths": [
+      4,
+      4
+    ],
+    "comparison_tuple_length": 5,
+    "baseline_predictions_scores_provenance_geometry_unchanged": true,
+    "txt_json_saved": true,
+    "static_formats": [
+      "PNG",
+      "JPEG"
+    ],
+    "metric_policy_version": "complete-labels-epsilon-v1",
+    "epsilon": 1e-08
+  }
+}

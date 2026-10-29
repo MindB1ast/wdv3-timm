@@ -266,3 +266,8 @@ results_merged.json
 =
 
 
+
+# Share only the portable root Python editor configuration.
+!/.vscode/
+/.vscode/*
+!/.vscode/settings.json

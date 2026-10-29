@@ -1,0 +1,181 @@
+{
+  "changeName": "add-typed-tagging-contracts-and-stable-metrics",
+  "changeDir": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics",
+  "schemaName": "spec-driven",
+  "contextFiles": {
+    "proposal": [
+      "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\proposal.md"
+    ],
+    "specs": [
+      "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\specs\\regional-tag-optimization\\spec.md"
+    ],
+    "design": [
+      "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\design.md"
+    ],
+    "tasks": [
+      "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md"
+    ]
+  },
+  "progress": {
+    "total": 21,
+    "complete": 9,
+    "remaining": 12
+  },
+  "tasks": [
+    {
+      "id": "1",
+      "description": "1.1 Сохранить baseline 55 регрессий, публичных способов вызова, структур JSON/CSV и текущих численных результатов в отдельном каталоге приёмки; проверить отсутствие изменений исходных изображений/TXT и исторических отчётов.",
+      "done": true,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 5
+    },
+    {
+      "id": "2",
+      "description": "1.2 Добавить фиксируемую dev-зависимость Pyright и конфигурацию с указанным в дизайне охватом; проверить запуск в проектном окружении и сохранить исходные диагностики, не выдавая исходный отчёт за прохождение новой типизации.",
+      "done": true,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 6
+    },
+    {
+      "id": "3",
+      "description": "2.1 Добавить общие типы score/category/provenance, WD-результата, региона, подробного и объединённого результата и пакета; проверить положительными примерами обязательные/необязательные поля и сохранение обычных словарей при JSON round-trip.",
+      "done": true,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 10
+    },
+    {
+      "id": "4",
+      "description": "2.2 Аннотировать tag_utils и preprocess с сохранением типов расширенных региональных результатов; проверить remove/add, категории, максимум confidence, provenance, порядок текста, неизменность входов и отсутствие новых runtime-преобразований.",
+      "done": true,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 11
+    },
+    {
+      "id": "5",
+      "description": "2.3 Уточнить модель, transform, LabelData, коллекции детекторов/YOLO, устройство и поля существующих ресурсов/конфигураций; проверить текущие str/Path, None-сентинелы, умолчания и отсутствие нового порядка загрузки.",
+      "done": true,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 12
+    },
+    {
+      "id": "6",
+      "description": "2.4 Провести типы через detection, tagging и main до BatchTagging; проверить, что потребитель видит типы labels.names, полей региона и объединённых тегов, а пустой каталог по-прежнему возвращает None.",
+      "done": true,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 13
+    },
+    {
+      "id": "7",
+      "description": "2.5 Аннотировать потребителей в сохранении, визуализации, загрузке данных и оценке; проверить прежние два списка и пять элементов сравнения, реальные PNG/JPG и читаемые JSON/TXT без изменения форматов.",
+      "done": false,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 14
+    },
+    {
+      "id": "8",
+      "description": "2.6 Документировать типы, optional-поля и правила на границе сторонних библиотек; проверить runnable-пример доступа к результату и убедиться, что голые Any/object не заменяют собственные контракты.",
+      "done": true,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 15
+    },
+    {
+      "id": "9",
+      "description": "3.1 До изменения чисел добавить независимые ожидаемые счётчики/значения для TP-only, FP-only, FN-only, пустых множеств и смешанных примеров; воспроизвести расхождение пустой строки и ожидаемые отличия epsilon с достаточно строгим численным допуском.",
+      "done": true,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 19
+    },
+    {
+      "id": "10",
+      "description": "3.2 Ввести единую METRIC_EPSILON=1e-8 и общие операции P/R/F1 в evaluation; проверить независимым расчётом нулевые числители, правильный непустой результат и отсутствие epsilon в числителях.",
+      "done": true,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 20
+    },
+    {
+      "id": "11",
+      "description": "3.3 Перевести analyze_tagging_errors и analyze_tag_performance на общие операции; проверить одинаковую политику пустоты и совпадение TP/FP/FN между сводкой и соответствующими таблицами на одинаковых входах.",
+      "done": false,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 21
+    },
+    {
+      "id": "12",
+      "description": "3.4 Сохранить историческую агрегацию сводки; проверить на различающем примере mean(P_i), mean(R_i), затем F1 с epsilon, а также неизменные делители N/coverage, ошибки пустой выборки и чужих ID, учёт пропущенных предсказаний.",
+      "done": false,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 22
+    },
+    {
+      "id": "13",
+      "description": "3.5 Добавить версию политики и epsilon в опциональные diagnostics и вывод notebook; проверить сохранение трёх обычных ключей, CSV-столбцов и return shape, документировать точную формулу и пересчёт сравнений разных версий.",
+      "done": false,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 23
+    },
+    {
+      "id": "14",
+      "description": "3.6 Обновить только обоснованно затронутые численные ожидания/снимки; показать отдельно delta значений и возможного ранжирования, проверить сохранение текста подписей, форматов и остального поведения графиков.",
+      "done": false,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 24
+    },
+    {
+      "id": "15",
+      "description": "4.1 Добавить положительные и отрицательные потребители типов; проверить корректные поля/устройство/score и ожидаемые диагностики неверного поля, строкового score и незащищённого optional-доступа, отличая их от ошибок окружения.",
+      "done": false,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 28
+    },
+    {
+      "id": "16",
+      "description": "4.2 Добиться успешной проверки заданного охвата Pyright без широких подавлений собственных данных; проверить вывод типов переменных и возвращаемых значений, записать версии checker и необходимых stubs для Python 3.11/3.12.",
+      "done": false,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 29
+    },
+    {
+      "id": "17",
+      "description": "4.3 Включить проектные inlay hints и точечное отслеживание .vscode/settings.json; проверить переносимость пути, сохранность прочих настроек и отсутствие глобальных изменений, документировать видимые подсказки в примере notebook/модуля.",
+      "done": false,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 30
+    },
+    {
+      "id": "18",
+      "description": "5.1 Выполнить полный набор регрессий с новыми тестами, Pyright и Pylint 10/10; проверить публичные вызовы и сериализацию в Python 3.11/3.12, отсутствие skip/xfail и отсутствие ослабления линтера ради результата.",
+      "done": false,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 34
+    },
+    {
+      "id": "19",
+      "description": "5.2 На изолированной копии выполнить ограниченные проверки с epsilon=0, возвратом единицы для пустой строки и подменой агрегации на mean(F_i); подтвердить конкретные падения ожидаемых проверок, путь импорта и классификацию сбоев инструмента.",
+      "done": false,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 35
+    },
+    {
+      "id": "20",
+      "description": "5.3 Выполнить настоящие notebook-ячейки с локальными WD/YOLO на копиях изображений, сохранением и сравнением; проверить неизменность предсказаний/текста при типизации, изменение только согласованной оценки, сохранность оригиналов и отсутствие новых требований к GPU.",
+      "done": false,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 36
+    },
+    {
+      "id": "21",
+      "description": "5.4 Сохранить итоговый отчёт команд, версий, типов, численных delta и ограничений; сверить все сценарии delta-spec, общую семантику с завершённой ревизией и отсутствие реализации несогласованной переработки аналитики.",
+      "done": false,
+      "sourcePath": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\openspec\\changes\\add-typed-tagging-contracts-and-stable-metrics\\tasks.md",
+      "line": 37
+    }
+  ],
+  "taskTrackingConfigured": true,
+  "state": "ready",
+  "instruction": "Read context files, work through pending tasks, mark complete as you go.\nPause if you hit blockers or need clarification.",
+  "context": "Write all OpenSpec artifacts in Russian. Preserve code identifiers and command names in their original form.\n",
+  "root": {
+    "path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm",
+    "source": "nearest"
+  }
+}

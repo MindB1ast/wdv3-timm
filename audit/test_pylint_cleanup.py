@@ -36,7 +36,7 @@ def analytics_cases():
 
 class PylintRefactorContracts(AuditFixture):
     def test_analytics_charts_and_change_tables_preserve_baseline(self):
-        baseline = json.loads((Path(__file__).parent / 'fixtures/analytics-before.json').read_text(encoding='utf-8'))
+        baseline = json.loads((Path(__file__).parent / 'fixtures/analytics-epsilon.json').read_text(encoding='utf-8'))
         self.assertEqual(analytics_cases(), baseline)
 
     def test_tag_editing_and_priority_sort_preserve_stats(self):

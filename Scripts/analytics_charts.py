@@ -1,5 +1,6 @@
 """Single-method and aggregate Plotly analytics figures."""
 
+from collections.abc import Mapping
 from typing import Dict, Set
 
 import pandas as pd
@@ -7,6 +8,7 @@ import plotly.graph_objects as go
 
 from .analytics_stats import calculate_average_tag_count
 from .analytics_text import wrap_text
+from .types import Metrics
 
 
 def create_interactive_image_metrics_chart(
@@ -180,7 +182,7 @@ def create_interactive_tag_metrics_chart(
     return fig
 
 
-def create_combined_metrics_chart(metrics: Dict[str, Dict[str, float]]) -> go.Figure:
+def create_combined_metrics_chart(metrics: Mapping[str, Metrics]) -> go.Figure:
     """Создает единый интерактивный график для сравнения метрик обоих методов."""
     methods = list(metrics.keys())
     metric_types = list(metrics[methods[0]].keys())

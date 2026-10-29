@@ -5,10 +5,17 @@ import random
 
 import numpy as np
 import plotly.express as px
+from numpy.typing import NDArray
 from PIL import Image, ImageDraw
+from plotly.graph_objects import Figure
+
+from .types import BatchResult, DetailedResult, PathInput, RegionResult
 
 
-def _save_static(pixels, detection_results, colors, output_path):
+def _save_static(
+    pixels: NDArray[np.uint8], detection_results: DetailedResult,
+    colors: dict[str, str], output_path: PathInput,
+) -> None:
     """Save boxes and labels with Pillow without a browser/static renderer."""
     with Image.fromarray(pixels).convert("RGB") as canvas:
         draw = ImageDraw.Draw(canvas)
@@ -23,7 +30,10 @@ def _save_static(pixels, detection_results, colors, output_path):
         canvas.save(output_path)
 
 
-def visualize_detection_results(image_path, detection_results, output_path=None, show=True):
+def visualize_detection_results(
+    image_path: PathInput, detection_results: DetailedResult,
+    output_path: PathInput | None = None, show: bool = True,
+) -> Figure:
     """
     Визуализирует результаты детекции YOLO-моделей с использованием plotly
     с интерактивным отображением тегов для каждого бокса.
@@ -70,8 +80,9 @@ def visualize_detection_results(image_path, detection_results, output_path=None,
 
 
 def view_image_results(
-    results, image_index, visualize=True, save_visualization=False, verbose=False
-):
+    results: BatchResult | None, image_index: int, visualize: bool = True,
+    save_visualization: bool = False, verbose: bool = False,
+) -> None:
     """
     Просматривает результаты обработки конкретного изображения
 
@@ -142,7 +153,9 @@ def view_image_results(
     return None
 
 
-def _draw_region(fig, detector_name, region, color):
+def _draw_region(
+    fig: Figure, detector_name: str, region: RegionResult, color: str,
+) -> None:
     """Add a region box and its tag hover annotation."""
     x1, y1, x2, y2 = region["bbox"]
     region_tags = region.get("taglist", "")

@@ -187,8 +187,11 @@ class HealthyBehavior(AuditFixture):
 
     def test_metrics_for_complete_correct_predictions(self):
         truth = {'a': {'smile'}, 'b': {'blue eyes'}}
-        self.assertEqual(calculate_tag_metrics(truth, truth),
-                         {'Precision': 1.0, 'Recall': 1.0, 'F1-score': 1.0})
+        metrics = calculate_tag_metrics(truth, truth)
+        expected = {'Precision': 0.9999999900000001, 'Recall': 0.9999999900000001,
+                    'F1-score': 0.9999999850000002}
+        for key, value in expected.items():
+            self.assertAlmostEqual(metrics[key], value, delta=1e-12)
 
 
 class DefectContracts(AuditFixture):

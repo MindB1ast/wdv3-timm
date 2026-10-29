@@ -5,11 +5,13 @@ from pathlib import Path
 
 from .io_utils import atomic_write_text
 from .tag_utils import apply_tag_rules, parse_tags
+from .types import BatchResult, PathInput, WDTagResult
 
 
 def save_tags_to_txt(
-    image_path, merged_tags, append_tags=True, add_tags_before="", add_tags_after=""
-):
+    image_path: PathInput, merged_tags: WDTagResult, append_tags: bool = True,
+    add_tags_before: str = "", add_tags_after: str = "",
+) -> str:
     """Export tags. Read/write errors propagate without replacing existing bytes."""
     txt_path = Path(image_path).with_suffix(".txt")
     existing = (
@@ -33,7 +35,9 @@ def save_tags_to_txt(
     return str(txt_path)
 
 
-def add_tag_to_merged(tags_for_image, add_tags_before="", add_tags_after=""):
+def add_tag_to_merged(
+    tags_for_image: BatchResult, add_tags_before: str = "", add_tags_after: str = "",
+) -> BatchResult:
     """Update merged dictionaries and strings together, retaining the public API."""
     if len(tags_for_image) != 2:
         raise ValueError("Expected detailed and merged result lists")

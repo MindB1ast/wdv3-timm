@@ -87,7 +87,7 @@ class EvaluationContracts(AuditFixture):
         metrics, diagnostics = calculate_tag_metrics(
             {'a': {'smile'}, 'b': {'blue eyes'}}, {'a': {'smile'}},
             return_diagnostics=True)
-        self.assertEqual(metrics['Recall'], 0.5)
+        self.assertAlmostEqual(metrics['Recall'], 0.4999999950000001, delta=1e-12)
         self.assertEqual(diagnostics['coverage'], 0.5)
         self.assertEqual((diagnostics['TP'], diagnostics['FN']), (1, 1))
         self.assertEqual(diagnostics['missing_ids'], ['b'])

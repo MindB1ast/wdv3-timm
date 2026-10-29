@@ -2,10 +2,11 @@
 
 # Файл для классов конфигов
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from simple_parsing import field as sp_field
+
+from .types import PathInput, Scores
 
 
 # класс конфига для настройки раьоты yolo моделей + параметров работы теггера в найденой области
@@ -16,15 +17,15 @@ class DetectorConfig:  # pylint: disable=R0902  # Public configuration fields.
     name: str  # Как будет отображатся название модели в результате
     model_path: str  # Путь до помдели
     confidence: float = 0.25  # Confedence для определения областей
-    classes: List[int] = None  # Классы определяемые моделью, если может в несколько
-    remove_tags_from_full: List[str] = (
+    classes: Optional[List[int]] = None  # Классы определяемые моделью, если может в несколько
+    remove_tags_from_full: Optional[List[str]] = (
         None  # Для удаления тегов с предсказания с полной картинки при использовании этой модели
     )
-    remove_tags_from_region: List[str] = (
+    remove_tags_from_region: Optional[List[str]] = (
         None  # Удаление тегов из предсказаний в области определенной этой моделью
     )
-    add_tags_to_region: Dict[str, float] = None  # Добавляет теги в этот регион
-    exclude_from_region: List[str] = None
+    add_tags_to_region: Scores | None = None  # Добавляет теги в этот регион
+    exclude_from_region: Optional[List[str]] = None
     # specific_excluded_tags: List[str] = None
     region_gen_threshold: Optional[float] = None  # Порог для общих тегов в регионах
     region_char_threshold: Optional[float] = None  # Порог для тегов персонажей в регионах
@@ -87,16 +88,16 @@ EXAMPLE_DETECTORS_CONFIG = [
 class ScriptOptions:  # pylint: disable=R0902  # Public configuration fields.
     """Legacy notebook and command-line batch options."""
 
-    ImageFolder: Path = sp_field(positional=True)  # pylint: disable=C0103
+    ImageFolder: PathInput = sp_field(positional=True)  # pylint: disable=C0103
     model: str = sp_field(default="vit")
     gen_threshold: float = sp_field(default=0.35)
     char_threshold: float = sp_field(default=0.75)
     batch: int = sp_field(default=1)
     recursive: bool = sp_field(default=False)
-    model_folder: Path = sp_field(default="./models/taggers/")  # Для моделей тегирования
-    yolo_model_dir: Path = sp_field(default="./models/yolo/")  # Для YOLO моделей
-    detectors_config: str = sp_field(default="detectors.json")
-    output_file: str = sp_field(default="results.json")
+    model_folder: PathInput = sp_field(default="./models/taggers/")  # Для моделей тегирования
+    yolo_model_dir: PathInput = sp_field(default="./models/yolo/")  # Для YOLO моделей
+    detectors_config: PathInput = sp_field(default="detectors.json")
+    output_file: PathInput | None = sp_field(default="results.json")
     save_txt: bool = sp_field(default=True)  # Сохранять ли теги в TXT файлы
     append_txt: bool = sp_field(default=True)  # Добавлять ли теги к существующим TXT файлам
     add_tags_before: str = sp_field(default="")  # Теги для добавления в начало

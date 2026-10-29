@@ -2,11 +2,16 @@
 
 import copy
 import json
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 import numpy as np
 
+from .configs import DetectorConfig
 from .tag_utils import format_result, normalized_scores, parse_tags
+from .types import (CATEGORIES, Category, DetailedResult, MergedResult,
+                    PathInput, Provenance, Score, Scores, TagInput,
+                    WDTagResult)
 
 GLOBAL_EXCLUDED_REGION_TAGS = {
     "1boy",
@@ -146,7 +151,7 @@ GLOBAL_EXCLUDED_REGION_TAGS = {
 }
 
 
-def process_tags(tags_dict, tags_to_remove):
+def process_tags(tags_dict: Mapping[str, Score], tags_to_remove: TagInput) -> Scores:
     """Remove tags using the same canonical names as configuration inputs."""
     blocked = set(parse_tags(tags_to_remove))
     return {tag: score for tag, score in normalized_scores(tags_dict).items() if tag not in blocked}
@@ -156,42 +161,49 @@ def process_tags(tags_dict, tags_to_remove):
 class _MergePolicy:
     """Restrictions and provenance for one source of merged evidence."""
 
-    removed: object = ()
-    confirmation: object = ()
-    full_tags: object = ()
-    provenance: dict | None = None
+    removed: TagInput = ()
+    confirmation: TagInput = ()
+    full_tags: TagInput = ()
+    provenance: Provenance | None = None
 
 
-def _merge_source(output, category, scores, source, policy=_MergePolicy()):
+def _merge_source(
+    output: WDTagResult, category: Category, scores: Mapping[str, Score],
+    source: str, policy: _MergePolicy = _MergePolicy(),
+) -> None:
     """Merge one category using independent source policy."""
     blocked = set(parse_tags(policy.removed))
     conditional = set(parse_tags(policy.confirmation))
     for tag, score in normalized_scores(scores).items():
-        if tag in blocked or (tag in conditional and tag not in policy.full_tags):
+        if tag in blocked or (tag in conditional and tag not in (policy.full_tags or ())):
             continue
         if tag not in output[category] or score > output[category][tag]:
             output[category][tag] = score
-            output["provenance"][tag] = copy.deepcopy(
+            output.setdefault("provenance", {})[tag] = copy.deepcopy(
                 (policy.provenance or {}).get(tag, {"source": source, "model_score": score})
             )
 
 
-def merge_tags_from_regions(image_result, detectors):
+def merge_tags_from_regions(
+    image_result: DetailedResult, detectors: Sequence[DetectorConfig],
+) -> WDTagResult:
     """Union active exclusions; merge scores without mutating source evidence."""
     configs = {detector.name: detector for detector in detectors}
     full = image_result["full_image"]
     full_tags = set(normalized_scores(full["general"])) | set(normalized_scores(full["character"]))
-    excluded = set()
+    excluded: set[str] = set()
     for name, regions in image_result["detectors"].items():
         if regions and name in configs:
             excluded.update(parse_tags(configs[name].remove_tags_from_full))
-    output = {
+    output: WDTagResult = {
         "general": {},
         "character": {},
         "ratings": copy.deepcopy(full["ratings"]),
         "provenance": {},
+        "caption": "",
+        "taglist": "",
     }
-    for category in ("general", "character"):
+    for category in CATEGORIES:
         _merge_source(
             output,
             category,
@@ -204,7 +216,7 @@ def merge_tags_from_regions(image_result, detectors):
             continue
         detector = configs[name]
         for region in regions:
-            for category in ("general", "character"):
+            for category in CATEGORIES:
                 blocked = set(parse_tags(detector.remove_tags_from_region))
                 if category == "general":
                     blocked.update(GLOBAL_EXCLUDED_REGION_TAGS)
@@ -228,13 +240,16 @@ class NumpyEncoder(json.JSONEncoder):
 
     def default(self, o):
         """Serialize NumPy float32 scores; delegate other values to JSON."""
-        if isinstance(o, np.float32):
+        # NumPy 1.26 stubs spell this runtime class as a generic alias.
+        if isinstance(o, np.float32):  # pyright: ignore[reportArgumentType]
             return float(o)
         return json.JSONEncoder.default(self, o)
 
 
 # Сохранение в Json результатов
-def save_results_to_json(results, output_file):
+def save_results_to_json(
+    results: Sequence[DetailedResult] | Sequence[MergedResult], output_file: PathInput,
+) -> None:
     """Write detailed or merged results using the NumPy-aware JSON encoder."""
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, ensure_ascii=False, cls=NumpyEncoder)
