@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "tests_run": 30,
+  "passed": 27,
+  "failures": 2,
+  "errors": 1,
+  "skipped": 0,
+  "tests": [
+    {
+      "test": "test_current_behavior.DefectContracts.test_append_read_error_must_preserve_existing_file",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_empty_detector_must_not_remove_full_tags",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_full_character_must_be_in_caption",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_global_addition_must_update_dictionary",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_global_removal_must_update_dictionary",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_merge_must_not_depend_on_detector_order",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_missing_predictions_must_not_report_perfect_recall",
+      "status": "failed",
+      "reason": "1.0 not less than 1.0"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_new_export_must_not_duplicate_before_after_tags",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_region_caption_must_match_filtered_dictionary",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_same_basename_must_not_overwrite_another_image",
+      "status": "failed",
+      "reason": "1 != 2"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_spaced_filter_must_match_canonical_tag",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_visualization_save_branch_must_not_raise_name_error",
+      "status": "error",
+      "reason": "NameError: name 'os' is not defined"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_append_txt_is_idempotent",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_batch_entry_without_export_returns_two_lists",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_category_threshold_is_strict",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_composition_tags_from_region_are_excluded",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_config_defaults_do_not_share_mutable_lists",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_detection_crops_in_original_coordinates",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_empty_detection_returns_empty_list",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_existing_detector_configuration_loads",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_json_encoder_handles_float32",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_merge_does_not_mutate_input",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_merge_uses_maximum_confidence",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_metrics_for_complete_correct_predictions",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_process_tags_preserves_unremoved_scores",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_ratings_are_kept_separate",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_region_confirmation_requires_full_image_tag",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_square_padding_preserves_original_pixels",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_tag_manager_edits_only_on_explicit_save",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_transparent_image_composites_on_white",
+      "status": "passed"
+    }
+  ]
+}

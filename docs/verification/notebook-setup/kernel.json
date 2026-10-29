@@ -1,0 +1,27 @@
+{
+  "python": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\.venv\\Scripts\\python.exe",
+  "versions": {
+    "ipykernel": "7.4.0",
+    "ipywidgets": "8.1.9",
+    "matplotlib": "3.8.2",
+    "pandas": "2.2.3",
+    "numpy": "1.26.4",
+    "torch": "2.6.0",
+    "torchvision": "0.21.0",
+    "torchaudio": "2.6.0",
+    "timm": "1.0.30",
+    "ultralytics": "8.3.85",
+    "scikit-learn": "1.5.2",
+    "plotly": "6.0.0",
+    "nbformat": "5.11.1"
+  },
+  "project_imports": true,
+  "batch_tagging": true,
+  "result_lengths": [
+    1,
+    1
+  ],
+  "txt_saved": true,
+  "json_saved": true,
+  "regions_png_saved": true
+}

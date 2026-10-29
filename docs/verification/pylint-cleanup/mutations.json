@@ -1,0 +1,20 @@
+[
+  {
+    "file": "preprocess.py",
+    "line": 186,
+    "tool_exit": 1,
+    "snapshot": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\fix-mutants-6af63676",
+    "method": "controlled-copy-fallback",
+    "detected": true,
+    "test_exit": 1
+  },
+  {
+    "file": "savingProc.py",
+    "line": 17,
+    "tool_exit": 1,
+    "snapshot": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\fix-mutants-6af63676",
+    "method": "controlled-copy-fallback",
+    "detected": true,
+    "test_exit": 1
+  }
+]

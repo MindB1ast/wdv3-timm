@@ -1,0 +1,10 @@
+{
+  "counts": {
+    "convention": 290,
+    "refactor": 93,
+    "warning": 46
+  },
+  "new_warning_signatures": [],
+  "baseline_errors": 1,
+  "baseline_warnings": 71
+}
