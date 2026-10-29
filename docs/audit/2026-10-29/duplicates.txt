@@ -1,0 +1,4 @@
+Wrote C:\Users\annak\OneDrive\Документы\ChatGPT\defoult\wdv3-timm\temp\audit-snapshot\.metrics\dry.edn
+DUPLICATE score=1.00
+  Scripts/analitycs.py:1077-1261
+  Scripts/analitycs.py:1263-1447

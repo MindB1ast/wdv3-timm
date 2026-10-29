@@ -1,0 +1,410 @@
+[
+  {
+    "name": "analitycs.load_ground_truth_tags",
+    "before": "(txt_folder, recursive=False, image_root=None)",
+    "after": "(txt_folder, recursive=False, image_root=None)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.load_model_tags",
+    "before": "(results, use_merged=True, image_root=None)",
+    "after": "(results, use_merged=True, image_root=None)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.filter_known_tags",
+    "before": "(tags, model_labels_path)",
+    "after": "(tags, model_labels_path)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.calculate_tag_metrics",
+    "before": "(ground_truth, model_tags, *, return_diagnostics=False)",
+    "after": "(ground_truth, model_tags, *, return_diagnostics=False)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.analyze_tagging_errors",
+    "before": "(ground_truth, model_tags, output_file=None)",
+    "after": "(ground_truth, model_tags, output_file=None)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.analyze_tag_performance",
+    "before": "(ground_truth, model_tags, output_file=None)",
+    "after": "(ground_truth, model_tags, output_file=None)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.display_metrics_summary",
+    "before": "(metrics)",
+    "after": "(metrics)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.create_interactive_image_metrics_chart",
+    "before": "(error_df, method_name, n=10)",
+    "after": "(error_df, method_name, n=10)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.create_interactive_tag_metrics_chart",
+    "before": "(tag_df, method_name, n=20)",
+    "after": "(tag_df, method_name, n=20)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.display_tags_inline",
+    "before": "(tags_string)",
+    "after": "(tags_string)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.display_worst_performing_images",
+    "before": "(error_df, method_name, n=5)",
+    "after": "(error_df, method_name, n=5)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.wrap_text",
+    "before": "(text, width=50)",
+    "after": "(text, width=50)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.display_worst_performing_tags",
+    "before": "(tag_df, method_name, n=5)",
+    "after": "(tag_df, method_name, n=5)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.create_combined_metrics_chart",
+    "before": "(metrics)",
+    "after": "(metrics)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.create_combined_image_metrics_chart",
+    "before": "(error_dfs, n=10)",
+    "after": "(error_dfs, n=10)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.create_combined_tag_metrics_chart",
+    "before": "(tag_dfs, n=20)",
+    "after": "(tag_dfs, n=20)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.calculate_average_tag_count",
+    "before": "(tags_dict)",
+    "after": "(tags_dict)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.display_tag_count_statistics",
+    "before": "(ground_truth, method_tags)",
+    "after": "(ground_truth, method_tags)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.create_interactive_tag_count_chart",
+    "before": "(ground_truth, method_tags)",
+    "after": "(ground_truth, method_tags)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.analyze_tag_improvements",
+    "before": "(full_image_tag_perf, merged_tags_tag_perf, top_n=20, min_occurrences=3, interactive=True)",
+    "after": "(full_image_tag_perf, merged_tags_tag_perf, top_n=20, min_occurrences=3, interactive=True)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.analyze_tag_deteriorations",
+    "before": "(full_image_tag_perf, merged_tags_tag_perf, top_n=20, min_occurrences=3, interactive=True)",
+    "after": "(full_image_tag_perf, merged_tags_tag_perf, top_n=20, min_occurrences=3, interactive=True)",
+    "unchanged": true
+  },
+  {
+    "name": "analitycs.compare_tagging_methods",
+    "before": "(image_folder, txt_folder, results, model_labels_path, filter_tags=True, num_worst_examples=5, num_top_improved=20, num_top_deteriorated=20, visualize=True, interactive=True)",
+    "after": "(image_folder, txt_folder, results, model_labels_path, filter_tags=True, num_worst_examples=5, num_top_improved=20, num_top_deteriorated=20, visualize=True, interactive=True)",
+    "unchanged": true
+  },
+  {
+    "name": "configs.DetectorConfig.__init__",
+    "before": "(self, name, model_path, confidence=0.25, classes=None, remove_tags_from_full=None, remove_tags_from_region=None, add_tags_to_region=None, exclude_from_region=None, region_gen_threshold=None, region_char_threshold=None)",
+    "after": "(self, name, model_path, confidence=0.25, classes=None, remove_tags_from_full=None, remove_tags_from_region=None, add_tags_to_region=None, exclude_from_region=None, region_gen_threshold=None, region_char_threshold=None)",
+    "unchanged": true
+  },
+  {
+    "name": "configs.ScriptOptions.__init__",
+    "before": "(self, ImageFolder, model='vit', gen_threshold=0.35, char_threshold=0.75, batch=1, recursive=False, model_folder='./models/taggers/', yolo_model_dir='./models/yolo/', detectors_config='detectors.json', output_file='results.json', save_txt=True, append_txt=True, add_tags_before='', add_tags_after='', remove_tags='')",
+    "after": "(self, ImageFolder, model='vit', gen_threshold=0.35, char_threshold=0.75, batch=1, recursive=False, model_folder='./models/taggers/', yolo_model_dir='./models/yolo/', detectors_config='detectors.json', output_file='results.json', save_txt=True, append_txt=True, add_tags_before='', add_tags_after='', remove_tags='')",
+    "unchanged": true
+  },
+  {
+    "name": "detection.load_detectors_config",
+    "before": "(config_path)",
+    "after": "(config_path)",
+    "unchanged": true
+  },
+  {
+    "name": "detection.extract_regions_with_detector",
+    "before": "(img_path, detector, yolo_model)",
+    "after": "(img_path, detector, yolo_model)",
+    "unchanged": true
+  },
+  {
+    "name": "evaluation.image_id",
+    "before": "(path, root=None, stem_only=False)",
+    "after": "(path, root=None, stem_only=False)",
+    "unchanged": true
+  },
+  {
+    "name": "evaluation.ground_truth_tags",
+    "before": "(txt_folder, recursive=False, image_root=None)",
+    "after": "(txt_folder, recursive=False, image_root=None)",
+    "unchanged": true
+  },
+  {
+    "name": "evaluation.model_tags",
+    "before": "(results, use_merged=True, image_root=None)",
+    "after": "(results, use_merged=True, image_root=None)",
+    "unchanged": true
+  },
+  {
+    "name": "evaluation.aligned_samples",
+    "before": "(ground_truth, predictions)",
+    "after": "(ground_truth, predictions)",
+    "unchanged": true
+  },
+  {
+    "name": "evaluation.tag_metrics",
+    "before": "(ground_truth, predictions, return_diagnostics=False)",
+    "after": "(ground_truth, predictions, return_diagnostics=False)",
+    "unchanged": true
+  },
+  {
+    "name": "io_utils.atomic_write_text",
+    "before": "(path, text)",
+    "after": "(path, text)",
+    "unchanged": true
+  },
+  {
+    "name": "main.BatchTagging",
+    "before": "(opts)",
+    "after": "(opts)",
+    "unchanged": true
+  },
+  {
+    "name": "model.ensure_model_folder",
+    "before": "(folder_path)",
+    "after": "(folder_path)",
+    "unchanged": true
+  },
+  {
+    "name": "model.download_model_files",
+    "before": "(repo_id, model_folder)",
+    "after": "(repo_id, model_folder)",
+    "unchanged": true
+  },
+  {
+    "name": "model.load_model_local_or_remote",
+    "before": "(repo_id, model_folder)",
+    "after": "(repo_id, model_folder)",
+    "unchanged": true
+  },
+  {
+    "name": "model.load_labels_local_or_remote",
+    "before": "(repo_id, model_folder)",
+    "after": "(repo_id, model_folder)",
+    "unchanged": true
+  },
+  {
+    "name": "model.load_yolo_model",
+    "before": "(model_path, yolo_model_dir)",
+    "after": "(model_path, yolo_model_dir)",
+    "unchanged": true
+  },
+  {
+    "name": "preprocess.process_tags",
+    "before": "(tags_dict, tags_to_remove)",
+    "after": "(tags_dict, tags_to_remove)",
+    "unchanged": true
+  },
+  {
+    "name": "preprocess.merge_tags_from_regions",
+    "before": "(image_result, detectors)",
+    "after": "(image_result, detectors)",
+    "unchanged": true
+  },
+  {
+    "name": "preprocess.save_results_to_json",
+    "before": "(results, output_file)",
+    "after": "(results, output_file)",
+    "unchanged": true
+  },
+  {
+    "name": "savingProc.save_tags_to_txt",
+    "before": "(image_path, merged_tags, append_tags=True, add_tags_before='', add_tags_after='')",
+    "after": "(image_path, merged_tags, append_tags=True, add_tags_before='', add_tags_after='')",
+    "unchanged": true
+  },
+  {
+    "name": "savingProc.add_tag_to_merged",
+    "before": "(tags_for_image, add_tags_before='', add_tags_after='')",
+    "after": "(tags_for_image, add_tags_before='', add_tags_after='')",
+    "unchanged": true
+  },
+  {
+    "name": "tagging.tag_image",
+    "before": "(img, model, transform, labels, gen_threshold, char_threshold, torch_device)",
+    "after": "(img, model, transform, labels, gen_threshold, char_threshold, torch_device)",
+    "unchanged": true
+  },
+  {
+    "name": "tagging.process_image_with_multiple_detectors",
+    "before": "(img_path, tagger_model, transform, labels, detectors, yolo_models, gen_threshold, char_threshold, torch_device)",
+    "after": "(img_path, tagger_model, transform, labels, detectors, yolo_models, gen_threshold, char_threshold, torch_device)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_manager.TagManager.__init__",
+    "before": "(self, txt_folder=None)",
+    "after": "(self, txt_folder=None)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_manager.TagManager.load_from_folder",
+    "before": "(self, folder_path, recursive=False)",
+    "after": "(self, folder_path, recursive=False)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_manager.TagManager.build_index_from_results",
+    "before": "(self, results)",
+    "after": "(self, results)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_manager.TagManager.find_files_with_tag",
+    "before": "(self, tag)",
+    "after": "(self, tag)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_manager.TagManager.add_tags",
+    "before": "(self, add_tags_before='', add_tags_after='', files=None)",
+    "after": "(self, add_tags_before='', add_tags_after='', files=None)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_manager.TagManager.remove_tags",
+    "before": "(self, tags_to_remove, files=None)",
+    "after": "(self, tags_to_remove, files=None)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_manager.TagManager.replace_tag",
+    "before": "(self, old_tag, new_tag, files=None)",
+    "after": "(self, old_tag, new_tag, files=None)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_manager.TagManager.sort_tags",
+    "before": "(self, alphabetical=True, importance=None, files=None)",
+    "after": "(self, alphabetical=True, importance=None, files=None)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_manager.TagManager.get_top_tags",
+    "before": "(self, limit=50)",
+    "after": "(self, limit=50)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_manager.TagManager.save_changes",
+    "before": "(self, files=None)",
+    "after": "(self, files=None)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_manager.TagManager.remove_redundant_subtags",
+    "before": "(self, files=None)",
+    "after": "(self, files=None)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_utils.canonical_tag",
+    "before": "(tag)",
+    "after": "(tag)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_utils.parse_tags",
+    "before": "(value)",
+    "after": "(value)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_utils.normalized_scores",
+    "before": "(scores)",
+    "after": "(scores)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_utils.format_result",
+    "before": "(result, order=None)",
+    "after": "(result, order=None)",
+    "unchanged": true
+  },
+  {
+    "name": "tag_utils.apply_tag_rules",
+    "before": "(result, remove=(), add=None, before=(), after=(), character_names=())",
+    "after": "(result, remove=(), add=None, before=(), after=(), character_names=())",
+    "unchanged": true
+  },
+  {
+    "name": "visualization.visualize_detection_results",
+    "before": "(image_path, detection_results, output_path=None, show=True)",
+    "after": "(image_path, detection_results, output_path=None, show=True)",
+    "unchanged": true
+  },
+  {
+    "name": "visualization.view_image_results",
+    "before": "(results, image_index, visualize=True, save_visualization=False, verbose=False)",
+    "after": "(results, image_index, visualize=True, save_visualization=False, verbose=False)",
+    "unchanged": true
+  },
+  {
+    "name": "wdv3_timm.pil_ensure_rgb",
+    "before": "(image)",
+    "after": "(image)",
+    "unchanged": true
+  },
+  {
+    "name": "wdv3_timm.pil_pad_square",
+    "before": "(image)",
+    "after": "(image)",
+    "unchanged": true
+  },
+  {
+    "name": "wdv3_timm.LabelData.__init__",
+    "before": "(self, names, rating, general, character)",
+    "after": "(self, names, rating, general, character)",
+    "unchanged": true
+  },
+  {
+    "name": "wdv3_timm.load_labels_hf",
+    "before": "(repo_id, revision=None, token=None)",
+    "after": "(repo_id, revision=None, token=None)",
+    "unchanged": true
+  },
+  {
+    "name": "wdv3_timm.get_tags",
+    "before": "(probs, labels, gen_threshold, char_threshold)",
+    "after": "(probs, labels, gen_threshold, char_threshold)",
+    "unchanged": true
+  }
+]

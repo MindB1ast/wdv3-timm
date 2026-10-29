@@ -1,0 +1,38 @@
+{
+  "tool": "pylint",
+  "version": "4.1.3",
+  "exit_code": 30,
+  "counts": [
+    {
+      "type": "convention",
+      "count": 385
+    },
+    {
+      "type": "error",
+      "count": 1
+    },
+    {
+      "type": "refactor",
+      "count": 86
+    },
+    {
+      "type": "warning",
+      "count": 71
+    }
+  ],
+  "errors": [
+    {
+      "type": "error",
+      "module": "Scripts.visualization",
+      "obj": "view_image_results",
+      "line": 141,
+      "column": 26,
+      "endLine": 141,
+      "endColumn": 28,
+      "path": "Scripts\\visualization.py",
+      "symbol": "undefined-variable",
+      "message": "Undefined variable 'os'",
+      "message-id": "E0602"
+    }
+  ]
+}

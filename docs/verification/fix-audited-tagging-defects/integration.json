@@ -1,0 +1,60 @@
+{
+  "signature": "(opts: Scripts.configs.ScriptOptions)",
+  "result_lists": [
+    1,
+    1
+  ],
+  "json_round_trip": true,
+  "txt_append_idempotent": true,
+  "static_formats": [
+    "PNG",
+    "JPEG"
+  ],
+  "plotly_preserved": true,
+  "notebook_tuple_length": 5,
+  "source_integrity": [
+    {
+      "path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing1.txt",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing2.txt",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing3.txt",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing4.txt",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing1.png",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing2.png",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing3.png",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing4.jpg",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\audit\\test_current_behavior.py",
+      "unchanged": true
+    }
+  ],
+  "model": "wd-vit-tagger-v3",
+  "input_size": [
+    448,
+    448
+  ],
+  "device": "cpu",
+  "source_images_unchanged": true
+}

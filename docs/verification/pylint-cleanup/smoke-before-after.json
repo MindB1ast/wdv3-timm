@@ -1,0 +1,39 @@
+[
+  {
+    "image": "shinobu-reference.jpg",
+    "before": 42,
+    "after": 42,
+    "added": [],
+    "removed": []
+  },
+  {
+    "image": "tag_managing4.jpg",
+    "before": 14,
+    "after": 14,
+    "added": [],
+    "removed": []
+  },
+  {
+    "image": "tag_managing1.png",
+    "before": 15,
+    "after": 15,
+    "added": [],
+    "removed": []
+  },
+  {
+    "image": "tag_managing2.png",
+    "before": 9,
+    "after": 10,
+    "added": [
+      "eyelashes"
+    ],
+    "removed": []
+  },
+  {
+    "image": "tag_managing3.png",
+    "before": 35,
+    "after": 35,
+    "added": [],
+    "removed": []
+  }
+]

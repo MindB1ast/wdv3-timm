@@ -1,17 +1,16 @@
+"""WD model identifiers, label loading, and image preprocessing."""
+
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 import numpy as np
 import pandas as pd
-import timm
 import torch
 from huggingface_hub import hf_hub_download
 from huggingface_hub.utils import HfHubHTTPError
 from PIL import Image
-from simple_parsing import field, parse_known_args
-from torch import Tensor, nn
-from torch.nn import functional as F
+from torch import Tensor
 
 torch_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 MODEL_REPO_MAP = {
@@ -25,6 +24,7 @@ MODEL_REPO_MAP = {
 
 def pil_ensure_rgb(image: Image.Image) -> Image.Image:
     # convert to RGB/RGBA if not already (deals with palette images etc.)
+    """Convert images to RGB, compositing transparency onto white."""
     if image.mode not in ["RGB", "RGBA"]:
         image = image.convert("RGBA") if "transparency" in image.info else image.convert("RGB")
     # convert RGBA to RGB with white background
@@ -36,6 +36,7 @@ def pil_ensure_rgb(image: Image.Image) -> Image.Image:
 
 
 def pil_pad_square(image: Image.Image) -> Image.Image:
+    """Pad the shorter image dimension with a white background."""
     w, h = image.size
     # get the largest dimension so we can pad to a square
     px = max(image.size)
@@ -44,52 +45,32 @@ def pil_pad_square(image: Image.Image) -> Image.Image:
     canvas.paste(image, ((px - w) // 2, (px - h) // 2))
     return canvas
 
+
 # что бы не писать init, и ещё для сравнения
 @dataclass
 class LabelData:
+    """Names and category indices from a model label dictionary."""
+
     names: list[str]
     rating: list[np.int64]
     general: list[np.int64]
     character: list[np.int64]
 
-"""
-Скачивает csv файл с тегами и получаем LabekData с листами 
-всех тегов, 
-Ratings: general, sensitive, questionable, explicit
-Список обычных тегов general
-и список персонажей
-"""
+
 def load_labels_hf(
-    repo_id: str,
-    revision: Optional[str] = None,
-    token: Optional[str] = None,
+    repo_id: str, revision: Optional[str] = None, token: Optional[str] = None
 ) -> LabelData:
+    """Download model labels and separate their category indices."""
     try:
         csv_path = hf_hub_download(
             repo_id=repo_id, filename="selected_tags.csv", revision=revision, token=token
         )
-        csv_path = Path(csv_path).resolve()#resolve - получение полного пути, не относительного
+        csv_path = Path(csv_path).resolve()
     except HfHubHTTPError as e:
         raise FileNotFoundError(f"selected_tags.csv failed to download from {repo_id}") from e
+    return load_labels_csv(csv_path)
 
-    df: pd.DataFrame = pd.read_csv(csv_path, usecols=["name", "category"])
-    tag_data = LabelData(
-        names=df["name"].tolist(),
-        rating=list(np.where(df["category"] == 9)[0]),
-        general=list(np.where(df["category"] == 0)[0]),
-        character=list(np.where(df["category"] == 4)[0]),
-    )
 
-    return tag_data
-
-"""
-Получаем теги из предсказаний
-Caption - теги с _
-taglist - теги без _
-rating_labels - список вероятностей отношения к к рейтингу
-char_labels - вероятность отношения к персонажу
-
-"""
 def get_tags(
     probs: Tensor,
     labels: LabelData,
@@ -97,30 +78,40 @@ def get_tags(
     char_threshold: float,
 ):
     # Convert indices+probs to labels
+    """Select model probabilities and format thresholded tag categories."""
     probs = list(zip(labels.names, probs.numpy()))
 
     # First 4 labels are actually ratings
-    rating_labels = dict([probs[i] for i in labels.rating])
+    rating_labels = dict(probs[index] for index in labels.rating)
 
     # General labels, pick any where prediction confidence > threshold
     gen_labels = [probs[i] for i in labels.general]
-    gen_labels = dict([x for x in gen_labels if x[1] > gen_threshold])
+    gen_labels = {name: score for name, score in gen_labels if score > gen_threshold}
     gen_labels = dict(sorted(gen_labels.items(), key=lambda item: item[1], reverse=True))
 
     # Character labels, pick any where prediction confidence > threshold
     char_labels = [probs[i] for i in labels.character]
-    char_labels = dict([x for x in char_labels if x[1] > char_threshold])
+    char_labels = {name: score for name, score in char_labels if score > char_threshold}
     char_labels = dict(sorted(char_labels.items(), key=lambda item: item[1], reverse=True))
 
     # Combine general and character labels, sort by confidence
-    combined_names = [x for x in gen_labels]
-    combined_names.extend([x for x in char_labels])
+    combined_names = list(gen_labels)
+    combined_names.extend(char_labels)
 
     # Convert to a string suitable for use as a training caption
     caption = ", ".join(combined_names)
-    taglist = caption.replace("_", " ").replace("(", "\(").replace(")", "\)")
+    taglist = caption.replace("_", " ").replace("(", r"\(").replace(")", r"\)")
 
     return caption, taglist, rating_labels, char_labels, gen_labels
 
 
-
+def load_labels_csv(csv_path):
+    """Read one label dictionary consistently for local and Hub loaders."""
+    df: pd.DataFrame = pd.read_csv(csv_path, usecols=["name", "category"])
+    tag_data = LabelData(
+        names=df["name"].tolist(),
+        rating=list(np.where(df["category"] == 9)[0]),
+        general=list(np.where(df["category"] == 0)[0]),
+        character=list(np.where(df["category"] == 4)[0]),
+    )
+    return tag_data

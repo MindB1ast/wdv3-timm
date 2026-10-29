@@ -1,27 +1,34 @@
-#Файл для классов конфигов
-from dataclasses import dataclass, field
+"""Serializable detector settings and public notebook options."""
+
+# Файл для классов конфигов
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Dict, List
+from typing import Dict, List, Optional
+
 from simple_parsing import field as sp_field
 
 
-
-
-#класс конфига для настройки раьоты yolo моделей + параметров работы теггера в найденой области
+# класс конфига для настройки раьоты yolo моделей + параметров работы теггера в найденой области
 @dataclass
-class DetectorConfig:
-    name: str #Как будет отображатся название модели в результате
-    model_path: str #Путь до помдели
+class DetectorConfig:  # pylint: disable=R0902  # Public configuration fields.
+    """Settings and independent tag rules for one detector."""
+
+    name: str  # Как будет отображатся название модели в результате
+    model_path: str  # Путь до помдели
     confidence: float = 0.25  # Confedence для определения областей
-    classes: List[int] = None # Классы определяемые моделью, если может в несколько
-    remove_tags_from_full: List[str] = None # Для удаления тегов с предсказания с полной картинки при использовании этой модели
-    remove_tags_from_region: List[str] = None # Удаление тегов из предсказаний в области определенной этой моделью
-    add_tags_to_region: Dict[str, float] = None # Добавляет теги в этот регион
-    exclude_from_region: List[str] = None 
-    #specific_excluded_tags: List[str] = None
+    classes: List[int] = None  # Классы определяемые моделью, если может в несколько
+    remove_tags_from_full: List[str] = (
+        None  # Для удаления тегов с предсказания с полной картинки при использовании этой модели
+    )
+    remove_tags_from_region: List[str] = (
+        None  # Удаление тегов из предсказаний в области определенной этой моделью
+    )
+    add_tags_to_region: Dict[str, float] = None  # Добавляет теги в этот регион
+    exclude_from_region: List[str] = None
+    # specific_excluded_tags: List[str] = None
     region_gen_threshold: Optional[float] = None  # Порог для общих тегов в регионах
     region_char_threshold: Optional[float] = None  # Порог для тегов персонажей в регионах
-    
+
     def __post_init__(self):
         if self.classes is None:
             self.classes = [0]
@@ -33,24 +40,32 @@ class DetectorConfig:
             self.add_tags_to_region = {}
         if self.exclude_from_region is None:
             self.exclude_from_region = []
+
+
 #        if self.specific_excluded_tags is None:
 #            self.specific_excluded_tags = []
 
 
-# Пример конфига для настройки yolo моделей и обработки рещультата областей, должен быть в формате json и передан в BatchWork параметром detectors_config, пример конфига detectors.json
+# Пример конфига для настройки yolo моделей и обработки рещультата областей, должен быть в формате
+# json и передан в BatchWork параметром detectors_config, пример конфига detectors.json
 EXAMPLE_DETECTORS_CONFIG = [
     {
-        "name": "person_detector", 
+        "name": "person_detector",
         "model_path": "yolov8n.pt",
         "confidence": 0.25,
         "classes": [0],
-        "remove_tags_from_full": ["1girl", "1boy"], #Удалить теги полной области при нахождении моделью области
-        "remove_tags_from_region": ["multiple views"], # удалить теги из найденой области
-        "add_tags_to_region": {"person": 1.0}, #Добавление тега в теги области при нахождении области на картинки 
-        "exclude_from_region": ["close-up", "cowboy_shot", "full_body"], 
-        #"specific_excluded_tags": [],
-        "region_gen_threshold": 0.4, 
-        "region_char_threshold": 0.8
+        "remove_tags_from_full": [
+            "1girl",
+            "1boy",
+        ],  # Удалить теги полной области при нахождении моделью области
+        "remove_tags_from_region": ["multiple views"],  # удалить теги из найденой области
+        "add_tags_to_region": {
+            "person": 1.0
+        },  # Добавление тега в теги области при нахождении области на картинки
+        "exclude_from_region": ["close-up", "cowboy_shot", "full_body"],
+        # "specific_excluded_tags": [],
+        "region_gen_threshold": 0.4,
+        "region_char_threshold": 0.8,
     },
     {
         "name": "face_detector",
@@ -62,29 +77,28 @@ EXAMPLE_DETECTORS_CONFIG = [
         "add_tags_to_region": {"face": 1.0},
         "exclude_from_region": ["1girl", "portrait", "upper_body"],
         "specific_excluded_tags": ["blue_eyes", "green_eyes", "yellow_eyes", "smile"],
-        "region_gen_threshold": 0.5, 
-        "region_char_threshold": 0.85
-    }
+        "region_gen_threshold": 0.5,
+        "region_char_threshold": 0.85,
+    },
 ]
 
 
-
 @dataclass
-class ScriptOptions:
-    ImageFolder: Path = sp_field(positional=True)
+class ScriptOptions:  # pylint: disable=R0902  # Public configuration fields.
+    """Legacy notebook and command-line batch options."""
+
+    ImageFolder: Path = sp_field(positional=True)  # pylint: disable=C0103
     model: str = sp_field(default="vit")
     gen_threshold: float = sp_field(default=0.35)
     char_threshold: float = sp_field(default=0.75)
     batch: int = sp_field(default=1)
     recursive: bool = sp_field(default=False)
     model_folder: Path = sp_field(default="./models/taggers/")  # Для моделей тегирования
-    yolo_model_dir: Path = sp_field(default="./models/yolo/")    # Для YOLO моделей
+    yolo_model_dir: Path = sp_field(default="./models/yolo/")  # Для YOLO моделей
     detectors_config: str = sp_field(default="detectors.json")
     output_file: str = sp_field(default="results.json")
-    save_txt: bool = sp_field(default=True)      # Сохранять ли теги в TXT файлы
-    append_txt: bool = sp_field(default=True)    # Добавлять ли теги к существующим TXT файлам
+    save_txt: bool = sp_field(default=True)  # Сохранять ли теги в TXT файлы
+    append_txt: bool = sp_field(default=True)  # Добавлять ли теги к существующим TXT файлам
     add_tags_before: str = sp_field(default="")  # Теги для добавления в начало
-    add_tags_after: str = sp_field(default="")   # Теги для добавления в конец
-    remove_tags: str = sp_field(default="")      # Теги для удаления
-
-
+    add_tags_after: str = sp_field(default="")  # Теги для добавления в конец
+    remove_tags: str = sp_field(default="")  # Теги для удаления

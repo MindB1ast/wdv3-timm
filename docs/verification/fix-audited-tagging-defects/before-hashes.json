@@ -1,0 +1,86 @@
+[
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\Scripts\\__init__.py",
+    "Hash": "3A6F2130F7FF21C3344E91601806E7E9C31B203D1FF2AB87D2CBADF1BDDFDA32"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\Scripts\\analitycs.py",
+    "Hash": "370D94D82FF5182B5EF7276FC09F95DB89F70464CAF15D1E74A1B922F11D7B58"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\Scripts\\configs.py",
+    "Hash": "6DD19E27007CE8F532A9070C83FADD5F28728AA8D050FEB08B9FFACC53F9F5FF"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\Scripts\\detection.py",
+    "Hash": "034F8435F7CBDB3051E80ECF6AFDC27AA0E117BB5259AE02B7C907C07461FF97"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\Scripts\\main.py",
+    "Hash": "9520362D262D1D5493EC27CF9BADC3032BC6A974CAD37BD6C74DD5B84CFB73C8"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\Scripts\\model.py",
+    "Hash": "AF44E24E0E689FB51E917797ED43081CCB7D668F00288587214814790CD663EE"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\Scripts\\preprocess.py",
+    "Hash": "504C15B770F3EBC0EF8B0F4997BB1F84E14FA5752062E5167111CABAB78D8C60"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\Scripts\\savingProc.py",
+    "Hash": "E54764E22DF46B9E5428D251DEF3DC1EA08F983E3C12FFB0A67988A3A4294C0F"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\Scripts\\tag_manager.py",
+    "Hash": "67607638C53A87395D6AF70FEAECF7C80F48BE0E5C97FA6AD3BEB9377CC65ABC"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\Scripts\\tagging.py",
+    "Hash": "7C918ACCDB629EFE85F01BE734B6BDEE5E8BBB05AB742F34FB0D386713AC4BC3"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\Scripts\\visualization.py",
+    "Hash": "A9F09ADFF6C8385349A380721CBE19710625C58CB241801076E42B17BF859D88"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\Scripts\\wdv3_timm.py",
+    "Hash": "BC0ED38B3434EFB001F85F98D04292F231C51614A99F6F722B4B6DAEBCCF1999"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing1.txt",
+    "Hash": "C06F873CAE2CED337DF80FDB76440B007891BCD0D16E35B940F356099E5A3BF5"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing2.txt",
+    "Hash": "375BB2E86F60AA906B5AEDDB9C65102D119DE8E2BA76DF49C6E17E105B39FD95"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing3.txt",
+    "Hash": "9A5ED87781BF91975E7BCEF1D24964DCEDAEEF02A0734F7CDCC9FB2049F9C3FC"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing4.txt",
+    "Hash": "09229F7496C968768671F24191A9FAB7CF43A88D70441A647D56D83F8DD38DE4"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing1.png",
+    "Hash": "6966291F5DF90E6AC85928F3FE78FA46AD1BD44BEEAF4A41B80172894EE7EFEA"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing2.png",
+    "Hash": "F4A2CE4615F91BB8B54105BA61A579D3A24B5017B07BAAAFAF15936C8D1470D6"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing3.png",
+    "Hash": "EA9AB3209254AD1848E6B30D423864ED105DA5A6C2B141B2A8DF451B242F7137"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\TestTagPic\\tag_managing4.jpg",
+    "Hash": "92E0268D0DC21F318EEAE6606F8D4E8A0E6D2E92D5A43DE64E3BFB199B2BE2CF"
+  },
+  {
+    "Path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\audit\\test_current_behavior.py",
+    "Hash": "8671ED7D931B949B5292829C1A48FCCE9EDF04681D0D9980CE40036592F06ACF"
+  }
+]

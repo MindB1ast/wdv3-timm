@@ -1,0 +1,8 @@
+{:candidates [
+ {:score 1.0
+  :language "python"
+  :left {:file "Scripts/analitycs.py", :start-line 1029, :end-line 1213}
+  :right {:file "Scripts/analitycs.py", :start-line 1215, :end-line 1399}
+  :left-nodes 1350
+  :right-nodes 1350}
+]}

@@ -1,0 +1,64 @@
+CRAP Report
+===========
+Languages: python
+
+Function                               Namespace                             CC    Cov%     CRAP
+------------------------------------------------------------------------------------------------
+BatchTagging                           Scripts.main                          32   N/A       N/A
+merge_tags_from_regions                Scripts.preprocess                    20   N/A       N/A
+save_tags_to_txt                       Scripts.savingProc                    18   N/A       N/A
+remove_redundant_subtags               Scripts.tag_manager.TagManager        17   N/A       N/A
+create_combined_image_metrics_chart    Scripts.analitycs                     14   N/A       N/A
+create_combined_tag_metrics_chart      Scripts.analitycs                     14   N/A       N/A
+add_tags                               Scripts.tag_manager.TagManager        14   N/A       N/A
+load_yolo_model                        Scripts.model                         13   N/A       N/A
+replace_tag                            Scripts.tag_manager.TagManager        12   N/A       N/A
+analyze_tag_performance                Scripts.analitycs                     11   N/A       N/A
+add_tag_to_merged                      Scripts.savingProc                    11   N/A       N/A
+load_from_folder                       Scripts.tag_manager.TagManager        11   N/A       N/A
+remove_tags                            Scripts.tag_manager.TagManager        11   N/A       N/A
+process_image_with_multiple_detectors  Scripts.tagging                        9   N/A       N/A
+view_image_results                     Scripts.visualization                  8   N/A       N/A
+analyze_tag_deteriorations             Scripts.analitycs                      7   N/A       N/A
+analyze_tag_improvements               Scripts.analitycs                      7   N/A       N/A
+calculate_tag_metrics                  Scripts.analitycs                      7   N/A       N/A
+sort_tags                              Scripts.tag_manager.TagManager         7   N/A       N/A
+visualize_detection_results            Scripts.visualization                  7   N/A       N/A
+analyze_tagging_errors                 Scripts.analitycs                      6   N/A       N/A
+__post_init__                          Scripts.configs.DetectorConfig         6   N/A       N/A
+load_detectors_config                  Scripts.detection                      6   N/A       N/A
+load_labels_local_or_remote            Scripts.model                          6   N/A       N/A
+compare_tagging_methods                Scripts.analitycs                      5   N/A       N/A
+extract_regions_with_detector          Scripts.detection                      5   N/A       N/A
+download_model_files                   Scripts.model                          5   N/A       N/A
+build_index_from_results               Scripts.tag_manager.TagManager         5   N/A       N/A
+save_changes                           Scripts.tag_manager.TagManager         5   N/A       N/A
+load_model_tags                        Scripts.analitycs                      4   N/A       N/A
+_update_tag_stats                      Scripts.tag_manager.TagManager         4   N/A       N/A
+pil_ensure_rgb                         Scripts.wdv3_timm                      4   N/A       N/A
+display_tag_count_statistics           Scripts.analitycs                      3   N/A       N/A
+load_ground_truth_tags                 Scripts.analitycs                      3   N/A       N/A
+get_tags                               Scripts.wdv3_timm                      3   N/A       N/A
+calculate_average_tag_count            Scripts.analitycs                      2   N/A       N/A
+create_combined_metrics_chart          Scripts.analitycs                      2   N/A       N/A
+create_interactive_image_metrics_chart Scripts.analitycs                      2   N/A       N/A
+create_interactive_tag_metrics_chart   Scripts.analitycs                      2   N/A       N/A
+display_tags_inline                    Scripts.analitycs                      2   N/A       N/A
+display_worst_performing_images        Scripts.analitycs                      2   N/A       N/A
+filter_known_tags                      Scripts.analitycs                      2   N/A       N/A
+ensure_model_folder                    Scripts.model                          2   N/A       N/A
+load_model_local_or_remote             Scripts.model                          2   N/A       N/A
+process_tags                           Scripts.preprocess                     2   N/A       N/A
+default                                Scripts.preprocess.NumpyEncoder        2   N/A       N/A
+__init__                               Scripts.tag_manager.TagManager         2   N/A       N/A
+find_files_with_tag                    Scripts.tag_manager.TagManager         2   N/A       N/A
+load_labels_hf                         Scripts.wdv3_timm                      2   N/A       N/A
+create_interactive_tag_count_chart     Scripts.analitycs                      1   N/A       N/A
+Wrote C:\Users\annak\OneDrive\Документы\ChatGPT\defoult\wdv3-timm\temp\audit-snapshot\.metrics\crap.edn
+display_metrics_summary                Scripts.analitycs                      1   N/A       N/A
+display_worst_performing_tags          Scripts.analitycs                      1   N/A       N/A
+wrap_text                              Scripts.analitycs                      1   N/A       N/A
+save_results_to_json                   Scripts.preprocess                     1   N/A       N/A
+get_top_tags                           Scripts.tag_manager.TagManager         1   N/A       N/A
+tag_image                              Scripts.tagging                        1   N/A       N/A
+pil_pad_square                         Scripts.wdv3_timm                      1   N/A       N/A

@@ -1,137 +1,241 @@
-from typing import Dict, List, Set
+"""Consistent regional tag filtering and JSON results."""
+
+import copy
 import json
-from .configs import DetectorConfig
+from dataclasses import dataclass
+
 import numpy as np
 
+from .tag_utils import format_result, normalized_scores, parse_tags
 
-def process_tags(tags_dict: Dict[str, float], tags_to_remove: List[str]) -> Dict[str, float]:
-    """
-    Удаляет указанные теги из словаря тегов.
-
-    Args:
-        tags_dict: Словарь тегов и их уверенностей
-        tags_to_remove: Список тегов для удаления
-
-    Returns:
-        Обновленный словарь тегов
-    """
-    return {tag: conf for tag, conf in tags_dict.items() if tag not in tags_to_remove}
-
-
-def merge_tags_from_regions(image_result: Dict, detectors: List[DetectorConfig]) -> Dict:
-    # Теги из полной картинки
-    full_general = image_result["full_image"]["general"]
-    full_character = image_result["full_image"]["character"]
-    full_tags_set = set(full_general.keys()) | set(full_character.keys())
-
-    # Глобальный список запрещённых тегов
-    # Удаляет теги которые появились в обнаруженой области если они есть
-    #Для артефактов приближения определяя данные теги из полного изображения
-    GLOBAL_EXCLUDED_REGION_TAGS = {"close-up", "cowboy_shot", "portrait", "upper_body", "full_body", "eye_focus", "1girl", "2girls", "3girls", "4girls", "5girls", "6+girls", "multiple_girls", "solo", "solo_focus", "1boy",
-    "2boys", "3boys", "4boys", "5boys", "6+boys", "multiple_boys", "multiple_others", "looking_back", "looking_at_another", "looking_away", "looking_ahead", "looking_to_the_side", "looking_at_viewer", "male_focus", "other_focus",  "1other", "2others",
-    "3others","4others", "5others", "6+others", "multiple_others", "multiple_views",  "ass_focus",  "animal_focus", "foot_focus", "text_focus",
-    "hip_focus", "vehicle_focus", "food_focus", "mecha_focus", "pokemon_focus", "reflection_focus",
-    "breast_focus", "back_focus", "hand_focus", "object_focus", "crotch_focus", "pectoral_focus",
-    "weapon_focus","armpit_focus", "monster_focus", "pussy_focus", "creature_focus", "flower_focus",
-    "hair_focus","footwear_focus", "navel_focus", "sky_focus", "plant_focus", "thigh_focus", "mouth_focus",
+GLOBAL_EXCLUDED_REGION_TAGS = {
+    "1boy",
+    "1girl",
+    "1other",
+    "2boys",
+    "2girls",
+    "2others",
+    "3boys",
+    "3girls",
+    "3others",
+    "4boys",
+    "4girls",
+    "4others",
+    "5boys",
+    "5girls",
+    "5others",
+    "6+boys",
+    "6+girls",
+    "6+others",
+    "abstract_background",
+    "animal_focus",
+    "aqua_background",
+    "argyle_background",
+    "armpit_focus",
+    "ass_focus",
+    "back_focus",
+    "black_background",
+    "black_border",
+    "blue_background",
+    "blue_sky",
+    "blurry",
+    "blurry_background",
+    "blurry_foreground",
+    "border",
+    "breast_focus",
+    "bright_background",
+    "brown_background",
+    "checkered_background",
+    "close-up",
+    "colorful_background",
+    "cowboy_shot",
+    "creature_focus",
+    "cross_background",
+    "crotch_focus",
+    "dark_background",
+    "depth_of_field",
+    "diagonal-striped_background",
+    "dithered_background",
+    "dotted_background",
+    "drama_layer",
+    "ear_focus",
+    "eye_focus",
+    "feet_out_of_frame",
+    "film_grain",
+    "flower_focus",
+    "food_focus",
+    "foot_focus",
+    "foot_out_of_frame",
+    "footwear_focus",
+    "full_body",
+    "gradient_background",
+    "green_background",
+    "grey_background",
+    "grid_background",
+    "hair_focus",
+    "halftone_background",
+    "hand_focus",
+    "heaven_condition",
+    "hip_focus",
+    "honeycomb_background",
+    "kanji_focus",
+    "lace_background",
     "leg_focus",
-    "ear_focus", "kanji_focus", "neck_focus", "penis_focus", "simple_background", "white_background",
-    "blue_background", "aqua_background", "black_background", "brown_background", "green_background",
-    "grey_background", "orange_background", "pink_background", "purple_background", "red_background",
-    "colorful_background", "gradient_background", "halftone_background", "monochrome_background",
-     "rainbow_background", "heaven_condition", "two-tone_background", "argyle_background",
-     "checkered_background", "cross_background", "dithered_background", "sky", "blue_sky", "night",
-     "night_sky", "dotted_background", "grid_background", "honeycomb_background", "lace_background",
-     "marble_background", "mosaic_background", "patterned_background", "plaid_background",
-     "polka_dot_background", "spiral_background", "splatter_background", "striped_background",
-     "diagonal-striped_background", "sunburst_background", "triangle_background", "abstract_background",
-     "blurry_background", "bright_background", "dark_background", "drama_layer", "border", "white_border",
-     "black_border", "blurry", "blurry_background", "depth_of_field", "blurry_foreground", "pov", "pov_hands",
-     "out_of_frame", "pov_hands", "feet_out_of_frame", "foot_out_of_frame", "film_grain", "meme", "parody", "oekaki", }
+    "looking_ahead",
+    "looking_at_another",
+    "looking_at_viewer",
+    "looking_away",
+    "looking_back",
+    "looking_to_the_side",
+    "male_focus",
+    "marble_background",
+    "mecha_focus",
+    "meme",
+    "monochrome_background",
+    "monster_focus",
+    "mosaic_background",
+    "mouth_focus",
+    "multiple_boys",
+    "multiple_girls",
+    "multiple_others",
+    "multiple_views",
+    "navel_focus",
+    "neck_focus",
+    "night",
+    "night_sky",
+    "object_focus",
+    "oekaki",
+    "orange_background",
+    "other_focus",
+    "out_of_frame",
+    "parody",
+    "patterned_background",
+    "pectoral_focus",
+    "penis_focus",
+    "pink_background",
+    "plaid_background",
+    "plant_focus",
+    "pokemon_focus",
+    "polka_dot_background",
+    "portrait",
+    "pov",
+    "pov_hands",
+    "purple_background",
+    "pussy_focus",
+    "rainbow_background",
+    "red_background",
+    "reflection_focus",
+    "simple_background",
+    "sky",
+    "sky_focus",
+    "solo",
+    "solo_focus",
+    "spiral_background",
+    "splatter_background",
+    "striped_background",
+    "sunburst_background",
+    "text_focus",
+    "thigh_focus",
+    "triangle_background",
+    "two-tone_background",
+    "upper_body",
+    "vehicle_focus",
+    "weapon_focus",
+    "white_background",
+    "white_border",
+}
 
-    # Инициализируем результирующие теги
-    merged_general = {}
-    merged_character = full_character.copy()  # Пока из полной картинки
-    merged_tags = []  # Единый список тегов для caption и taglist
 
-    # Initialize exclude_from_full as an empty set outside of the loop
-    exclude_from_full = set()
+def process_tags(tags_dict, tags_to_remove):
+    """Remove tags using the same canonical names as configuration inputs."""
+    blocked = set(parse_tags(tags_to_remove))
+    return {tag: score for tag, score in normalized_scores(tags_dict).items() if tag not in blocked}
 
-    # Проходим по всем детекторам и их областям
-    for detector_name, regions in image_result["detectors"].items():
-        detector_config = next((d for d in detectors if d.name == detector_name), None)
 
-        if detector_config is None:
+@dataclass(frozen=True)
+class _MergePolicy:
+    """Restrictions and provenance for one source of merged evidence."""
+
+    removed: object = ()
+    confirmation: object = ()
+    full_tags: object = ()
+    provenance: dict | None = None
+
+
+def _merge_source(output, category, scores, source, policy=_MergePolicy()):
+    """Merge one category using independent source policy."""
+    blocked = set(parse_tags(policy.removed))
+    conditional = set(parse_tags(policy.confirmation))
+    for tag, score in normalized_scores(scores).items():
+        if tag in blocked or (tag in conditional and tag not in policy.full_tags):
             continue
+        if tag not in output[category] or score > output[category][tag]:
+            output[category][tag] = score
+            output["provenance"][tag] = copy.deepcopy(
+                (policy.provenance or {}).get(tag, {"source": source, "model_score": score})
+            )
 
-        # Теги для исключения из полной картинки
-        exclude_from_full = set(detector_config.remove_tags_from_full)# | set(detector_config.specific_excluded_tags)
 
-        for region in regions:
-            region_general = region["general"]
-            region_character = region["character"]
-
-            # Фильтруем теги области
-            filtered_general = {}
-            for tag, conf in region_general.items():
-                # Удаляем теги из region_general, если они в remove_tags_from_region
-                if tag in detector_config.remove_tags_from_region:
-                    continue
-
-                # Удаляем глобальные теги артефактов приближения - они должны браться только из полной картинки
-                if tag in GLOBAL_EXCLUDED_REGION_TAGS:
-                    continue
-
-                # Проверяем другие условия исключения для конкретного детектора
-                if tag in detector_config.exclude_from_region and tag not in full_tags_set:
-                    continue
-
-                filtered_general[tag] = conf
-
-            # Обновляем merged_general
-            for tag, conf in filtered_general.items():
-                if tag not in merged_general or conf > merged_general[tag]:
-                    merged_general[tag] = conf
-
-            # Обновляем merged_character
-            for tag, conf in region_character.items():
-                if tag not in merged_character or conf > merged_character[tag]:
-                    merged_character[tag] = conf
-
-            # Собираем теги из области в единый список
-            region_tags = list(filtered_general.keys()) + list(region_character.keys())
-            merged_tags.extend(region_tags)
-
-    # Добавляем теги из полной картинки, исключая указанные
-    for tag, conf in full_general.items():
-        if tag not in exclude_from_full:
-            if tag not in merged_general or conf > merged_general[tag]:
-                merged_general[tag] = conf
-                merged_tags.append(tag)
-
-    # Формируем caption и taglist из одного источника
-    unique_merged_tags = sorted(set(merged_tags))  # Убираем дубликаты и сортируем
-    merged_caption = ", ".join(unique_merged_tags)  # С подчёркиваниями
-    merged_taglist = ", ".join(tag.replace("_", " ") for tag in unique_merged_tags)  # Без подчёркиваний
-
-    return {
-        "caption": merged_caption,
-        "taglist": merged_taglist,
-        "general": merged_general,
-        "character": merged_character,
-        "ratings": image_result["full_image"]["ratings"].copy()
+def merge_tags_from_regions(image_result, detectors):
+    """Union active exclusions; merge scores without mutating source evidence."""
+    configs = {detector.name: detector for detector in detectors}
+    full = image_result["full_image"]
+    full_tags = set(normalized_scores(full["general"])) | set(normalized_scores(full["character"]))
+    excluded = set()
+    for name, regions in image_result["detectors"].items():
+        if regions and name in configs:
+            excluded.update(parse_tags(configs[name].remove_tags_from_full))
+    output = {
+        "general": {},
+        "character": {},
+        "ratings": copy.deepcopy(full["ratings"]),
+        "provenance": {},
     }
+    for category in ("general", "character"):
+        _merge_source(
+            output,
+            category,
+            full[category],
+            "full",
+            _MergePolicy(removed=excluded, provenance=full.get("provenance")),
+        )
+    for name, regions in sorted(image_result["detectors"].items()):
+        if name not in configs:
+            continue
+        detector = configs[name]
+        for region in regions:
+            for category in ("general", "character"):
+                blocked = set(parse_tags(detector.remove_tags_from_region))
+                if category == "general":
+                    blocked.update(GLOBAL_EXCLUDED_REGION_TAGS)
+                _merge_source(
+                    output,
+                    category,
+                    region[category],
+                    f"{name}:{region.get('region_id', 0)}",
+                    _MergePolicy(
+                        removed=blocked,
+                        confirmation=detector.exclude_from_region,
+                        full_tags=full_tags,
+                        provenance=region.get("provenance"),
+                    ),
+                )
+    return format_result(output)
 
 
-# Создаем кастомный энкодер для обработки numpy.float32
 class NumpyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.float32):
-            return float(obj)
-        return json.JSONEncoder.default(self, obj)
+    """JSON encoder for the NumPy float32 scores returned by tagging."""
+
+    def default(self, o):
+        """Serialize NumPy float32 scores; delegate other values to JSON."""
+        if isinstance(o, np.float32):
+            return float(o)
+        return json.JSONEncoder.default(self, o)
+
 
 # Сохранение в Json результатов
 def save_results_to_json(results, output_file):
-    with open(output_file, 'w', encoding='utf-8') as f:
+    """Write detailed or merged results using the NumPy-aware JSON encoder."""
+    with open(output_file, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, ensure_ascii=False, cls=NumpyEncoder)
     print(f"Результаты сохранены в {output_file}")

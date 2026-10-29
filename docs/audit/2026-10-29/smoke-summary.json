@@ -1,0 +1,63 @@
+[
+  {
+    "image": "shinobu-reference.jpg",
+    "regions": {
+      "person_detector": 1,
+      "face_detector": 1
+    },
+    "added": [
+      "helmet",
+      "open_mouth",
+      "skin_fang",
+      "smile"
+    ],
+    "removed": []
+  },
+  {
+    "image": "tag_managing4.jpg",
+    "regions": {
+      "person_detector": 0,
+      "face_detector": 1
+    },
+    "added": [
+      "colored_sclera",
+      "orange_eyes",
+      "pokemon_(creature)",
+      "profile",
+      "yellow_eyes"
+    ],
+    "removed": []
+  },
+  {
+    "image": "tag_managing1.png",
+    "regions": {
+      "person_detector": 1,
+      "face_detector": 0
+    },
+    "added": [
+      "computer",
+      "laptop"
+    ],
+    "removed": []
+  },
+  {
+    "image": "tag_managing2.png",
+    "regions": {
+      "person_detector": 1,
+      "face_detector": 0
+    },
+    "added": [],
+    "removed": [
+      "eyelashes"
+    ]
+  },
+  {
+    "image": "tag_managing3.png",
+    "regions": {
+      "person_detector": 1,
+      "face_detector": 1
+    },
+    "added": [],
+    "removed": []
+  }
+]
