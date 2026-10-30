@@ -1,0 +1,40 @@
+{
+  "status": "passed",
+  "scope": "tiny random SAM; real library and CPU subprocess; not user weights",
+  "provenance": {
+    "backend": "transformers",
+    "device": "cpu",
+    "precision": "float32",
+    "python": "3.12.15",
+    "torch": "2.6.0+cpu",
+    "transformers_version": "5.22.1",
+    "cuda": null,
+    "model_id": null,
+    "revision": null,
+    "checkpoint_format": "transformers_safetensors",
+    "checkpoint_sha256": {
+      "model.safetensors": "781b7ab6020f512c3fc5145a7090f25a35904b9dbb3b2b4c345250f06808e23a"
+    },
+    "metadata_sha256": {
+      "config.json": "f851c58e5c6803438d0e6e488a3545c6d3f7b32cc257219f196494259de3c0c3",
+      "processor_config.json": "38e59147438269e3fa1a9614098595aab578e9e71bec85fb254df8d5581a7983",
+      "tokenizer_config.json": "be23d845c09ccdfbfc52af88980104a27cbe7fa28c94d24e2980b4353ace70dd",
+      "tokenizer.json": "3a64dd47db29e8bb38ad1c30ee81cd655d9446a0e4e426dcfd93ca979017587b"
+    },
+    "validation": "requires_full_model_smoke"
+  },
+  "metrics": {
+    "seconds": 0.0470000000204891,
+    "images": 1,
+    "peak_allocated_bytes": 0,
+    "peak_reserved_bytes": 0
+  },
+  "images": 2,
+  "prompts": 2,
+  "batches": [
+    1,
+    2
+  ],
+  "load_offload_roundtrip": true,
+  "missing_weights_rejected": true
+}

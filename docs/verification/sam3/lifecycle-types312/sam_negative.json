@@ -1,0 +1,45 @@
+{
+    "version": "1.1.414",
+    "time": "1793385239578",
+    "generalDiagnostics": [
+        {
+            "file": "c:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\audit\\typecheck\\sam_negative.py",
+            "severity": "error",
+            "message": "Could not assign item in TypedDict\n  \"Literal['not coordinates']\" is not assignable to \"list[int]\"",
+            "range": {
+                "start": {
+                    "line": 6,
+                    "character": 4
+                },
+                "end": {
+                    "line": 6,
+                    "character": 20
+                }
+            },
+            "rule": "reportGeneralTypeIssues"
+        },
+        {
+            "file": "c:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\audit\\typecheck\\sam_negative.py",
+            "severity": "error",
+            "message": "Argument of type \"Literal['unknown']\" cannot be assigned to parameter \"mode\" of type \"Literal['mask', 'bbox']\" in function \"__init__\"\n  Type \"Literal['unknown']\" is not assignable to type \"Literal['mask', 'bbox']\"\n    \"Literal['unknown']\" is not assignable to type \"Literal['mask']\"\n    \"Literal['unknown']\" is not assignable to type \"Literal['bbox']\"",
+            "range": {
+                "start": {
+                    "line": 7,
+                    "character": 26
+                },
+                "end": {
+                    "line": 7,
+                    "character": 35
+                }
+            },
+            "rule": "reportArgumentType"
+        }
+    ],
+    "summary": {
+        "filesAnalyzed": 1,
+        "errorCount": 2,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 0.656
+    }
+}

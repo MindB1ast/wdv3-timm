@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "model": {
+    "checkpoint": "models/sam3/model.safetensors",
+    "model_id": "unsloth/sam3.1",
+    "backend": "auto",
+    "device": "auto",
+    "allow_download": true
+  },
+  "sources": [
+    {
+      "source_id": "eyes",
+      "name": "sam_eyes",
+      "prompt": "eyes",
+      "confidence": 0.5,
+      "mask_threshold": 0.5,
+      "min_mask_area_px": 4,
+      "max_regions": 32,
+      "view_mode": "mask",
+      "padding": {"unit": "fraction", "value": 0.15},
+      "background_rgb": [255, 255, 255],
+      "region_gen_threshold": 0.35,
+      "remove_tags_from_region": ["portrait"],
+      "add_tags_to_region": {}
+    },
+    {
+      "source_id": "clothes",
+      "name": "sam_clothes",
+      "prompt": "skirt",
+      "max_regions": 16,
+      "view_mode": "bbox",
+      "padding": {"unit": "px", "value": 16}
+    }
+  ]
+}

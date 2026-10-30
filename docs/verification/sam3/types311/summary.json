@@ -1,0 +1,25 @@
+{
+  "positive": {
+    "filesAnalyzed": 26,
+    "errorCount": 0,
+    "warningCount": 0,
+    "informationCount": 0,
+    "timeInSec": 13.012
+  },
+  "negative": {
+    "filesAnalyzed": 1,
+    "errorCount": 3,
+    "warningCount": 0,
+    "informationCount": 0,
+    "timeInSec": 1.101
+  },
+  "sam_negative": {
+    "filesAnalyzed": 1,
+    "errorCount": 2,
+    "warningCount": 0,
+    "informationCount": 0,
+    "timeInSec": 0.867
+  },
+  "interpreter": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\apply-runtime\\Scripts\\python.exe",
+  "python": "3.11.17 (main, Oct  3 2026, 01:03:09) [MSC v.1944 64 bit (AMD64)]"
+}

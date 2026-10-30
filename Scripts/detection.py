@@ -26,6 +26,16 @@ def load_detectors_config(config_path: PathInput) -> List[DetectorConfig]:
         print(f"Ошибка в формате конфигурационного файла: {e}")
         return []
 
+    if isinstance(config_data, dict) and "sources" in config_data:
+        raise ValueError(
+            f"{config_path}: это конфигурация SAM 3, а не YOLO. "
+            "Передайте её через ScriptOptions(sam_config=...), "
+            "а detectors_config оставьте для detectors.json с YOLO-детекторами. "
+            "Для SAM также задайте sam_python — Python отдельного SAM-окружения."
+        )
+    if not isinstance(config_data, list):
+        raise ValueError(f"{config_path}: конфигурация YOLO должна быть JSON-массивом детекторов")
+
     detectors = []
     for item in config_data:
         try:

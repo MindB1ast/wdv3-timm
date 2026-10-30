@@ -53,6 +53,37 @@ class RegionResult(WDTagResult):
 
     region_id: int
     bbox: list[float]
+    geometry: NotRequired["RegionGeometry"]
+    view: NotRequired["RegionViewMetadata"]
+
+
+class RegionGeometry(TypedDict):
+    """Canonical half-open geometry; paths are relative to the run export."""
+
+    image_id: str
+    source_id: str
+    region_id: int
+    image_size: list[int]
+    bbox: list[int]
+    mask_path: NotRequired[str]
+    mask_sha256: NotRequired[str]
+    segmentation_score: NotRequired[float]
+    prompt: NotRequired[str]
+    model_bbox: NotRequired[list[float]]
+
+
+class RegionViewMetadata(TypedDict):
+    """Pixel selection before the independent WD transform."""
+
+    mode: Literal["mask", "bbox"]
+    padding_unit: Literal["px", "fraction"]
+    padding_value: float
+    padding_px: list[int]
+    crop_bbox: list[int]
+    offset: list[int]
+    background_rgb: list[int]
+    transform_version: int
+    fingerprint: str
 
 
 class DetailedResult(TypedDict):
@@ -61,6 +92,10 @@ class DetailedResult(TypedDict):
     image_path: PathInput
     full_image: WDTagResult
     detectors: dict[str, list[RegionResult]]
+    image_id: NotRequired[str]
+    export_root: NotRequired[str]
+    canonical_path: NotRequired[str]
+    tagging_fingerprint: NotRequired[str]
 
 
 class MergedResult(TypedDict):

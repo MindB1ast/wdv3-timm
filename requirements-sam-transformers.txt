@@ -1,0 +1,6 @@
+# Optional environment for Transformers SAM 3 / 3.1 (CPU or CUDA PyTorch).
+# Install the PyTorch build for your hardware first; this file does not replace it.
+transformers==5.22.1
+safetensors>=0.5.3
+pillow>=9.5
+numpy>=1.26,<2

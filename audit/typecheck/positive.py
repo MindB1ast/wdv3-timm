@@ -1,5 +1,5 @@
 """Static consumers, also safe to import without model loading."""
-from typing import assert_type
+from typing import Literal, assert_type
 from pathlib import Path
 
 import numpy as np
@@ -8,6 +8,7 @@ from PIL import Image
 from torch import nn
 
 from Scripts.configs import DetectorConfig, ScriptOptions
+from Scripts.sam_config import RegionViewConfig, SamSourceConfig
 from Scripts.main import BatchTagging
 # Internal resource acceptance deliberately inspects the existing private container.
 from Scripts.main import _BatchResources  # pyright: ignore[reportPrivateUsage]
@@ -48,3 +49,13 @@ def notebook_consumer() -> None:
     options = ScriptOptions(ImageFolder=Path("images"), output_file=None)
     assert_type(BatchTagging(options), BatchResult | None)
     DetectorConfig("face", "face.pt", classes=None, remove_tags_from_full=None)
+
+
+def sam_consumer(region_result: RegionResult) -> None:
+    source = SamSourceConfig("eyes", "sam_eyes", "eye", view=RegionViewConfig(mode="mask"))
+    assert_type(source.prompt, str)
+    assert_type(source.view.mode, Literal["mask", "bbox"])
+    if "geometry" in region_result:
+        assert_type(region_result["geometry"]["bbox"], list[int])
+    if "view" in region_result:
+        assert_type(region_result["view"]["fingerprint"], str)

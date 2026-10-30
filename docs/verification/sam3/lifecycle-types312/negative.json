@@ -1,0 +1,61 @@
+{
+    "version": "1.1.414",
+    "time": "1793385237262",
+    "generalDiagnostics": [
+        {
+            "file": "c:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\audit\\typecheck\\negative.py",
+            "severity": "error",
+            "message": "Could not access item in TypedDict\n  \"missing_field\" is not a defined key in \"WDTagResult\"",
+            "range": {
+                "start": {
+                    "line": 5,
+                    "character": 10
+                },
+                "end": {
+                    "line": 5,
+                    "character": 33
+                }
+            },
+            "rule": "reportGeneralTypeIssues"
+        },
+        {
+            "file": "c:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\audit\\typecheck\\negative.py",
+            "severity": "error",
+            "message": "Argument of type \"Literal['yellow']\" cannot be assigned to parameter \"value\" of type \"Score\" in function \"__setitem__\"\n  Type \"Literal['yellow']\" is not assignable to type \"Score\"\n    \"Literal['yellow']\" is not assignable to \"float\"\n    \"Literal['yellow']\" is not assignable to \"floating[_16Bit]\"\n    \"Literal['yellow']\" is not assignable to \"floating[_32Bit]\"\n    \"Literal['yellow']\" is not assignable to \"floating[_64Bit]\"",
+            "range": {
+                "start": {
+                    "line": 6,
+                    "character": 4
+                },
+                "end": {
+                    "line": 6,
+                    "character": 29
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "c:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\audit\\typecheck\\negative.py",
+            "severity": "error",
+            "message": "Could not access item in TypedDict\n  \"provenance\" is not a required key in \"WDTagResult\", so access may result in runtime exception",
+            "range": {
+                "start": {
+                    "line": 7,
+                    "character": 10
+                },
+                "end": {
+                    "line": 7,
+                    "character": 30
+                }
+            },
+            "rule": "reportTypedDictNotRequiredAccess"
+        }
+    ],
+    "summary": {
+        "filesAnalyzed": 1,
+        "errorCount": 3,
+        "warningCount": 0,
+        "informationCount": 0,
+        "timeInSec": 0.829
+    }
+}

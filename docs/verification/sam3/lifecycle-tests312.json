@@ -1,0 +1,450 @@
+{
+  "schema_version": 1,
+  "tests_run": 110,
+  "passed": 110,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "tests": [
+    {
+      "test": "test_current_behavior.DefectContracts.test_append_read_error_must_preserve_existing_file",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_empty_detector_must_not_remove_full_tags",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_full_character_must_be_in_caption",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_global_addition_must_update_dictionary",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_global_removal_must_update_dictionary",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_merge_must_not_depend_on_detector_order",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_missing_predictions_must_not_report_perfect_recall",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_new_export_must_not_duplicate_before_after_tags",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_region_caption_must_match_filtered_dictionary",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_same_basename_must_not_overwrite_another_image",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_spaced_filter_must_match_canonical_tag",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.DefectContracts.test_visualization_save_branch_must_not_raise_name_error",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_append_txt_is_idempotent",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_batch_entry_without_export_returns_two_lists",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_category_threshold_is_strict",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_composition_tags_from_region_are_excluded",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_config_defaults_do_not_share_mutable_lists",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_detection_crops_in_original_coordinates",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_empty_detection_returns_empty_list",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_existing_detector_configuration_loads",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_json_encoder_handles_float32",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_merge_does_not_mutate_input",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_merge_uses_maximum_confidence",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_metrics_for_complete_correct_predictions",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_process_tags_preserves_unremoved_scores",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_ratings_are_kept_separate",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_region_confirmation_requires_full_image_tag",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_square_padding_preserves_original_pixels",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_tag_manager_edits_only_on_explicit_save",
+      "status": "passed"
+    },
+    {
+      "test": "test_current_behavior.HealthyBehavior.test_transparent_image_composites_on_white",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.ConsistentTags.test_global_order_and_input_are_preserved",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.ConsistentTags.test_manual_character_and_original_model_score",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.ConsistentTags.test_remove_wins_and_punctuation_survives",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.EvaluationContracts.test_ambiguous_extensions_are_rejected",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.EvaluationContracts.test_empty_labels_are_zero_and_empty_dataset_is_error",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.EvaluationContracts.test_historical_f1_is_explicit_and_unchanged",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.EvaluationContracts.test_missing_predictions_are_present_in_both_tables",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.EvaluationContracts.test_missing_predictions_report_coverage_and_counts",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.EvaluationContracts.test_relative_roots_and_recursive_labels_match",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.EvaluationContracts.test_repeated_result_and_outside_root_are_errors",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.EvaluationContracts.test_unknown_prediction_id_is_error",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.ImageResources.test_actual_png_export_without_plotly_renderer",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.ImageResources.test_crops_work_after_source_is_closed",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.ImageResources.test_empty_detection_closes_file",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.ImageResources.test_full_inference_exception_closes_file",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.NotebookCompatibility.test_numeric_tables_render_with_supported_pandas",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.SafeStorage.test_mixed_separators_and_canonical_duplicates",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.SafeStorage.test_replace_failure_preserves_original_and_cleans_temp",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.SafeStorage.test_tag_manager_counts_only_successful_replacements",
+      "status": "passed"
+    },
+    {
+      "test": "test_fixes.SafeStorage.test_write_failure_preserves_original",
+      "status": "passed"
+    },
+    {
+      "test": "test_pylint_cleanup.ModelLoadingContracts.test_custom_local_yolo_weights_do_not_access_network",
+      "status": "passed"
+    },
+    {
+      "test": "test_pylint_cleanup.ModelLoadingContracts.test_known_yolo_download_has_timeout_and_closes_response",
+      "status": "passed"
+    },
+    {
+      "test": "test_pylint_cleanup.ModelLoadingContracts.test_shared_label_parser_preserves_categories_and_names",
+      "status": "passed"
+    },
+    {
+      "test": "test_pylint_cleanup.PylintRefactorContracts.test_analytics_charts_and_change_tables_preserve_baseline",
+      "status": "passed"
+    },
+    {
+      "test": "test_pylint_cleanup.PylintRefactorContracts.test_tag_editing_and_priority_sort_preserve_stats",
+      "status": "passed"
+    },
+    {
+      "test": "test_region_hover.HoverTests.test_notebook_and_html_keep_hover_and_unhover_callbacks",
+      "status": "passed"
+    },
+    {
+      "test": "test_region_hover.HoverTests.test_notebook_has_visible_original_png_without_executing_parent_scripts",
+      "status": "passed"
+    },
+    {
+      "test": "test_region_hover.HoverTests.test_source_is_only_image_trace_and_masks_start_hidden_with_png_alpha",
+      "status": "passed"
+    },
+    {
+      "test": "test_region_hover.HoverTests.test_static_overview_leaves_mask_interiors_untinted",
+      "status": "passed"
+    },
+    {
+      "test": "test_region_hover.HoverTests.test_yolo_only_does_not_have_mask_layers_or_custom_renderer",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_auto.AutoTests.test_auto_cpu_cuda_probe_and_explicit_device",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_auto.AutoTests.test_auto_factory_uses_cpu_transformers_for_hf_weights",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_auto.AutoTests.test_current_interpreter_and_config_defaults",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_auto.AutoTests.test_download_metadata_does_not_replace_existing_weights_or_config",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_auto.AutoTests.test_hf_candidates_are_xyxy_and_use_presence_score",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_auto.AutoTests.test_initial_repository_download_and_offline_failure",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_auto.AutoTests.test_layout_detection_and_backend_override",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_auto.AutoTests.test_missing_metadata_requires_source_repo_without_network",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_backend.BackendTests.test_failed_batch_releases_features_before_offload_and_can_retry",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_backend.BackendTests.test_native_batch_independent_prompts_and_probability_decoding",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_checkpoint.CheckpointTests.test_incomplete_and_wrong_shape_weights_are_not_silently_accepted",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_checkpoint.CheckpointTests.test_native_detector_prefix_and_tracker_are_handled",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_checkpoint.CheckpointTests.test_native_safetensors_loads_exact_values_without_downloading",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_checkpoint.CheckpointTests.test_pt_keeps_official_loading_path_and_invalid_header_fails",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_checkpoint.CheckpointTests.test_sam_config_in_yolo_field_fails_before_loading_weights",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_checkpoint.CheckpointTests.test_transformers_file_is_rejected_before_build_or_tensor_loading",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_config.SamConfigTests.test_bad_inputs_fail_before_models",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_config.SamConfigTests.test_conflicting_sources_and_batch_limits",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_config.SamConfigTests.test_defaults_and_relative_checkpoint",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_config.SamConfigTests.test_shipped_example",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_pipeline.SamPipelineTests.test_cancel_keeps_committed_image",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_pipeline.SamPipelineTests.test_corrupt_file_and_commit_failure_preserve_previous",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_pipeline.SamPipelineTests.test_example_runs_without_vlm_or_comfyui",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_pipeline.SamPipelineTests.test_inspector_and_overview_render_both_modes",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_pipeline.SamPipelineTests.test_manifest_retries_only_transient_windows_replace_failure",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_pipeline.SamPipelineTests.test_mask_copy_failure_cannot_commit_dangling_links",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_pipeline.SamPipelineTests.test_mixed_yolo_sources_share_canonical_frame_and_filters",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_pipeline.SamPipelineTests.test_output_parent_does_not_exclude_the_input_folder",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_pipeline.SamPipelineTests.test_portable_export_masks_views_retag_and_legacy_txt",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_pipeline.SamPipelineTests.test_recursive_scan_does_not_reingest_prior_exports",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_pipeline.SamPipelineTests.test_sam_wd_phase_order_across_portions",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_pipeline.SamPipelineTests.test_wd_batch_rows_and_last_partial",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_regions.RegionTests.test_exif_rotation_has_matching_pixels",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_regions.RegionTests.test_fraction_clipping_and_bbox",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_regions.RegionTests.test_mask_holes_components_and_context",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_regions.RegionTests.test_minimum_bbox_and_empty",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_worker.MaskSelectionTests.test_selection_order_duplicates_thresholds_and_limit",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_worker.WorkerTests.test_actual_process_batch_empty_branches_and_cleanup",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_worker.WorkerTests.test_bad_replies_and_mask_validation",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_worker.WorkerTests.test_oom_is_actionable_and_not_empty",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_worker.WorkerTests.test_real_worker_preflight_without_network",
+      "status": "passed"
+    },
+    {
+      "test": "test_sam_worker.WorkerTests.test_timeout_and_cancel_terminate_process",
+      "status": "passed"
+    },
+    {
+      "test": "test_typed_contracts.StableMetricContracts.test_invalid_dataset_and_unknown_ids_still_fail",
+      "status": "passed"
+    },
+    {
+      "test": "test_typed_contracts.StableMetricContracts.test_missing_predictions_and_policy_diagnostics",
+      "status": "passed"
+    },
+    {
+      "test": "test_typed_contracts.StableMetricContracts.test_one_correct_tag_uses_epsilon_in_all_denominators",
+      "status": "passed"
+    },
+    {
+      "test": "test_typed_contracts.StableMetricContracts.test_per_tag_counts_and_stabilization",
+      "status": "passed"
+    },
+    {
+      "test": "test_typed_contracts.StableMetricContracts.test_summary_keeps_historical_order_of_aggregation",
+      "status": "passed"
+    },
+    {
+      "test": "test_typed_contracts.StableMetricContracts.test_tp_fp_fn_and_empty_agree_across_image_tables",
+      "status": "passed"
+    },
+    {
+      "test": "test_typed_contracts.TypedRuntimeContracts.test_existing_path_and_none_configuration",
+      "status": "passed"
+    },
+    {
+      "test": "test_typed_contracts.TypedRuntimeContracts.test_plain_dictionary_round_trip_and_extra_region_fields",
+      "status": "passed"
+    }
+  ]
+}

@@ -20,8 +20,12 @@ def main():
     negative_config.parent.mkdir(parents=True, exist_ok=True)
     negative_config.write_text(json.dumps({'extends': '../pyrightconfig.json',
         'include': ['../audit/typecheck/negative.py'], 'exclude': [], 'strict': [], 'extraPaths': ['..']}), encoding='utf-8')
+    sam_negative_config = ROOT / 'temp/typed-sam-negative.json'
+    sam_negative_config.write_text(json.dumps({'extends': '../pyrightconfig.json',
+        'include': ['../audit/typecheck/sam_negative.py'], 'exclude': [], 'strict': [], 'extraPaths': ['..']}), encoding='utf-8')
     summary = {}
-    for name, arguments in [('positive', []), ('negative', ['--project', str(negative_config)])]:
+    for name, arguments in [('positive', []), ('negative', ['--project', str(negative_config)]),
+                            ('sam_negative', ['--project', str(sam_negative_config)])]:
         result = subprocess.run(command + arguments, cwd=ROOT, capture_output=True,
                                 text=True, encoding='utf-8')
         assert result.stdout.strip().startswith('{'), (result.returncode, result.stderr)
@@ -34,11 +38,13 @@ def main():
         else:
             expected = {(6, 'reportGeneralTypeIssues'), (7, 'reportArgumentType'),
                         (8, 'reportTypedDictNotRequiredAccess')}
+            if name == 'sam_negative':
+                expected = {(7, 'reportGeneralTypeIssues'), (8, 'reportArgumentType')}
             actual = {(item['range']['start']['line'] + 1, item.get('rule'))
                       for item in diagnostics}
             assert result.returncode == 1, (result.returncode, result.stderr)
-            assert len(diagnostics) == 3 and actual == expected, diagnostics
-            assert all(Path(item['file']).name == 'negative.py' for item in diagnostics)
+            assert len(diagnostics) == len(expected) and actual == expected, diagnostics
+            assert all(Path(item['file']).name == name + '.py' for item in diagnostics)
         summary[name] = data['summary']
     summary['interpreter'] = sys.executable
     summary['python'] = sys.version

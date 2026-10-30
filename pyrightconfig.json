@@ -11,16 +11,28 @@
     "Scripts/main.py",
     "Scripts/savingProc.py",
     "Scripts/visualization.py",
+    "Scripts/region_figure.py",
     "Scripts/evaluation.py",
     "Scripts/analitycs.py",
     "Scripts/analytics_charts.py",
+    "Scripts/sam_config.py",
+    "Scripts/sam_checkpoint.py",
+    "Scripts/sam_runtime.py",
+    "Scripts/mask_ops.py",
+    "Scripts/sam_masks.py",
+    "Scripts/regions.py",
+    "Scripts/sam3_adapter.py",
+    "Scripts/region_export.py",
+    "Scripts/region_tagging.py",
+    "Scripts/sam_pipeline.py",
     "audit/typecheck/positive.py"
   ],
   "exclude": [
     ".venv",
     "temp",
     "models",
-    "audit/typecheck/negative.py"
+    "audit/typecheck/negative.py",
+    "audit/typecheck/sam_negative.py"
   ],
   "strict": [
     "Scripts/types.py",

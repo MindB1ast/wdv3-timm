@@ -56,6 +56,8 @@ def _load_yolo_models(
 
 def _load_batch_resources(opts: ScriptOptions) -> _BatchResources:
     """Load model resources independently of file iteration and output formatting."""
+    print(f"Загрузка конфигурации детекторов из {opts.detectors_config}...")
+    detectors = load_detectors_config(opts.detectors_config)
     repo_id = MODEL_REPO_MAP[opts.model]
     model_folder = ensure_model_folder(Path(opts.model_folder))
     yolo_folder = ensure_model_folder(Path(opts.yolo_model_dir))
@@ -67,8 +69,6 @@ def _load_batch_resources(opts: ScriptOptions) -> _BatchResources:
     print("Создание трансформации данных...")
     transform = cast(ImageTransform, create_transform(
         **resolve_data_config(model.pretrained_cfg, model=model)))
-    print(f"Загрузка конфигурации детекторов из {opts.detectors_config}...")
-    detectors = load_detectors_config(opts.detectors_config)
     return _BatchResources(
         model, transform, labels, detectors, _load_yolo_models(detectors, yolo_folder)
     )
@@ -91,6 +91,13 @@ def _process_image(
     )
     if not result:
         return None
+    return _postprocess_result(result, resources, opts)
+
+
+def _postprocess_result(
+    result: DetailedResult, resources: _BatchResources, opts: ScriptOptions,
+) -> tuple[DetailedResult, MergedResult]:
+    """Use the same merge and TXT rules for legacy and SAM image results."""
     character_names = [
         resources.labels.names[index] for index in getattr(resources.labels, "character", [])
     ]
@@ -134,6 +141,9 @@ def BatchTagging(opts: ScriptOptions) -> BatchResult | None:
     image_folder = Path(opts.ImageFolder).resolve()
     if not image_folder.is_dir():
         raise FileNotFoundError(f"Директория не найдена: {image_folder}")
+    if opts.sam_config is not None:
+        from .sam_pipeline import run_sam_batch
+        return run_sam_batch(opts)
     resources = _load_batch_resources(opts)
     search = image_folder.rglob if opts.recursive else image_folder.glob
     image_files = [path for extension in ("*.jpg", "*.jpeg", "*.png") for path in search(extension)]

@@ -1,0 +1,621 @@
+{
+  "runs": [
+    {
+      "sam_batch_size": 1,
+      "sam": {
+        "backend": "transformers",
+        "device": "cpu",
+        "precision": "float32",
+        "python": "3.12.15",
+        "torch": "2.6.0+cpu",
+        "transformers_version": "5.22.1",
+        "cuda": null,
+        "model_id": "unsloth/sam3.1",
+        "revision": null,
+        "checkpoint_format": "transformers_safetensors",
+        "checkpoint_sha256": {
+          "model.safetensors": "28cd71c60e3034fc05ab67aa6b960d5340087fc72e456f2989b50294dd6b4dc9"
+        },
+        "metadata_sha256": {
+          "config.json": "8c543c43a0767a6f2c79036fb846b24d1356c6d4c950c6b713072b462858b671",
+          "processor_config.json": "2dd00f49eee27c1df598273cc184acc897ff11c97d37dee0ac0ad529f6a7ac42",
+          "tokenizer_config.json": "39670ad98457fe8f14ca59f6bb74591e9fc850974380a63993e5b8ffc865baa2",
+          "tokenizer.json": "6d9109cc838977f3ca94a379eec36aecc7c807e1785cd729660ca2fc0171fb35",
+          "special_tokens_map.json": "2cdb3b8331a60c92fc1e55a13e9fd61fd2293c5a51275fdcccd62b780052530e",
+          "vocab.json": "5047b556ce86ccaf6aa22b3ffccfc52d391ea4accdab9c2f2407da5b742d4363",
+          "merges.txt": "9fd691f7c8039210e0fced15865466c65820d09b63988b0174bfe25de299051a"
+        },
+        "validation": "requires_full_model_smoke"
+      },
+      "run_id": "0039a85001d346bebfa4b5d9e97656db",
+      "images": [
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 131.10899999999674,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 200,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 0
+            }
+          },
+          "image_id": "585bd6a8361781016872a4c8",
+          "status": "complete"
+        },
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 133.2039999999979,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 200,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 0
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 200,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 0
+            }
+          },
+          "image_id": "0ac4ec9536ee27b5a8bd1a80",
+          "status": "complete"
+        },
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 132.85899999999674,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            }
+          },
+          "image_id": "549f318edb6a098e5ffd430f",
+          "status": "complete"
+        },
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 137.40599999998813,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            }
+          },
+          "image_id": "09c41ab08a7a4340bdebfee5",
+          "status": "complete"
+        }
+      ],
+      "region_batch_size": 8,
+      "status": "complete",
+      "manifest_sha256": "77752252bf8c7a9d1e35ac10f0c38a6adaedbdca991759cce45816e9effe1656"
+    },
+    {
+      "sam_batch_size": 1,
+      "sam": {
+        "backend": "transformers",
+        "device": "cpu",
+        "precision": "float32",
+        "python": "3.12.15",
+        "torch": "2.6.0+cpu",
+        "transformers_version": "5.22.1",
+        "cuda": null,
+        "model_id": "unsloth/sam3.1",
+        "revision": null,
+        "checkpoint_format": "transformers_safetensors",
+        "checkpoint_sha256": {
+          "model.safetensors": "28cd71c60e3034fc05ab67aa6b960d5340087fc72e456f2989b50294dd6b4dc9"
+        },
+        "metadata_sha256": {
+          "config.json": "8c543c43a0767a6f2c79036fb846b24d1356c6d4c950c6b713072b462858b671",
+          "processor_config.json": "2dd00f49eee27c1df598273cc184acc897ff11c97d37dee0ac0ad529f6a7ac42",
+          "tokenizer_config.json": "39670ad98457fe8f14ca59f6bb74591e9fc850974380a63993e5b8ffc865baa2",
+          "tokenizer.json": "6d9109cc838977f3ca94a379eec36aecc7c807e1785cd729660ca2fc0171fb35",
+          "special_tokens_map.json": "2cdb3b8331a60c92fc1e55a13e9fd61fd2293c5a51275fdcccd62b780052530e",
+          "vocab.json": "5047b556ce86ccaf6aa22b3ffccfc52d391ea4accdab9c2f2407da5b742d4363",
+          "merges.txt": "9fd691f7c8039210e0fced15865466c65820d09b63988b0174bfe25de299051a"
+        },
+        "validation": "requires_full_model_smoke"
+      },
+      "run_id": "075a5a558ef741f988c588e1d4224f0b",
+      "images": [
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 126.04699999999139,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 200,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 0
+            }
+          },
+          "image_id": "585bd6a8361781016872a4c8",
+          "status": "complete"
+        },
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 125.65700000000652,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 200,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 0
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 200,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 0
+            }
+          },
+          "image_id": "0ac4ec9536ee27b5a8bd1a80",
+          "status": "complete"
+        },
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 124.60899999999674,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            }
+          },
+          "image_id": "549f318edb6a098e5ffd430f",
+          "status": "complete"
+        },
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 121.71900000001187,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            }
+          },
+          "image_id": "09c41ab08a7a4340bdebfee5",
+          "status": "complete"
+        }
+      ],
+      "region_batch_size": 8,
+      "status": "complete",
+      "manifest_sha256": "a4e25af12b52f2bfa112c4e9e75209caed043f414f8ba29b00b38926fda4dfa6"
+    },
+    {
+      "sam_batch_size": 1,
+      "sam": {
+        "backend": "transformers",
+        "device": "cpu",
+        "precision": "float32",
+        "python": "3.12.15",
+        "torch": "2.6.0+cpu",
+        "transformers_version": "5.22.1",
+        "cuda": null,
+        "model_id": "unsloth/sam3.1",
+        "revision": null,
+        "checkpoint_format": "transformers_safetensors",
+        "checkpoint_sha256": {
+          "model.safetensors": "28cd71c60e3034fc05ab67aa6b960d5340087fc72e456f2989b50294dd6b4dc9"
+        },
+        "metadata_sha256": {
+          "config.json": "8c543c43a0767a6f2c79036fb846b24d1356c6d4c950c6b713072b462858b671",
+          "processor_config.json": "2dd00f49eee27c1df598273cc184acc897ff11c97d37dee0ac0ad529f6a7ac42",
+          "tokenizer_config.json": "39670ad98457fe8f14ca59f6bb74591e9fc850974380a63993e5b8ffc865baa2",
+          "tokenizer.json": "6d9109cc838977f3ca94a379eec36aecc7c807e1785cd729660ca2fc0171fb35",
+          "special_tokens_map.json": "2cdb3b8331a60c92fc1e55a13e9fd61fd2293c5a51275fdcccd62b780052530e",
+          "vocab.json": "5047b556ce86ccaf6aa22b3ffccfc52d391ea4accdab9c2f2407da5b742d4363",
+          "merges.txt": "9fd691f7c8039210e0fced15865466c65820d09b63988b0174bfe25de299051a"
+        },
+        "validation": "requires_full_model_smoke"
+      },
+      "run_id": "4e6da693a17645188b87c336728598ac",
+      "images": [
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 125.36000000001513,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 197,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 3
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 200,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 0
+            }
+          },
+          "image_id": "585bd6a8361781016872a4c8",
+          "status": "complete"
+        },
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 136.81299999999464,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 200,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 0
+            }
+          },
+          "image_id": "0ac4ec9536ee27b5a8bd1a80",
+          "status": "complete"
+        },
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 154.64100000000326,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 196,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 4
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            }
+          },
+          "image_id": "549f318edb6a098e5ffd430f",
+          "status": "complete"
+        },
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 152.0470000000205,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            }
+          },
+          "image_id": "09c41ab08a7a4340bdebfee5",
+          "status": "complete"
+        }
+      ],
+      "region_batch_size": 8,
+      "status": "complete",
+      "manifest_sha256": "1419231c03bfb2220d6e96823796205268471c620ed9bab56cf8b99a3a29f41d"
+    },
+    {
+      "sam_batch_size": 1,
+      "sam": {
+        "backend": "transformers",
+        "device": "cpu",
+        "precision": "float32",
+        "python": "3.12.15",
+        "torch": "2.6.0+cpu",
+        "transformers_version": "5.22.1",
+        "cuda": null,
+        "model_id": "unsloth/sam3.1",
+        "revision": null,
+        "checkpoint_format": "transformers_safetensors",
+        "checkpoint_sha256": {
+          "model.safetensors": "28cd71c60e3034fc05ab67aa6b960d5340087fc72e456f2989b50294dd6b4dc9"
+        },
+        "metadata_sha256": {
+          "config.json": "8c543c43a0767a6f2c79036fb846b24d1356c6d4c950c6b713072b462858b671",
+          "processor_config.json": "2dd00f49eee27c1df598273cc184acc897ff11c97d37dee0ac0ad529f6a7ac42",
+          "tokenizer_config.json": "39670ad98457fe8f14ca59f6bb74591e9fc850974380a63993e5b8ffc865baa2",
+          "tokenizer.json": "6d9109cc838977f3ca94a379eec36aecc7c807e1785cd729660ca2fc0171fb35",
+          "special_tokens_map.json": "2cdb3b8331a60c92fc1e55a13e9fd61fd2293c5a51275fdcccd62b780052530e",
+          "vocab.json": "5047b556ce86ccaf6aa22b3ffccfc52d391ea4accdab9c2f2407da5b742d4363",
+          "merges.txt": "9fd691f7c8039210e0fced15865466c65820d09b63988b0174bfe25de299051a"
+        },
+        "validation": "requires_full_model_smoke"
+      },
+      "run_id": "eecdfbcb465148728e6fd74f0d6560eb",
+      "images": [
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 127.34299999999348,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 200,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 0
+            }
+          },
+          "image_id": "585bd6a8361781016872a4c8",
+          "status": "complete"
+        },
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 132.03099999998813,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 200,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 0
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 200,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 0
+            }
+          },
+          "image_id": "0ac4ec9536ee27b5a8bd1a80",
+          "status": "complete"
+        },
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 133.32800000000861,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            }
+          },
+          "image_id": "549f318edb6a098e5ffd430f",
+          "status": "complete"
+        },
+        {
+          "diagnostics": {
+            "sam_batch_metrics": {
+              "seconds": 125.1710000000021,
+              "images": 1,
+              "peak_allocated_bytes": 0,
+              "peak_reserved_bytes": 0
+            },
+            "sam_eyes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            },
+            "sam_clothes": {
+              "total": 200,
+              "confidence": 199,
+              "empty": 0,
+              "area": 0,
+              "duplicate": 0,
+              "limited": 0,
+              "selected": 1
+            }
+          },
+          "image_id": "09c41ab08a7a4340bdebfee5",
+          "status": "complete"
+        }
+      ],
+      "region_batch_size": 8,
+      "status": "complete",
+      "manifest_sha256": "cd9944b563143ab4bd32cce8c11fa8ffe25655ae7795b499a4fc357473171339"
+    }
+  ],
+  "scope": "Existing user runs: full SAM 3.1 checkpoint on CPU; not GPU acceptance or batch equivalence"
+}

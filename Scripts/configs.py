@@ -103,3 +103,9 @@ class ScriptOptions:  # pylint: disable=R0902  # Public configuration fields.
     add_tags_before: str = sp_field(default="")  # Теги для добавления в начало
     add_tags_after: str = sp_field(default="")  # Теги для добавления в конец
     remove_tags: str = sp_field(default="")  # Теги для удаления
+    sam_config: PathInput | None = sp_field(default=None)
+    sam_python: PathInput | None = sp_field(default=None)
+    regions_output_dir: PathInput = sp_field(default="./region_runs")
+    sam_batch_size: int = sp_field(default=1)
+    region_batch_size: int = sp_field(default=8)
+    sam_timeout: float = sp_field(default=300.0)
