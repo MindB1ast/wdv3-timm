@@ -1,5 +1,7 @@
 """YOLO-only orchestration must send real bounded WD tensor batches."""
 from dataclasses import replace
+import io
+from contextlib import redirect_stdout
 from pathlib import Path
 import tempfile
 from types import SimpleNamespace
@@ -120,6 +122,38 @@ class YoloBatchTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     BatchTagging(replace(self.options, region_batch_size=value))
                 load.assert_not_called()
+
+    def test_empty_folder_does_not_load_models(self):
+        empty = self.root / "empty"
+        empty.mkdir()
+        output = io.StringIO()
+        with patch("Scripts.main._load_batch_resources") as load, redirect_stdout(output):
+            self.assertIsNone(BatchTagging(replace(self.options, ImageFolder=empty)))
+        load.assert_not_called()
+        self.assertEqual(output.getvalue(), "Изображения не найдены в указанной директории.\n")
+
+    def test_unsupported_files_do_not_load_models(self):
+        folder = self.root / "documents"
+        folder.mkdir()
+        (folder / "notes.txt").write_text("tags", encoding="utf-8")
+        with patch("Scripts.main._load_batch_resources") as load:
+            self.assertIsNone(BatchTagging(replace(self.options, ImageFolder=folder)))
+        load.assert_not_called()
+
+    def test_nested_image_is_processed_only_when_recursive(self):
+        folder = self.root / "nested"
+        folder.mkdir()
+        nested_image = self.path.rename(folder / self.path.name).resolve()
+        resources = SimpleNamespace(model=self.model, device=None)
+        with patch("Scripts.main._load_batch_resources", return_value=resources) as load, \
+                patch("Scripts.main._process_image", return_value=None) as process:
+            self.assertIsNone(BatchTagging(replace(self.options, recursive=False)))
+            load.assert_not_called()
+            process.assert_not_called()
+            options = replace(self.options, recursive=True)
+            self.assertEqual(BatchTagging(options), ([], []))
+            load.assert_called_once_with(options)
+            process.assert_called_once_with(nested_image, resources, options)
 
 
 if __name__ == "__main__":

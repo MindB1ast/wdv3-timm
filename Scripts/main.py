@@ -147,12 +147,12 @@ def BatchTagging(opts: ScriptOptions) -> BatchResult | None:
     if opts.sam_config is not None:
         from .sam_pipeline import run_sam_batch
         return run_sam_batch(opts)
-    resources = _load_batch_resources(opts)
     search = image_folder.rglob if opts.recursive else image_folder.glob
     image_files = [path for extension in ("*.jpg", "*.jpeg", "*.png") for path in search(extension)]
     if not image_files:
         print("Изображения не найдены в указанной директории.")
         return None
+    resources = _load_batch_resources(opts)
     resources.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     resources.model = resources.model.to(resources.device)
     results: list[DetailedResult] = []
