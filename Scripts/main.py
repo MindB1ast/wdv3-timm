@@ -18,6 +18,7 @@ from .model import (download_model_files, ensure_model_folder,
                     load_yolo_model)
 from .preprocess import merge_tags_from_regions, save_results_to_json
 from .savingProc import save_tags_to_txt
+from .sam_config import positive_integer
 from .tag_utils import apply_tag_rules
 from .tagging import process_image_with_multiple_detectors
 from .types import (BatchResult, DetailedResult, ImageTransform, MergedResult,
@@ -88,6 +89,7 @@ def _process_image(
         opts.gen_threshold,
         opts.char_threshold,
         resources.device,
+        region_batch_size=opts.region_batch_size,
     )
     if not result:
         return None
@@ -135,6 +137,7 @@ def _save_batch_results(
 # pylint: disable-next=C0103
 def BatchTagging(opts: ScriptOptions) -> BatchResult | None:
     """Run a batch, retaining the legacy public name and two-list result."""
+    positive_integer(opts.region_batch_size, "region_batch_size")
     if opts.model not in MODEL_REPO_MAP:
         print(f"Доступные модели: {list(MODEL_REPO_MAP.keys())}")
         raise ValueError(f"Неизвестная модель: {opts.model}")

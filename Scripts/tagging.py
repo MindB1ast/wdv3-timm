@@ -11,7 +11,9 @@ from ultralytics import YOLO
 
 from .configs import DetectorConfig
 from .detection import extract_regions_with_detector
-from .tag_utils import apply_tag_rules, format_result
+from .region_tagging import RegionTagger
+from .sam_config import positive_integer
+from .tag_utils import format_result
 from .types import (Crop, DetailedResult, ImageTransform, PathInput,
                     RegionResult, WDTagResult)
 from .wdv3_timm import LabelData, get_tags, pil_ensure_rgb, pil_pad_square
@@ -68,42 +70,25 @@ class _TaggingRuntime:
     gen_threshold: float
     char_threshold: float
     torch_device: torch.device | None
+    region_batch_size: int
 
 
 def _tag_detector_regions(
     regions: list[Crop], detector: DetectorConfig, runtime: _TaggingRuntime,
 ) -> list[RegionResult]:
     """Tag detached crops and close them even when inference fails."""
-    gen_threshold = (
-        detector.region_gen_threshold
-        if detector.region_gen_threshold is not None
-        else runtime.gen_threshold
-    )
-    char_threshold = (
-        detector.region_char_threshold
-        if detector.region_char_threshold is not None
-        else runtime.char_threshold
+    tagger = RegionTagger(
+        runtime.model, runtime.transform, runtime.labels,
+        runtime.torch_device or torch.device("cpu"),
+        runtime.gen_threshold, runtime.char_threshold,
     )
     results: list[RegionResult] = []
-    character_names = [runtime.labels.names[index] for index in runtime.labels.character]
     try:
-        for index, (image, bbox, _) in enumerate(regions):
-            raw = tag_image(
-                image,
-                runtime.model,
-                runtime.transform,
-                runtime.labels,
-                gen_threshold,
-                char_threshold,
-                runtime.torch_device,
-            )
-            filtered = apply_tag_rules(
-                raw,
-                remove=detector.remove_tags_from_region,
-                add=detector.add_tags_to_region,
-                character_names=character_names,
-            )
-            results.append({"region_id": index, "bbox": bbox, **filtered})
+        for start in range(0, len(regions), runtime.region_batch_size):
+            chunk = regions[start:start + runtime.region_batch_size]
+            tagged = tagger.tag_batch([image for image, _, _ in chunk], detector)
+            for offset, ((_, bbox, _), raw) in enumerate(zip(chunk, tagged)):
+                results.append({"region_id": start + offset, "bbox": bbox, **raw})
     finally:
         for image, _, _ in regions:
             image.close()
@@ -137,10 +122,14 @@ def process_image_with_multiple_detectors(
     gen_threshold: float,
     char_threshold: float,
     torch_device: torch.device | None,
+    *,
+    region_batch_size: int = 8,
 ) -> DetailedResult:
     """Tag the full image and independent crops, always closing owned images."""
+    positive_integer(region_batch_size, "region_batch_size")
     runtime = _TaggingRuntime(
-        tagger_model, transform, labels, gen_threshold, char_threshold, torch_device
+        tagger_model, transform, labels, gen_threshold, char_threshold, torch_device,
+        region_batch_size,
     )
     with Image.open(img_path) as image:
         full = tag_image(

@@ -16,6 +16,9 @@ This project is an image tagging tool that enhances tag accuracy by using region
 - Customizable tag thresholds
 - Ability to add or remove tags for specific regions
 - Batch processing
+- `region_batch_size` (default: 8) controls WD tensor batches of detected regions
+  for both YOLO-only and SAM runs. Batches stay within one image and source;
+  full images are tagged individually. The legacy `batch` option does not control this.
 - Optional SAM 3 text-prompted masks, minimal boxes and configurable region context:
   [configuration and setup](docs/sam3.md), [batch example](examples/sam3_batch.py).
 - Optional text file output for tags

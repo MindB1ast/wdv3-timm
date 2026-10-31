@@ -77,7 +77,7 @@ class AuditFixture(unittest.TestCase):
             create_transform=lambda **kwargs: None,
             resolve_data_config=lambda *args, **kwargs: {},
             load_detectors_config=lambda *args: [],
-            process_image_with_multiple_detectors=lambda *args: copy.deepcopy(image_result),
+            process_image_with_multiple_detectors=lambda *args, **kwargs: copy.deepcopy(image_result),
         )
         opts = ScriptOptions(ImageFolder=self.directory, model='vit',
                              save_txt=False, append_txt=False, output_file='', **options)
@@ -222,14 +222,15 @@ class DefectContracts(AuditFixture):
 
     def test_region_caption_must_match_filtered_dictionary(self):
         detector_config = config(remove_tags_from_region=['helmet'])
-        predictions = [tags({'smile': 0.8}), tags({'helmet': 0.9, 'smile': 0.8})]
+        labels = LabelData(names=['helmet', 'smile'], rating=[], general=[0, 1], character=[])
         with Image.open(self.image) as opened, \
              patch.object(tagging_module.Image, 'open', return_value=opened), \
-             patch.object(tagging_module, 'tag_image', side_effect=predictions), \
+             patch.object(tagging_module, 'tag_image', return_value=tags({'smile': 0.8})), \
              patch.object(tagging_module, 'extract_regions_with_detector',
                           return_value=[(Image.new('RGB', (10, 10)), [0, 0, 10, 10], 'face')]):
             data = tagging_module.process_image_with_multiple_detectors(
-                str(self.image), None, None, SimpleNamespace(names=[], character=[]),
+                str(self.image), lambda batch: torch.ones((len(batch), 2)),
+                lambda image: torch.zeros((3, 4, 4)), labels,
                 [detector_config], {'unused.pt': object()}, 0.35, 0.75, torch.device('cpu'))
         face = data['detectors']['face'][0]
         self.assertNotIn('helmet', face['general'])
