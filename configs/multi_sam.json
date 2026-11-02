@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "options": {
+    "general_threshold": 0.35,
+    "character_threshold": 0.75,
+    "image_batch_size": 2,
+    "region_batch_size": 8,
+    "replace_underscores": true,
+    "escape_parentheses": true,
+    "remove_tags": "",
+    "prefix_tags": "",
+    "suffix_tags": ""
+  },
+  "detectors": [],
+  "sam_sources": [
+    {
+      "name": "person_detail",
+      "prompt": "person",
+      "confidence": 0.6,
+      "mask_threshold": 0.5,
+      "min_mask_area_px": 32,
+      "max_regions": 16,
+      "view_mode": "mask",
+      "padding_px": 0,
+      "rules": {
+        "region_gen_threshold": 0.3,
+        "region_char_threshold": 0.85,
+        "remove_tags_from_full": [],
+        "remove_tags_from_region": [],
+        "add_tags_to_region": {},
+        "exclude_from_region": []
+      }
+    },
+    {
+      "name": "person_context",
+      "prompt": "person",
+      "confidence": 0.35,
+      "mask_threshold": 0.5,
+      "min_mask_area_px": 32,
+      "max_regions": 16,
+      "view_mode": "bbox",
+      "padding_px": 32,
+      "rules": {
+        "region_gen_threshold": 0.4,
+        "region_char_threshold": 0.65,
+        "remove_tags_from_full": [],
+        "remove_tags_from_region": [],
+        "add_tags_to_region": {},
+        "exclude_from_region": []
+      }
+    },
+    {
+      "name": "cup",
+      "prompt": "cup",
+      "confidence": 0.45,
+      "mask_threshold": 0.5,
+      "min_mask_area_px": 32,
+      "max_regions": 16,
+      "view_mode": "mask",
+      "padding_px": 8,
+      "rules": {
+        "region_gen_threshold": 0.3,
+        "region_char_threshold": 0.75,
+        "remove_tags_from_full": [],
+        "remove_tags_from_region": [],
+        "add_tags_to_region": {},
+        "exclude_from_region": []
+      }
+    }
+  ],
+  "sam_model": {
+    "model": "unsloth/sam3.1",
+    "device": "auto",
+    "download_missing": true,
+    "local_model_path": ""
+  }
+}

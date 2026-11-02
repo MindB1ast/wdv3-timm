@@ -1,0 +1,194 @@
+"""ComfyUI adapter: in-memory images, reusable WD weights, optional YOLO crops."""
+from dataclasses import dataclass
+import json
+from pathlib import Path
+
+import torch
+
+from .Scripts.configs import DetectorConfig
+from .Scripts.wdv3_timm import MODEL_REPO_MAP
+
+ROOT = Path(__file__).resolve().parent
+
+
+def model_directory(kind):
+    """Use ComfyUI's shared models directory, including --base-directory."""
+    import folder_paths
+    return Path(folder_paths.models_dir) / "wdv3" / kind
+
+
+@dataclass
+class WDRuntime:
+    model: object
+    transform: object
+    labels: object
+    device: object
+
+
+class WDModelLoader:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {
+            "model": (list(MODEL_REPO_MAP),),
+            "device": (["auto", "cpu", "cuda"],),
+        }}
+
+    RETURN_TYPES = ("WDV3_MODEL",)
+    RETURN_NAMES = ("wd_model",)
+    FUNCTION = "load"
+    CATEGORY = "WDV3"
+
+    def load(self, model, device):
+        from timm.data import create_transform, resolve_data_config
+        from .Scripts.model import load_labels_local_or_remote, load_model_local_or_remote
+
+        if device == "auto":
+            import comfy.model_management as management
+            selected = management.get_torch_device()
+        else:
+            if device == "cuda" and not torch.cuda.is_available():
+                raise ValueError("CUDA is unavailable; select cpu or auto")
+            selected = torch.device(device)
+        # Reuse notebook weights when this checkout already contains them.
+        local = ROOT / "models" / "taggers"
+        directory = local if (local / MODEL_REPO_MAP[model].split("/")[-1] /
+                              "model.safetensors").is_file() else model_directory("taggers")
+        directory.mkdir(parents=True, exist_ok=True)
+        network = load_model_local_or_remote(MODEL_REPO_MAP[model], directory)
+        labels = load_labels_local_or_remote(MODEL_REPO_MAP[model], directory)
+        transform = create_transform(**resolve_data_config(network.pretrained_cfg, model=network))
+        # Weights live on CPU between executions to avoid pinning GPU memory.
+        return (WDRuntime(network.cpu().eval(), transform, labels, selected),)
+
+
+class WDDetectorLoader:
+    @classmethod
+    def INPUT_TYPES(cls):
+        example = [{"name": "person", "model_path": "person_yolov8m-seg.pt",
+                    "confidence": 0.35, "classes": [0],
+                    "region_gen_threshold": 0.35, "region_char_threshold": 0.75}]
+        return {"required": {"detectors_json": ("STRING", {
+            "default": json.dumps(example, indent=2), "multiline": True})}}
+
+    RETURN_TYPES = ("WDV3_DETECTORS",)
+    RETURN_NAMES = ("detectors",)
+    FUNCTION = "load"
+    CATEGORY = "WDV3"
+
+    def load(self, detectors_json):
+        from .Scripts.model import load_yolo_model
+
+        entries = json.loads(detectors_json)
+        if not isinstance(entries, list) or not all(isinstance(item, dict) for item in entries):
+            raise ValueError("detectors_json must be a JSON array of detector objects")
+        configs = [DetectorConfig(**entry) for entry in entries]
+        if len({cfg.name for cfg in configs}) != len(configs):
+            raise ValueError("Detector names must be unique")
+        directory = model_directory("yolo")
+        directory.mkdir(parents=True, exist_ok=True)
+        models = {}
+        for config in configs:
+            if config.model_path not in models:
+                local = ROOT / "models" / "yolo" / config.model_path
+                path = str(local) if local.is_file() else config.model_path
+                models[config.model_path] = load_yolo_model(path, directory)
+                models[config.model_path].to("cpu")
+        return ((configs, models),)
+
+
+def tag_regions(image, tagger, configs, models, batch_size):
+    """Consume bounded groups of crops; never write intermediate images."""
+    output = {}
+    for config in configs:
+        if config.model_path not in models:
+            from .Scripts.model import load_yolo_model
+            directory = model_directory("yolo")
+            directory.mkdir(parents=True, exist_ok=True)
+            models[config.model_path] = load_yolo_model(config.model_path, directory).to("cpu")
+        results = models[config.model_path](image, conf=config.confidence,
+                                            classes=config.classes, device="cpu", verbose=False)
+        boxes = [box.xyxy[0].tolist() for result in results
+                 if getattr(result, "boxes", None) is not None for box in result.boxes]
+        regions = []
+        for start in range(0, len(boxes), batch_size):
+            crops = []
+            try:
+                for bbox in boxes[start:start + batch_size]:
+                    crops.append(image.crop(tuple(bbox)))
+                tagged = tagger.tag_batch(crops, config)
+                for offset, raw in enumerate(tagged):
+                    regions.append({"region_id": start + offset,
+                                    "bbox": boxes[start + offset], **raw})
+            finally:
+                for crop in crops:
+                    crop.close()
+        output[config.name] = regions
+    return output
+
+
+class WDTagger:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {
+            "images": ("IMAGE",), "wd_model": ("WDV3_MODEL",),
+            "general_threshold": ("FLOAT", {"default": 0.35, "min": 0., "max": 1., "step": 0.01}),
+            "character_threshold": ("FLOAT", {"default": 0.75, "min": 0., "max": 1., "step": 0.01}),
+            "region_batch_size": ("INT", {"default": 8, "min": 1, "max": 128}),
+            "replace_underscores": ("BOOLEAN", {"default": True}),
+            "escape_parentheses": ("BOOLEAN", {"default": True}),
+            "remove_tags": ("STRING", {"default": "", "multiline": True}),
+            "prefix_tags": ("STRING", {"default": ""}),
+            "suffix_tags": ("STRING", {"default": ""}),
+        }, "optional": {"detectors": ("WDV3_DETECTORS",),
+                          "sam_regions": ("WDV3_SAM_REGIONS",),
+                          "options": ("WDV3_OPTIONS",),
+                          "sam_model": ("WDV3_SAM_MODEL",),
+                          "sources": ("WDV3_SAM_SOURCES",),
+                          "sam_batch_size": ("INT", {"default": 1, "min": 1, "max": 16})}}
+
+    RETURN_TYPES = ("STRING", "STRING", "WDV3_SAM_REGIONS")
+    RETURN_NAMES = ("tags", "results_json", "sam_regions")
+    OUTPUT_IS_LIST = (True, True, False)
+    OUTPUT_NODE = True
+    FUNCTION = "tag"
+    CATEGORY = "WDV3"
+
+    def tag(self, images, wd_model, general_threshold=0.35, character_threshold=0.75,
+            region_batch_size=8, replace_underscores=True, escape_parentheses=True,
+            remove_tags="", prefix_tags="", suffix_tags="", detectors=None,
+            sam_regions=None, options=None, sam_model=None, sources=None, sam_batch_size=1):
+        from contextlib import ExitStack
+        from .comfy_processing import tensor_frame, tag_frames, json_result, segment_frames
+        if (images.ndim != 4 or images.shape[-1] not in (3, 4)
+                or any(size < 1 for size in images.shape)):
+            raise ValueError("Expected a nonempty IMAGE tensor [batch, height, width, 3 or 4]")
+        if sam_regions is not None and (sam_model is not None or sources is not None):
+            raise ValueError("Use either precomputed sam_regions or sam_model + sources")
+        if sources and sam_model is None:
+            raise ValueError("SAM sources need sam_model")
+        if sam_model is not None and sources is None:
+            raise ValueError("SAM model needs sources")
+        settings = dict(general_threshold=general_threshold, character_threshold=character_threshold,
+                        region_batch_size=region_batch_size, replace_underscores=replace_underscores,
+                        escape_parentheses=escape_parentheses, remove_tags=remove_tags,
+                        prefix_tags=prefix_tags, suffix_tags=suffix_tags)
+        settings.update(options or {})
+        with ExitStack() as stack:
+            frames = [stack.enter_context(tensor_frame(tensor)) for tensor in images]
+            if sources:
+                sam_regions = segment_frames(frames, sam_model, sources, sam_batch_size)
+            tags, records = tag_frames(frames, wd_model, detectors=detectors, sam_regions=sam_regions,
+                                       options=settings)
+        return {"ui": {"text": tags}, "result": (tags, [json_result(row) for row in records], sam_regions or [])}
+
+
+NODE_CLASS_MAPPINGS = {
+    "WDV3ModelLoader": WDModelLoader,
+    "WDV3DetectorLoader": WDDetectorLoader,
+    "WDV3Tagger": WDTagger,
+}
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "WDV3ModelLoader": "WDV3 Load Tagger Model",
+    "WDV3DetectorLoader": "WDV3 Load YOLO Detectors",
+    "WDV3Tagger": "WDV3 Tag Image / Regions",
+}

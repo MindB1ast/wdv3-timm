@@ -1,0 +1,340 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "LoadImage",
+      "pos": [
+        20,
+        20
+      ],
+      "size": [
+        340,
+        340
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            3,
+            5
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "tag_managing1.png",
+        "image"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "WDV3ModelLoader",
+      "pos": [
+        20,
+        390
+      ],
+      "size": [
+        340,
+        134
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "wd_model",
+          "type": "WDV3_MODEL",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3ModelLoader"
+      },
+      "widgets_values": [
+        "vit",
+        "auto"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "WDV3Tagger",
+      "pos": [
+        820,
+        20
+      ],
+      "size": [
+        340,
+        430
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 3
+        },
+        {
+          "name": "wd_model",
+          "type": "WDV3_MODEL",
+          "link": 1
+        },
+        {
+          "name": "detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        },
+        {
+          "name": "sam_regions",
+          "type": "WDV3_SAM_REGIONS",
+          "link": null
+        },
+        {
+          "name": "options",
+          "type": "WDV3_OPTIONS",
+          "link": 10
+        },
+        {
+          "name": "sam_model",
+          "type": "WDV3_SAM_MODEL",
+          "link": 12
+        },
+        {
+          "name": "sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": 11
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tags",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        },
+        {
+          "name": "results_json",
+          "type": "STRING",
+          "links": [
+            4
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "sam_regions",
+          "type": "WDV3_SAM_REGIONS",
+          "links": [
+            9
+          ],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3Tagger"
+      },
+      "widgets_values": [
+        0.35,
+        0.75,
+        8,
+        true,
+        true,
+        "",
+        "",
+        "",
+        1
+      ]
+    },
+    {
+      "id": 5,
+      "type": "WDV3Preview",
+      "pos": [
+        1240,
+        20
+      ],
+      "size": [
+        520,
+        760
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "results_json",
+          "type": "STRING",
+          "link": 4
+        },
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 5
+        },
+        {
+          "name": "sam_regions",
+          "type": "WDV3_SAM_REGIONS",
+          "link": 9
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "WDV3Preview"
+      },
+      "widgets_values": [
+        16
+      ]
+    },
+    {
+      "id": 10,
+      "type": "WDV3LoadConfig",
+      "pos": [
+        410,
+        20
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "options",
+          "type": "WDV3_OPTIONS",
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "detectors",
+          "type": "WDV3_DETECTORS",
+          "links": null,
+          "slot_index": 1
+        },
+        {
+          "name": "sources",
+          "type": "WDV3_SAM_SOURCES",
+          "links": [
+            11
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "sam_model",
+          "type": "WDV3_SAM_MODEL",
+          "links": [
+            12
+          ],
+          "slot_index": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3LoadConfig"
+      },
+      "widgets_values": [
+        "Example: multi_sam"
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      2,
+      0,
+      4,
+      1,
+      "WDV3_MODEL"
+    ],
+    [
+      3,
+      1,
+      0,
+      4,
+      0,
+      "IMAGE"
+    ],
+    [
+      4,
+      4,
+      1,
+      5,
+      0,
+      "STRING"
+    ],
+    [
+      5,
+      1,
+      0,
+      5,
+      1,
+      "IMAGE"
+    ],
+    [
+      9,
+      4,
+      2,
+      5,
+      2,
+      "WDV3_SAM_REGIONS"
+    ],
+    [
+      10,
+      10,
+      0,
+      4,
+      4,
+      "WDV3_OPTIONS"
+    ],
+    [
+      11,
+      10,
+      2,
+      4,
+      6,
+      "WDV3_SAM_SOURCES"
+    ],
+    [
+      12,
+      10,
+      3,
+      4,
+      5,
+      "WDV3_SAM_MODEL"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.65,
+      "offset": [
+        40,
+        40
+      ]
+    }
+  },
+  "version": 0.4,
+  "last_node_id": 10,
+  "last_link_id": 12
+}

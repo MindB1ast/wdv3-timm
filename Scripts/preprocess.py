@@ -182,6 +182,8 @@ def _merge_source(
             output.setdefault("provenance", {})[tag] = copy.deepcopy(
                 (policy.provenance or {}).get(tag, {"source": source, "model_score": score})
             )
+            if source != "full" and output["provenance"][tag]["source"] == "manual_rule":
+                output["provenance"][tag]["region_source"] = source
 
 
 def merge_tags_from_regions(

@@ -26,6 +26,15 @@ This project is an image tagging tool that enhances tag accuracy by using region
 
 ## Installation
 
+### ComfyUI extension
+
+This repository can also be installed as a ComfyUI custom node. It provides
+WD v3 model loading, image/folder batch tagging, a results viewer, editable
+tagging policies, YOLO regions and text-prompted SAM 3.1 masks with automatic
+download of missing model files.
+See [installation, nodes and example workflow](docs/comfyui.md).
+Use `requirements-comfyui.txt` in your ComfyUI environment.
+
 ```bash
 git clone https://github.com/MindB1ast/wdv3-timm.git
 cd wdv3-timm

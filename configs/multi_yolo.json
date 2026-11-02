@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "options": {
+    "general_threshold": 0.35,
+    "character_threshold": 0.75,
+    "image_batch_size": 2,
+    "region_batch_size": 8,
+    "replace_underscores": true,
+    "escape_parentheses": true,
+    "remove_tags": "",
+    "prefix_tags": "",
+    "suffix_tags": ""
+  },
+  "detectors": [
+    {
+      "name": "person",
+      "model_path": "person_yolov8m-seg.pt",
+      "confidence": 0.35,
+      "classes": [
+        0
+      ],
+      "region_gen_threshold": 0.35,
+      "region_char_threshold": 0.75,
+      "remove_tags_from_full": [],
+      "remove_tags_from_region": [],
+      "add_tags_to_region": {},
+      "exclude_from_region": []
+    },
+    {
+      "name": "face",
+      "model_path": "face_yolov9c.pt",
+      "confidence": 0.3,
+      "classes": [
+        0
+      ],
+      "region_gen_threshold": 0.25,
+      "region_char_threshold": 0.85,
+      "remove_tags_from_full": [],
+      "remove_tags_from_region": [],
+      "add_tags_to_region": {},
+      "exclude_from_region": []
+    }
+  ],
+  "sam_sources": [],
+  "sam_model": null
+}

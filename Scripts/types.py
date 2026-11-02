@@ -32,6 +32,7 @@ class ManualProvenance(TypedDict):
 
     source: str
     assigned_score: Score
+    region_source: NotRequired[str]
 
 
 Provenance: TypeAlias = dict[str, ModelProvenance | ManualProvenance]

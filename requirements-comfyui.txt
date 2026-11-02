@@ -1,0 +1,11 @@
+# Install using ComfyUI's Python. Keep its existing torch/torchvision installation.
+timm>=1.0.12,<2
+huggingface_hub>=0.28.1,<2
+safetensors>=0.5.3
+numpy>=1.26.4,<3
+pandas>=2.0.3,<3
+pillow>=9.5.0
+simple-parsing>=0.1.5
+ultralytics>=8.3.85,<9
+requests>=2.32.3
+transformers>=5.22.1,<6

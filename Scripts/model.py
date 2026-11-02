@@ -78,7 +78,9 @@ def load_model_local_or_remote(repo_id: str, model_folder: Path) -> nn.Module:
     """Load a WD architecture with locally cached weights when available."""
     model_name = repo_id.split("/")[-1]
     model_specific_folder = model_folder / model_name
-    model = timm.create_model("hf-hub:" + repo_id).eval()
+    architecture = (f"local-dir:{model_specific_folder}" if
+                    (model_specific_folder / "config.json").is_file() else "hf-hub:" + repo_id)
+    model = timm.create_model(architecture).eval()
 
     local_safetensors_path = model_specific_folder / "model.safetensors"
 

@@ -1,0 +1,47 @@
+{
+  "last_node_id": 4,
+  "last_link_id": 3,
+  "nodes": [
+    {
+      "id": 1, "type": "LoadImage", "pos": [40, 40], "size": [300, 310],
+      "flags": {}, "order": 0, "mode": 0, "inputs": [],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [1], "slot_index": 0},
+        {"name": "MASK", "type": "MASK", "links": null}
+      ],
+      "properties": {"Node name for S&R": "LoadImage"},
+      "widgets_values": ["example.png", "image"]
+    },
+    {
+      "id": 2, "type": "WDV3ModelLoader", "pos": [40, 400], "size": [300, 110],
+      "flags": {}, "order": 1, "mode": 0, "inputs": [],
+      "outputs": [{"name": "wd_model", "type": "WDV3_MODEL", "links": [2], "slot_index": 0}],
+      "properties": {"Node name for S&R": "WDV3ModelLoader"},
+      "widgets_values": ["vit", "auto"]
+    },
+    {
+      "id": 3, "type": "WDV3Tagger", "pos": [410, 40], "size": [370, 430],
+      "flags": {}, "order": 2, "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 1},
+        {"name": "wd_model", "type": "WDV3_MODEL", "link": 2},
+        {"name": "detectors", "type": "WDV3_DETECTORS", "link": null}
+      ],
+      "outputs": [
+        {"name": "tags", "type": "STRING", "links": [3], "slot_index": 0, "shape": 6},
+        {"name": "results_json", "type": "STRING", "links": null, "shape": 6}
+      ],
+      "properties": {"Node name for S&R": "WDV3Tagger"},
+      "widgets_values": [0.35, 0.75, 8, true, true, "", "", ""]
+    },
+    {
+      "id": 4, "type": "PreviewAny", "pos": [850, 40], "size": [420, 350],
+      "flags": {}, "order": 3, "mode": 0,
+      "inputs": [{"name": "source", "type": "*", "link": 3}],
+      "outputs": [{"name": "STRING", "type": "STRING", "links": null}],
+      "properties": {"Node name for S&R": "PreviewAny"}, "widgets_values": []
+    }
+  ],
+  "links": [[1, 1, 0, 3, 0, "IMAGE"], [2, 2, 0, 3, 1, "WDV3_MODEL"], [3, 3, 0, 4, 0, "STRING"]],
+  "groups": [], "config": {}, "extra": {}, "version": 0.4
+}
