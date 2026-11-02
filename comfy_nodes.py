@@ -1,5 +1,5 @@
 """ComfyUI adapter: in-memory images, reusable WD weights, optional YOLO crops."""
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import json
 from pathlib import Path
 
@@ -19,10 +19,12 @@ def model_directory(kind):
 
 @dataclass
 class WDRuntime:
-    model: object
-    transform: object
-    labels: object
+    model: object = field(repr=False)
+    transform: object = field(repr=False)
+    labels: object = field(repr=False)
     device: object
+    model_id: str = "custom-wd"
+    metadata: object = field(default=None, repr=False)
 
 
 class WDModelLoader:
@@ -31,6 +33,9 @@ class WDModelLoader:
         return {"required": {
             "model": (list(MODEL_REPO_MAP),),
             "device": (["auto", "cpu", "cuda"],),
+        }, "optional": {
+            "download_missing": ("BOOLEAN", {"default": True}),
+            "local_model_path": ("STRING", {"default": ""}),
         }}
 
     RETURN_TYPES = ("WDV3_MODEL",)
@@ -38,7 +43,16 @@ class WDModelLoader:
     FUNCTION = "load"
     CATEGORY = "WDV3"
 
-    def load(self, model, device):
+    @classmethod
+    def IS_CHANGED(cls, model, device, download_missing=True, local_model_path=""):
+        from .comfy_evidence import digest, file_stamp
+        candidates = [Path(local_model_path)] if local_model_path.strip() else [
+            ROOT / "models" / "taggers" / MODEL_REPO_MAP[model].split('/')[-1],
+            model_directory('taggers') / MODEL_REPO_MAP[model].split('/')[-1]]
+        candidates=[p.parent if p.suffix=='.safetensors' else p for p in candidates]
+        return digest([[file_stamp(p / n) for n in ('config.json', 'selected_tags.csv', 'model.safetensors')] for p in candidates])
+
+    def load(self, model, device, download_missing=True, local_model_path=""):
         from timm.data import create_transform, resolve_data_config
         from .Scripts.model import load_labels_local_or_remote, load_model_local_or_remote
 
@@ -54,11 +68,33 @@ class WDModelLoader:
         directory = local if (local / MODEL_REPO_MAP[model].split("/")[-1] /
                               "model.safetensors").is_file() else model_directory("taggers")
         directory.mkdir(parents=True, exist_ok=True)
-        network = load_model_local_or_remote(MODEL_REPO_MAP[model], directory)
-        labels = load_labels_local_or_remote(MODEL_REPO_MAP[model], directory)
+        target = Path(local_model_path).expanduser().resolve() if local_model_path.strip() else directory / MODEL_REPO_MAP[model].split('/')[-1]
+        if target.suffix == '.safetensors': target = target.parent
+        required = ['config.json', 'selected_tags.csv', 'model.safetensors']
+        missing = [name for name in required if not (target / name).is_file()]
+        if missing and not download_missing:
+            raise FileNotFoundError(f"Incomplete WD model folder: {target}. Missing {', '.join(missing)}. Enable download_missing.")
+        if missing:
+            from huggingface_hub import hf_hub_download
+            target.mkdir(parents=True, exist_ok=True)
+            for name in missing:
+                hf_hub_download(MODEL_REPO_MAP[model], name, local_dir=str(target))
+        if local_model_path.strip():
+            import timm
+            import safetensors.torch
+            from .Scripts.wdv3_timm import load_labels_csv
+            network = timm.create_model(f'local-dir:{target}', pretrained=False).eval()
+            network.load_state_dict(safetensors.torch.load_file(target / 'model.safetensors'))
+            labels = load_labels_csv(target / 'selected_tags.csv')
+        else:
+            network = load_model_local_or_remote(MODEL_REPO_MAP[model], directory)
+            labels = load_labels_local_or_remote(MODEL_REPO_MAP[model], directory)
         transform = create_transform(**resolve_data_config(network.pretrained_cfg, model=network))
         # Weights live on CPU between executions to avoid pinning GPU memory.
-        return (WDRuntime(network.cpu().eval(), transform, labels, selected),)
+        from .Scripts.evidence import Bundle
+        metadata = Bundle.pack('model', dict(model_id=MODEL_REPO_MAP[model], directory=str(target), device=str(selected),
+                    download_missing=download_missing, labels=len(labels.names)))
+        return (WDRuntime(network.cpu().eval(), transform, labels, selected, MODEL_REPO_MAP[model], metadata),)
 
 
 class WDDetectorLoader:
@@ -91,7 +127,7 @@ class WDDetectorLoader:
             if config.model_path not in models:
                 local = ROOT / "models" / "yolo" / config.model_path
                 path = str(local) if local.is_file() else config.model_path
-                models[config.model_path] = load_yolo_model(path, directory)
+                models[config.model_path] = load_yolo_model(path, directory, allow_download=config.download_missing)
                 models[config.model_path].to("cpu")
         return ((configs, models),)
 
@@ -104,11 +140,34 @@ def tag_regions(image, tagger, configs, models, batch_size):
             from .Scripts.model import load_yolo_model
             directory = model_directory("yolo")
             directory.mkdir(parents=True, exist_ok=True)
-            models[config.model_path] = load_yolo_model(config.model_path, directory).to("cpu")
+            models[config.model_path] = load_yolo_model(config.model_path, directory, allow_download=config.download_missing).to("cpu")
+        from .comfy_evidence import interrupt
+        interrupt()
+        if config.device == 'cuda' and not torch.cuda.is_available():
+            raise ValueError('CUDA is unavailable for YOLO; select cpu or auto')
+        device = config.device
+        if device == 'auto':
+            try:
+                import comfy.model_management as management
+                device = str(management.get_torch_device())
+            except ImportError:
+                device = 'cuda' if torch.cuda.is_available() else 'cpu'
         results = models[config.model_path](image, conf=config.confidence,
-                                            classes=config.classes, device="cpu", verbose=False)
-        boxes = [box.xyxy[0].tolist() for result in results
+                                            classes=config.classes, device=device, verbose=False)
+        objects = [box for result in results
                  if getattr(result, "boxes", None) is not None for box in result.boxes]
+        import math
+        boxes = []
+        for box in objects:
+            coordinates = box.xyxy[0].tolist()
+            if len(coordinates) != 4 or not all(math.isfinite(c) for c in coordinates):
+                raise ValueError('Detector returned an invalid bbox')
+            x1,y1,x2,y2=coordinates
+            bounded=[max(0,min(image.width,x1)),max(0,min(image.height,y1)),
+                     max(0,min(image.width,x2)),max(0,min(image.height,y2))]
+            if bounded[2]<=bounded[0] or bounded[3]<=bounded[1]:
+                raise ValueError('Detector returned an empty bbox')
+            boxes.append(bounded)
         regions = []
         for start in range(0, len(boxes), batch_size):
             crops = []
@@ -118,11 +177,14 @@ def tag_regions(image, tagger, configs, models, batch_size):
                 tagged = tagger.tag_batch(crops, config)
                 for offset, raw in enumerate(tagged):
                     regions.append({"region_id": start + offset,
-                                    "bbox": boxes[start + offset], **raw})
+                                    "bbox": boxes[start + offset],
+                                    "class_id": int(objects[start+offset].cls[0]) if getattr(objects[start+offset], 'cls', None) is not None else None,
+                                    "confidence": float(objects[start+offset].conf[0]) if getattr(objects[start+offset], 'conf', None) is not None else None, **raw})
             finally:
                 for crop in crops:
                     crop.close()
         output[config.name] = regions
+        if hasattr(models[config.model_path], 'to'): models[config.model_path].to('cpu')
     return output
 
 
@@ -158,7 +220,8 @@ class WDTagger:
             remove_tags="", prefix_tags="", suffix_tags="", detectors=None,
             sam_regions=None, options=None, sam_model=None, sources=None, sam_batch_size=1):
         from contextlib import ExitStack
-        from .comfy_processing import tensor_frame, tag_frames, json_result, segment_frames
+        from .comfy_processing import tensor_frame, tag_frames, json_result
+        from .comfy_evidence import cached_segment, interrupt
         if (images.ndim != 4 or images.shape[-1] not in (3, 4)
                 or any(size < 1 for size in images.shape)):
             raise ValueError("Expected a nonempty IMAGE tensor [batch, height, width, 3 or 4]")
@@ -173,10 +236,13 @@ class WDTagger:
                         escape_parentheses=escape_parentheses, remove_tags=remove_tags,
                         prefix_tags=prefix_tags, suffix_tags=suffix_tags)
         settings.update(options or {})
+        from .comfy_config import unique_names
+        unique_names([c.name for c in (detectors[0] if detectors else [])]+[s['name'] for s in (sources or [])])
         with ExitStack() as stack:
+            interrupt()
             frames = [stack.enter_context(tensor_frame(tensor)) for tensor in images]
             if sources:
-                sam_regions = segment_frames(frames, sam_model, sources, sam_batch_size)
+                sam_regions = cached_segment(frames, wd_model, sam_model, sources, sam_batch_size)
             tags, records = tag_frames(frames, wd_model, detectors=detectors, sam_regions=sam_regions,
                                        options=settings)
         return {"ui": {"text": tags}, "result": (tags, [json_result(row) for row in records], sam_regions or [])}

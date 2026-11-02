@@ -1,0 +1,9 @@
+{
+  "gui_prompt_id": "85befa86-f96f-4e9a-bedd-0042cac4fbaf",
+  "api_prompt_id": "ef0af59d-eb53-44ba-be61-d9473c33dbd9",
+  "same_tags": true,
+  "same_raw_decisions": true,
+  "same_settings": true,
+  "workflow_rules_reloaded": true,
+  "policy_import_and_restore_prompt_id": "7150daad-b0c5-4da8-a5fe-1a99ce2935b5"
+}

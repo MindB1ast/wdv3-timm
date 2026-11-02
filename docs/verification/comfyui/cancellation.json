@@ -1,0 +1,10 @@
+{
+  "prompt_id": "92a8712b-6ef0-4983-bd65-0a80dc81d8cd",
+  "interrupted": true,
+  "messages": [
+    "execution_start",
+    "execution_cached",
+    "execution_interrupted"
+  ],
+  "device": "cpu"
+}

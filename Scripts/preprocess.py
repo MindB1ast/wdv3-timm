@@ -8,7 +8,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from .configs import DetectorConfig
-from .tag_utils import format_result, normalized_scores, parse_tags
+from .tag_utils import format_result, normalized_scores, parse_tags, source_owners
 from .types import (CATEGORIES, Category, DetailedResult, MergedResult,
                     PathInput, Provenance, Score, Scores, TagInput,
                     WDTagResult)
@@ -179,11 +179,12 @@ def _merge_source(
             continue
         if tag not in output[category] or score > output[category][tag]:
             output[category][tag] = score
-            output.setdefault("provenance", {})[tag] = copy.deepcopy(
+            provenance = output.setdefault("provenance", {})
+            provenance[tag] = copy.deepcopy(
                 (policy.provenance or {}).get(tag, {"source": source, "model_score": score})
             )
-            if source != "full" and output["provenance"][tag]["source"] == "manual_rule":
-                output["provenance"][tag]["region_source"] = source
+            if source != "full" and provenance[tag]["source"] == "manual_rule":
+                provenance[tag]["region_source"] = source
 
 
 def merge_tags_from_regions(
@@ -191,6 +192,7 @@ def merge_tags_from_regions(
 ) -> WDTagResult:
     """Union active exclusions; merge scores without mutating source evidence."""
     configs = {detector.name: detector for detector in detectors}
+    owners = source_owners(detectors)
     full = image_result["full_image"]
     full_tags = set(normalized_scores(full["general"])) | set(normalized_scores(full["character"]))
     excluded: set[str] = set()
@@ -211,17 +213,20 @@ def merge_tags_from_regions(
             category,
             full[category],
             "full",
-            _MergePolicy(removed=excluded, provenance=full.get("provenance")),
+            _MergePolicy(removed=excluded | set(owners), provenance=full.get("provenance")),
         )
     for name, regions in sorted(image_result["detectors"].items()):
         if name not in configs:
             continue
         detector = configs[name]
-        for region in regions:
+        for region in sorted(regions, key=lambda row: row.get("region_id", 0)):
             for category in CATEGORIES:
                 blocked = set(parse_tags(detector.remove_tags_from_region))
-                if category == "general":
-                    blocked.update(GLOBAL_EXCLUDED_REGION_TAGS)
+                blocked.update(tag for tag, names in owners.items() if name not in names)
+                if detector.allowed_tags:
+                    blocked.update(set(normalized_scores(region[category])) - set(detector.allowed_tags))
+                if category == "general" or detector.full_image_only_tags is not None:
+                    blocked.update(composition_tags(detector))
                 _merge_source(
                     output,
                     category,
@@ -235,6 +240,10 @@ def merge_tags_from_regions(
                     ),
                 )
     return format_result(output)
+
+
+def composition_tags(config):
+    return GLOBAL_EXCLUDED_REGION_TAGS if config.full_image_only_tags is None else set(parse_tags(config.full_image_only_tags))
 
 
 class NumpyEncoder(json.JSONEncoder):

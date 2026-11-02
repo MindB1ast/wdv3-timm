@@ -51,6 +51,9 @@ def load_detectors_config(config_path: PathInput) -> List[DetectorConfig]:
                 # specific_excluded_tags=item.get("specific_excluded_tags", []),
                 region_gen_threshold=item.get("region_gen_threshold"),
                 region_char_threshold=item.get("region_char_threshold"),
+                only_from_source=item.get("only_from_source"), allowed_tags=item.get("allowed_tags"),
+                device=item.get('device','auto'), download_missing=item.get('download_missing',True),
+                full_image_only_tags=item.get('full_image_only_tags'),
             )
             detectors.append(detector)
         except KeyError as e:

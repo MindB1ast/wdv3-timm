@@ -1,0 +1,266 @@
+{
+  "prompt_id": "2b51e2f1-7306-4d5c-acc1-18109538d595",
+  "image": "wdv3-acceptance/tag_managing3.png",
+  "status": "success",
+  "model": "SmilingWolf/wd-vit-tagger-v3",
+  "raw_general_count": 8106,
+  "regions": {
+    "face": 1,
+    "person": 1
+  },
+  "rejection_reasons": [
+    "below_threshold",
+    "composition_full_only",
+    "not_in_allowed_tags",
+    "owned_by_other_sources"
+  ],
+  "helmet": [
+    {
+      "score": 0.002864205976948142,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "helmet",
+      "category": "general",
+      "source": "full",
+      "region_id": null
+    },
+    {
+      "score": 0.002108043059706688,
+      "status": "rejected",
+      "reason": "not_in_allowed_tags",
+      "tag": "helmet",
+      "category": "general",
+      "source": "face",
+      "region_id": 0
+    },
+    {
+      "score": 0.002586767077445984,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "helmet",
+      "category": "general",
+      "source": "person",
+      "region_id": 0
+    }
+  ],
+  "eyelashes": [
+    {
+      "score": 0.020720867440104485,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "eyelashes",
+      "category": "general",
+      "source": "full",
+      "region_id": null
+    },
+    {
+      "score": 0.016913630068302155,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "eyelashes",
+      "category": "general",
+      "source": "face",
+      "region_id": 0
+    },
+    {
+      "score": 0.022325104102492332,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "eyelashes",
+      "category": "general",
+      "source": "person",
+      "region_id": 0
+    }
+  ],
+  "merged_tags": {
+    "general": {
+      "1girl": 0.9982750415802002,
+      "sword": 0.9883167147636414,
+      "weapon": 0.984605073928833,
+      "long_hair": 0.9786398410797119,
+      "solo": 0.9701940417289734,
+      "blush_stickers": 0.9731324315071106,
+      "fang": 0.961641252040863,
+      "blonde_hair": 0.9542086720466614,
+      "katana": 0.9321523904800415,
+      "dress": 0.9077165722846985,
+      "open_mouth": 0.9113592505455017,
+      "holding_sword": 0.9003205299377441,
+      "holding": 0.880837619304657,
+      "holding_weapon": 0.8123589158058167,
+      "short_sleeves": 0.7995527386665344,
+      "bow": 0.7652442455291748,
+      "looking_at_viewer": 0.7247942686080933,
+      "red_bow": 0.7190879583358765,
+      "yellow_dress": 0.7134925723075867,
+      "very_long_hair": 0.6255406737327576,
+      "white_shirt": 0.5999518036842346,
+      "foreshortening": 0.5481249690055847,
+      "frills": 0.5331084728240967,
+      "shirt": 0.5221109390258789,
+      "sky": 0.5197005867958069,
+      "bowtie": 0.5037730932235718,
+      "red_bowtie": 0.4711769223213196,
+      "frilled_dress": 0.45094034075737,
+      "pointy_ears": 0.46734619140625,
+      "star_(sky)": 0.4501648545265198,
+      "smile": 0.6480038166046143,
+      "sleeveless_dress": 0.4193324148654938,
+      ":d": 0.36106911301612854,
+      "yellow_eyes": 0.9792544841766357
+    },
+    "character": {
+      "oshino_shinobu": 0.9956710338592529
+    },
+    "ratings": {
+      "general": 0.43469658493995667,
+      "sensitive": 0.5247132182121277,
+      "questionable": 0.0011476387735456228,
+      "explicit": 0.0003657170746009797
+    },
+    "provenance": {
+      "1girl": {
+        "source": "full",
+        "model_score": 0.9982750415802002
+      },
+      "sword": {
+        "source": "person:0",
+        "model_score": 0.9883167147636414
+      },
+      "weapon": {
+        "source": "person:0",
+        "model_score": 0.984605073928833
+      },
+      "long_hair": {
+        "source": "person:0",
+        "model_score": 0.9786398410797119
+      },
+      "solo": {
+        "source": "full",
+        "model_score": 0.9701940417289734
+      },
+      "blush_stickers": {
+        "source": "person:0",
+        "model_score": 0.9731324315071106
+      },
+      "fang": {
+        "source": "person:0",
+        "model_score": 0.961641252040863
+      },
+      "blonde_hair": {
+        "source": "full",
+        "model_score": 0.9542086720466614
+      },
+      "katana": {
+        "source": "person:0",
+        "model_score": 0.9321523904800415
+      },
+      "dress": {
+        "source": "full",
+        "model_score": 0.9077165722846985
+      },
+      "open_mouth": {
+        "source": "person:0",
+        "model_score": 0.9113592505455017
+      },
+      "holding_sword": {
+        "source": "full",
+        "model_score": 0.9003205299377441
+      },
+      "holding": {
+        "source": "full",
+        "model_score": 0.880837619304657
+      },
+      "holding_weapon": {
+        "source": "person:0",
+        "model_score": 0.8123589158058167
+      },
+      "short_sleeves": {
+        "source": "full",
+        "model_score": 0.7995527386665344
+      },
+      "bow": {
+        "source": "full",
+        "model_score": 0.7652442455291748
+      },
+      "looking_at_viewer": {
+        "source": "full",
+        "model_score": 0.7247942686080933
+      },
+      "red_bow": {
+        "source": "full",
+        "model_score": 0.7190879583358765
+      },
+      "yellow_dress": {
+        "source": "full",
+        "model_score": 0.7134925723075867
+      },
+      "very_long_hair": {
+        "source": "person:0",
+        "model_score": 0.6255406737327576
+      },
+      "white_shirt": {
+        "source": "full",
+        "model_score": 0.5999518036842346
+      },
+      "foreshortening": {
+        "source": "full",
+        "model_score": 0.5481249690055847
+      },
+      "frills": {
+        "source": "full",
+        "model_score": 0.5331084728240967
+      },
+      "shirt": {
+        "source": "full",
+        "model_score": 0.5221109390258789
+      },
+      "sky": {
+        "source": "full",
+        "model_score": 0.5197005867958069
+      },
+      "bowtie": {
+        "source": "full",
+        "model_score": 0.5037730932235718
+      },
+      "red_bowtie": {
+        "source": "full",
+        "model_score": 0.4711769223213196
+      },
+      "frilled_dress": {
+        "source": "full",
+        "model_score": 0.45094034075737
+      },
+      "pointy_ears": {
+        "source": "person:0",
+        "model_score": 0.46734619140625
+      },
+      "star_(sky)": {
+        "source": "full",
+        "model_score": 0.4501648545265198
+      },
+      "smile": {
+        "source": "face:0",
+        "model_score": 0.6480038166046143
+      },
+      "sleeveless_dress": {
+        "source": "full",
+        "model_score": 0.4193324148654938
+      },
+      ":d": {
+        "source": "full",
+        "model_score": 0.36106911301612854
+      },
+      "oshino_shinobu": {
+        "source": "person:0",
+        "model_score": 0.9956710338592529
+      },
+      "yellow_eyes": {
+        "source": "face:0",
+        "model_score": 0.9792544841766357
+      }
+    },
+    "caption": "1girl, :d, blonde_hair, blush_stickers, bow, bowtie, dress, fang, foreshortening, frilled_dress, frills, holding, holding_sword, holding_weapon, katana, long_hair, looking_at_viewer, open_mouth, oshino_shinobu, pointy_ears, red_bow, red_bowtie, shirt, short_sleeves, sky, sleeveless_dress, smile, solo, star_(sky), sword, very_long_hair, weapon, white_shirt, yellow_dress, yellow_eyes",
+    "taglist": "1girl, :d, blonde hair, blush stickers, bow, bowtie, dress, fang, foreshortening, frilled dress, frills, holding, holding sword, holding weapon, katana, long hair, looking at viewer, open mouth, oshino shinobu, pointy ears, red bow, red bowtie, shirt, short sleeves, sky, sleeveless dress, smile, solo, star (sky), sword, very long hair, weapon, white shirt, yellow dress, yellow eyes"
+  }
+}

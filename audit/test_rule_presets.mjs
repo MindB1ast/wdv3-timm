@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { ruleWidgetValues, taggingWidgetValues } from "../web/rule_presets.mjs";
+const source={only_from_source:["blue eyes","blue_eyes"],allowed_tags:["blue eyes"],add_tags_to_region:{smile:.8},region_gen_threshold:.6};
+const before=JSON.stringify(source), values=ruleWidgetValues(source);
+assert.equal(values.only_from_source,"blue_eyes");assert.equal(values.allowed_tags,"blue_eyes");
+assert.equal(values.add_to_regions,"smile:0.8");assert.equal(values.general_threshold,.6);assert.equal(JSON.stringify(source),before);
+for(const invalid of [{region_gen_threshold:2},{allowed_tags:"all"},{add_tags_to_region:{tag:NaN}},{add_tags_to_region:[]}])assert.throws(()=>ruleWidgetValues(invalid));
+assert.equal(ruleWidgetValues({}).only_from_source,"");
+assert.equal(taggingWidgetValues({}).general_threshold,.35);
+assert.throws(()=>taggingWidgetValues({region_batch_size:0}));
+console.log("Preset import validation, canonicalization, score preservation and defaults passed");

@@ -1,0 +1,20 @@
+{
+  "python": "3.12.15 (main, Oct  3 2026, 01:05:37) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\.venv\\Scripts\\python.exe",
+  "torch": "2.6.0+cpu",
+  "device": "cpu",
+  "actual_notebook_cells": [
+    "ManagingTags:0",
+    "ManagingTags:1"
+  ],
+  "result_lengths": [
+    1,
+    1
+  ],
+  "public_signature": "(opts: Scripts.configs.ScriptOptions) -> tuple[list[Scripts.types.DetailedResult], list[Scripts.types.MergedResult]] | None",
+  "txt_json_saved": true,
+  "originals_unchanged": true,
+  "without_comfy_api": true,
+  "custom_nodes_not_registered": true,
+  "workspace": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\comfy-notebook-72808ed851bf4d6b8920b6de0f646d48"
+}

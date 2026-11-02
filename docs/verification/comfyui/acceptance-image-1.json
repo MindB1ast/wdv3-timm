@@ -1,0 +1,152 @@
+{
+  "prompt_id": "13fc142d-eb89-46ce-ab12-c172791af7ee",
+  "image": "wdv3-acceptance/tag_managing1.png",
+  "status": "success",
+  "model": "SmilingWolf/wd-vit-tagger-v3",
+  "raw_general_count": 8106,
+  "regions": {
+    "face": 0,
+    "person": 1
+  },
+  "rejection_reasons": [
+    "below_threshold",
+    "composition_full_only",
+    "owned_by_other_sources"
+  ],
+  "helmet": [
+    {
+      "score": 0.0039432900957763195,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "helmet",
+      "category": "general",
+      "source": "full",
+      "region_id": null
+    },
+    {
+      "score": 0.0026177631225436926,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "helmet",
+      "category": "general",
+      "source": "person",
+      "region_id": 0
+    }
+  ],
+  "eyelashes": [
+    {
+      "score": 0.004326156340539455,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "eyelashes",
+      "category": "general",
+      "source": "full",
+      "region_id": null
+    },
+    {
+      "score": 0.004897174891084433,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "eyelashes",
+      "category": "general",
+      "source": "person",
+      "region_id": 0
+    }
+  ],
+  "merged_tags": {
+    "general": {
+      "1girl": 0.9932408332824707,
+      "blonde_hair": 0.9475623965263367,
+      "solo": 0.9436637163162231,
+      "long_hair": 0.9072344303131104,
+      "blush_stickers": 0.9069934487342834,
+      "cup": 0.9344474673271179,
+      "pointy_ears": 0.774490237236023,
+      "mug": 0.7565798759460449,
+      "smile": 0.5539658069610596,
+      "explosion": 0.5065675973892212,
+      "parody": 0.5034779906272888,
+      "computer": 0.8943533897399902,
+      "laptop": 0.7353317737579346,
+      "one_eye_closed": 0.636290967464447,
+      "coffee_mug": 0.3834229111671448
+    },
+    "character": {
+      "oshino_shinobu": 0.9752375483512878
+    },
+    "ratings": {
+      "general": 0.4818386137485504,
+      "sensitive": 0.550155758857727,
+      "questionable": 0.0011193963000550866,
+      "explicit": 0.00020786446111742407
+    },
+    "provenance": {
+      "1girl": {
+        "source": "full",
+        "model_score": 0.9932408332824707
+      },
+      "blonde_hair": {
+        "source": "full",
+        "model_score": 0.9475623965263367
+      },
+      "solo": {
+        "source": "full",
+        "model_score": 0.9436637163162231
+      },
+      "long_hair": {
+        "source": "full",
+        "model_score": 0.9072344303131104
+      },
+      "blush_stickers": {
+        "source": "full",
+        "model_score": 0.9069934487342834
+      },
+      "cup": {
+        "source": "person:0",
+        "model_score": 0.9344474673271179
+      },
+      "pointy_ears": {
+        "source": "full",
+        "model_score": 0.774490237236023
+      },
+      "mug": {
+        "source": "person:0",
+        "model_score": 0.7565798759460449
+      },
+      "smile": {
+        "source": "full",
+        "model_score": 0.5539658069610596
+      },
+      "explosion": {
+        "source": "full",
+        "model_score": 0.5065675973892212
+      },
+      "parody": {
+        "source": "full",
+        "model_score": 0.5034779906272888
+      },
+      "oshino_shinobu": {
+        "source": "full",
+        "model_score": 0.9752375483512878
+      },
+      "computer": {
+        "source": "person:0",
+        "model_score": 0.8943533897399902
+      },
+      "laptop": {
+        "source": "person:0",
+        "model_score": 0.7353317737579346
+      },
+      "one_eye_closed": {
+        "source": "person:0",
+        "model_score": 0.636290967464447
+      },
+      "coffee_mug": {
+        "source": "person:0",
+        "model_score": 0.3834229111671448
+      }
+    },
+    "caption": "1girl, blonde_hair, blush_stickers, coffee_mug, computer, cup, explosion, laptop, long_hair, mug, one_eye_closed, oshino_shinobu, parody, pointy_ears, smile, solo",
+    "taglist": "1girl, blonde hair, blush stickers, coffee mug, computer, cup, explosion, laptop, long hair, mug, one eye closed, oshino shinobu, parody, pointy ears, smile, solo"
+  }
+}

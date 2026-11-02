@@ -1,0 +1,116 @@
+{
+  "prompt_id": "bea9ec90-6785-4834-baa4-6ea15258336c",
+  "image": "wdv3-acceptance/tag_managing2.png",
+  "status": "success",
+  "model": "SmilingWolf/wd-vit-tagger-v3",
+  "raw_general_count": 8106,
+  "regions": {
+    "face": 0,
+    "person": 1
+  },
+  "rejection_reasons": [
+    "below_threshold",
+    "composition_full_only",
+    "owned_by_other_sources"
+  ],
+  "helmet": [
+    {
+      "score": 0.003097051754593849,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "helmet",
+      "category": "general",
+      "source": "full",
+      "region_id": null
+    },
+    {
+      "score": 0.0032038595527410507,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "helmet",
+      "category": "general",
+      "source": "person",
+      "region_id": 0
+    }
+  ],
+  "eyelashes": [
+    {
+      "score": 0.3637556731700897,
+      "status": "accepted",
+      "reason": "merged",
+      "tag": "eyelashes",
+      "category": "general",
+      "source": "full",
+      "region_id": null
+    },
+    {
+      "score": 0.32750895619392395,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "eyelashes",
+      "category": "general",
+      "source": "person",
+      "region_id": 0
+    }
+  ],
+  "merged_tags": {
+    "general": {
+      "eye_focus": 0.9894664883613586,
+      "eye_reflection": 0.9547484517097473,
+      "close-up": 0.7991499900817871,
+      "reflection": 0.7457218170166016,
+      "looking_at_viewer": 0.46835243701934814,
+      "multiple_girls": 0.4658966362476349,
+      "brown_hair": 0.4264615476131439,
+      "1girl": 0.394516259431839,
+      "eyelashes": 0.3637556731700897
+    },
+    "character": {},
+    "ratings": {
+      "general": 0.8960680365562439,
+      "sensitive": 0.11283212155103683,
+      "questionable": 0.0017266686772927642,
+      "explicit": 0.0012431489303708076
+    },
+    "provenance": {
+      "eye_focus": {
+        "source": "full",
+        "model_score": 0.9894664883613586
+      },
+      "eye_reflection": {
+        "source": "person:0",
+        "model_score": 0.9547484517097473
+      },
+      "close-up": {
+        "source": "full",
+        "model_score": 0.7991499900817871
+      },
+      "reflection": {
+        "source": "full",
+        "model_score": 0.7457218170166016
+      },
+      "looking_at_viewer": {
+        "source": "full",
+        "model_score": 0.46835243701934814
+      },
+      "multiple_girls": {
+        "source": "full",
+        "model_score": 0.4658966362476349
+      },
+      "brown_hair": {
+        "source": "full",
+        "model_score": 0.4264615476131439
+      },
+      "1girl": {
+        "source": "full",
+        "model_score": 0.394516259431839
+      },
+      "eyelashes": {
+        "source": "full",
+        "model_score": 0.3637556731700897
+      }
+    },
+    "caption": "1girl, brown_hair, close-up, eye_focus, eye_reflection, eyelashes, looking_at_viewer, multiple_girls, reflection",
+    "taglist": "1girl, brown hair, close-up, eye focus, eye reflection, eyelashes, looking at viewer, multiple girls, reflection"
+  }
+}

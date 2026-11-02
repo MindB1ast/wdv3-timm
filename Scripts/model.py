@@ -189,9 +189,11 @@ def _remote_yolo_model(model_path: str, model_directory: Path) -> YOLO | None:
     """Resolve the explicitly supported standard, known-URL, and Hub backends."""
     if any(model_path.startswith(name) for name in _STANDARD_YOLO_MODELS):
         print(f"Standard model {model_path} not found locally. Attempting to download...")
-        model = YOLO(model_path)
+        ensure_model_folder(model_directory)
         destination = model_directory / model_path
-        model.save(str(destination.parent))
+        model = YOLO(str(destination))
+        if not destination.is_file():
+            model.save(str(destination))
         print(f"Model saved to {destination}")
         return model
     if model_path in _KNOWN_YOLO_MODELS:
@@ -211,12 +213,14 @@ def _remote_yolo_model(model_path: str, model_directory: Path) -> YOLO | None:
     return None
 
 
-def load_yolo_model(model_path: str, yolo_model_dir: Path) -> YOLO:
+def load_yolo_model(model_path: str, yolo_model_dir: Path, *, allow_download=True) -> YOLO:
     """Load existing custom weights first, then try supported download backends."""
     local_path = _local_yolo_path(model_path, yolo_model_dir)
     if local_path is not None:
         print(f"Loading YOLO model from local path: {local_path}")
         return YOLO(str(local_path))
+    if not allow_download:
+        raise FileNotFoundError(f"YOLO weights not found: {model_path}. Enable download_missing or choose a local model in {yolo_model_dir}")
     try:
         model = _remote_yolo_model(model_path, yolo_model_dir)
         if model is not None:

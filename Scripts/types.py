@@ -25,6 +25,7 @@ class ModelProvenance(TypedDict):
 
     source: str
     model_score: Score
+    region_source: NotRequired[str]
 
 
 class ManualProvenance(TypedDict):

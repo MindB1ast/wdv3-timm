@@ -9,7 +9,7 @@ from .configs import DetectorConfig
 from .region_export import load_region_record
 from .regions import prepare_saved_region
 from .sam_config import RegionViewConfig, positive_integer
-from .tag_utils import apply_tag_rules, format_result
+from .tag_utils import apply_tag_rules, format_result, restrict_allowed_tags
 from .types import ImageTransform, RegionResult, WDTagResult
 from .wdv3_timm import LabelData, get_tags, pil_ensure_rgb, pil_pad_square
 
@@ -23,7 +23,7 @@ class RegionTagger:
     gen_threshold: float = .35
     char_threshold: float = .75
 
-    def tag_batch(self, images, rules: DetectorConfig) -> list[WDTagResult]:
+    def score_batch(self, images) -> list[WDTagResult]:
         if not images:
             return []
         tensors = []
@@ -40,16 +40,23 @@ class RegionTagger:
             output = self.model(batch).sigmoid().cpu()
         if output.ndim != 2 or output.shape != (len(images), len(self.labels.names)):
             raise ValueError("WD batch output shape does not match regions/labels")
+        records: list[WDTagResult] = []
+        for row in output:
+            caption,taglist,ratings,character,general=get_tags(row,self.labels,-1,-1)
+            records.append({"caption":caption,"taglist":taglist,"ratings":ratings,"character":character,"general":general})
+        return records
+
+    def tag_batch(self, images, rules: DetectorConfig) -> list[WDTagResult]:
+        scores = self.score_batch(images)
         gen = rules.region_gen_threshold if rules.region_gen_threshold is not None else self.gen_threshold
         char = rules.region_char_threshold if rules.region_char_threshold is not None else self.char_threshold
         names = [self.labels.names[index] for index in self.labels.character]
         results = []
-        for row in output:
-            caption, taglist, ratings, character, general = get_tags(row, self.labels, gen, char)
-            raw: WDTagResult = {"caption": caption, "taglist": taglist, "ratings": ratings,
-                                "character": character, "general": general}
-            results.append(apply_tag_rules(raw, remove=rules.remove_tags_from_region,
-                                           add=rules.add_tags_to_region, character_names=names))
+        for raw in scores:
+            raw["general"] = {tag: score for tag, score in raw["general"].items() if score > gen}
+            raw["character"] = {tag: score for tag, score in raw["character"].items() if score > char}
+            results.append(restrict_allowed_tags(apply_tag_rules(raw, remove=rules.remove_tags_from_region,
+                                           add=rules.add_tags_to_region, character_names=names), rules))
         return results
 
     def tag_regions(self, inputs, rules: DetectorConfig, batch_size: int) -> list[RegionResult]:

@@ -1,0 +1,125 @@
+{
+  "prompt_id": "4174ca01-b82f-48ae-93d3-d588230674cc",
+  "image": "wdv3-acceptance/tag_managing4.jpg",
+  "status": "success",
+  "model": "SmilingWolf/wd-vit-tagger-v3",
+  "raw_general_count": 8106,
+  "regions": {
+    "face": 1,
+    "person": 0
+  },
+  "rejection_reasons": [
+    "below_threshold",
+    "not_in_allowed_tags"
+  ],
+  "helmet": [
+    {
+      "score": 0.00017115144873969257,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "helmet",
+      "category": "general",
+      "source": "full",
+      "region_id": null
+    },
+    {
+      "score": 0.002317378530278802,
+      "status": "rejected",
+      "reason": "not_in_allowed_tags",
+      "tag": "helmet",
+      "category": "general",
+      "source": "face",
+      "region_id": 0
+    }
+  ],
+  "eyelashes": [
+    {
+      "score": 0.001796206459403038,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "eyelashes",
+      "category": "general",
+      "source": "full",
+      "region_id": null
+    },
+    {
+      "score": 0.019211608916521072,
+      "status": "rejected",
+      "reason": "below_threshold",
+      "tag": "eyelashes",
+      "category": "general",
+      "source": "face",
+      "region_id": 0
+    }
+  ],
+  "merged_tags": {
+    "general": {
+      "1girl": 0.9960124492645264,
+      "solo": 0.9512902498245239,
+      "long_hair": 0.921301007270813,
+      "blonde_hair": 0.8352395296096802,
+      "dress": 0.7454820871353149,
+      "power_lines": 0.6606486439704895,
+      "very_long_hair": 0.5717405080795288,
+      "hair_bow": 0.4316645860671997,
+      "bow": 0.4137803018093109,
+      "red_dress": 0.36014455556869507,
+      "yellow_eyes": 0.6485868096351624
+    },
+    "character": {},
+    "ratings": {
+      "general": 0.2536119520664215,
+      "sensitive": 0.7544307112693787,
+      "questionable": 0.0009454181417822838,
+      "explicit": 0.00029743934283033013
+    },
+    "provenance": {
+      "1girl": {
+        "source": "full",
+        "model_score": 0.9960124492645264
+      },
+      "solo": {
+        "source": "full",
+        "model_score": 0.9512902498245239
+      },
+      "long_hair": {
+        "source": "full",
+        "model_score": 0.921301007270813
+      },
+      "blonde_hair": {
+        "source": "full",
+        "model_score": 0.8352395296096802
+      },
+      "dress": {
+        "source": "full",
+        "model_score": 0.7454820871353149
+      },
+      "power_lines": {
+        "source": "full",
+        "model_score": 0.6606486439704895
+      },
+      "very_long_hair": {
+        "source": "full",
+        "model_score": 0.5717405080795288
+      },
+      "hair_bow": {
+        "source": "full",
+        "model_score": 0.4316645860671997
+      },
+      "bow": {
+        "source": "full",
+        "model_score": 0.4137803018093109
+      },
+      "red_dress": {
+        "source": "full",
+        "model_score": 0.36014455556869507
+      },
+      "yellow_eyes": {
+        "source": "face:0",
+        "model_score": 0.6485868096351624
+      }
+    },
+    "caption": "1girl, blonde_hair, bow, dress, hair_bow, long_hair, power_lines, red_dress, solo, very_long_hair, yellow_eyes",
+    "taglist": "1girl, blonde hair, bow, dress, hair bow, long hair, power lines, red dress, solo, very long hair, yellow eyes"
+  }
+}

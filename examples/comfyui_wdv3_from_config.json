@@ -49,7 +49,7 @@
       ],
       "size": [
         340,
-        134
+        198
       ],
       "flags": {},
       "order": 1,
@@ -70,7 +70,9 @@
       },
       "widgets_values": [
         "vit",
-        "auto"
+        "auto",
+        true,
+        ""
       ]
     },
     {

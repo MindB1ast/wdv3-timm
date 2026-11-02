@@ -145,7 +145,7 @@ function regionCanvas(row, regions, pick) {
 app.registerExtension({
     name: "wdv3.results",
     async beforeRegisterNodeDef(nodeType, nodeData) {
-        if (nodeData.name !== "WDV3Preview") return;
+        if (!["WDV3Preview", "WDV3Inspect"].includes(nodeData.name)) return;
         const configure = nodeType.prototype.onConfigure;
         nodeType.prototype.onConfigure = function () {
             const result = configure?.apply(this, arguments);
@@ -165,9 +165,10 @@ app.registerExtension({
                 const panel = element("div");
                 panel.style.cssText = "overflow:auto;padding:10px;background:#20242c;color:#eee;font:13px sans-serif;box-sizing:border-box;height:100%;border-radius:8px";
                 const widget = this.addDOMWidget("wdv3_results", "wdv3_results", panel, { serialize: false });
-                widget.computeSize = () => [460, 620];
+                const inspect = nodeData.name === "WDV3Inspect";
+                widget.computeSize = () => inspect ? [620, 980] : [460, 620];
                 this.wdv3Panel = panel;
-                this.setSize([Math.max(500, this.size[0]), Math.max(720, this.size[1])]);
+                this.setSize([Math.max(inspect ? 660 : 500, this.size[0]), Math.max(inspect ? 1100 : 720, this.size[1])]);
             }
             const panel = this.wdv3Panel;
             panel.replaceChildren();
@@ -189,9 +190,16 @@ app.registerExtension({
                 const row = rows[Number(imageChoice.value)];
                 const detail = row.detail;
                 content.replaceChildren();
+                if (detail.model) {
+                    const model=element("div",`${detail.model.model_id} · ${detail.model.device || ""} · ${(detail.image_size || []).join(" × ")}`);
+                    model.style.cssText="font-size:11px;color:#bbb;margin:6px 0";
+                    model.title=`Weights SHA256: ${detail.model.weights_sha256 || "not recorded"}`;
+                    content.append(model);
+                }
                 const source = element("select");
                 source.style.cssText = "width:100%;margin:8px 0;padding:6px";
-                const evidence = [["Merged tags", detail.merged_tags], ["Full image", detail.full_image]];
+                const rawStage = detail.stage && detail.stage !== "results";
+                const evidence = [[rawStage ? (detail.stage === "regions" ? "Regions" : "Raw full image") : "Merged tags", detail.merged_tags], ["Full image", detail.full_image]];
                 const regions = [];
                 for (const [name, regions] of Object.entries(detail.detectors || {})) {
                     for (const region of regions) evidence.push([`${name} #${region.region_id} · box ${region.bbox.join(", ")}`, region,
@@ -216,13 +224,56 @@ app.registerExtension({
                 };
                 const scores = element("div");
                 let imageView;
+                let searchDecisions=()=>{};
                 const update = () => {
                     const selected = evidence[Number(source.value)];
                     const result = selected[1];
                     imageView?.select(selected[2] || null, Number(source.value) === 0);
-                    text.value = result.taglist || result.caption || "";
+                    const format=detail.settings?.options || {};
+                    text.value = format.replace_underscores === false ? (result.caption ?? result.taglist ?? "") : (result.taglist || result.caption || "");
+                    if(format.escape_parentheses !== false)text.value=text.value.replaceAll("(","\\(").replaceAll(")","\\)");
                     scores.replaceChildren();
-                    const merged = Number(source.value) === 0;
+                    searchDecisions=()=>{};
+                    const decisionRows = Number(source.value) === 0 ? detail.decisions : result.decisions;
+                    const records = Array.isArray(decisionRows) ? decisionRows : decisionRows ?
+                        Object.entries(decisionRows).flatMap(([category, tags]) => Object.entries(tags).map(([tag, decision]) =>
+                            ({tag, category, ...decision, source:selected[2]?.name || "full"}))) :
+                        ["general", "character"].flatMap(category => Object.entries(result.raw_scores?.[category] || result[category] || {}).map(([tag,score]) =>
+                            ({tag,category,score,source:selected[2]?.name || "full",status:"raw",reason:"raw_evidence"})));
+                    if (records.length) {
+                        const controls = element("div"), query = element("input"), mode = element("select");
+                        query.placeholder = "Search tag, source or reason"; query.style.width = "95%";
+                        for (const name of ["all", "accepted", "rejected", "raw"]) {
+                            const option=element("option",name);option.value=name;mode.append(option);
+                        }
+                        const previous=element("button","Previous"), next=element("button","Next"), count=element("span");
+                        const table=element("table"); table.style.cssText="width:100%;font-size:11px;overflow-wrap:anywhere";
+                        let page=0;
+                        const renderDecisions=()=>{
+                            const q=query.value.toLowerCase();
+                            const filtered=records.filter(r=>(mode.value==="all"||r.status===mode.value)&&
+                                `${r.tag} ${r.source} ${r.reason}`.toLowerCase().includes(q));
+                            page=Math.min(page,Math.max(0,Math.ceil(filtered.length/50)-1));table.replaceChildren();
+                            const header=element("tr");
+                            for(const name of ["Tag","Score","Source","Status / reason"])header.append(element("th",name));table.append(header);
+                            for(const record of filtered.slice(page*50,(page+1)*50)){
+                                const tr=element("tr");
+                                for(const value of [record.tag,`${(100*record.score).toFixed(2)}%`,record.source,`${record.status}: ${record.reason}`])tr.append(element("td",value));
+                                if(record.region_id!==undefined&&record.region_id!==null)tr.onclick=()=>{
+                                    const region=regions.find(r=>r.key===`${record.source}:${record.region_id}`);
+                                    if(region){source.value=String(region.option);update();}
+                                };
+                                table.append(tr);
+                            }
+                            count.textContent=` ${page+1}/${Math.max(1,Math.ceil(filtered.length/50))} · ${filtered.length} records `;
+                            previous.disabled=page===0;next.disabled=(page+1)*50>=filtered.length;
+                        };
+                        query.oninput=mode.onchange=()=>{page=0;renderDecisions();};
+                        previous.onclick=()=>{page--;renderDecisions();}; next.onclick=()=>{page++;renderDecisions();};
+                        controls.append(query,mode,previous,count,next);scores.append(controls,table);renderDecisions();
+                        searchDecisions=tag=>{query.value=tag;mode.value="all";page=0;renderDecisions();};
+                    }
+                    const merged = Number(source.value) === 0 && !rawStage;
                     const chooseOrigin = origin => {
                         const region = regions.find(region => region.key === origin.key);
                         if (region) { source.value = String(region.option); imageView?.resetClicks(); update(); }
@@ -242,6 +293,15 @@ app.registerExtension({
                             added.append(button);
                         }
                         scores.append(added);
+                        const removed=["character","general"].flatMap(category=>Object.keys(detail.full_image?.[category]||{})
+                            .filter(tag=>!Object.hasOwn(result[category]||{},tag)).map(tag=>({tag,category})));
+                        const missing=element("details");missing.append(element("summary",`Removed from full image (${removed.length})`));
+                        for(const {tag,category}of removed){
+                            const reason=detail.decisions?.find(d=>d.tag===tag&&d.category===category&&d.source==="full"&&d.status==="rejected")?.reason||"removed";
+                            const button=element("button",`${tag} · ${reason}`);button.style.cssText="margin:3px;color:#ffb8b8";
+                            button.onclick=()=>searchDecisions(tag);missing.append(button);
+                        }
+                        scores.append(missing);
                     }
                     if (result.segmentation_score !== undefined) scores.append(element("div", `SAM confidence: ${(100 * result.segmentation_score).toFixed(1)}%`));
                     for (const category of ["ratings", "character", "general"]) {
@@ -250,7 +310,7 @@ app.registerExtension({
                         const group = element("details"); group.open = category !== "general";
                         group.append(element("summary", `${category} (${entries.length})`));
                         const table = element("table"); table.style.cssText = "width:100%;border-collapse:collapse";
-                        for (const [tag, score] of entries) {
+                        for (const [tag, score] of entries.slice(0, 50)) {
                             const tr = element("tr");
                             tr.append(element("td", tag), element("td", `${(100 * score).toFixed(2)}%`));
                             if (merged && category !== "ratings") {
@@ -264,6 +324,7 @@ app.registerExtension({
                             }
                             table.append(tr);
                         }
+                        if(entries.length>50)group.append(element("div","Top 50 shown; use the searchable table for all scores."));
                         group.append(table); scores.append(group);
                     }
                 };

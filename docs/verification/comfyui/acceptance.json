@@ -1,0 +1,26 @@
+{
+  "runs": [
+    {
+      "prompt_id": "13fc142d-eb89-46ce-ab12-c172791af7ee",
+      "image": "wdv3-acceptance/tag_managing1.png",
+      "status": "success"
+    },
+    {
+      "prompt_id": "bea9ec90-6785-4834-baa4-6ea15258336c",
+      "image": "wdv3-acceptance/tag_managing2.png",
+      "status": "success"
+    },
+    {
+      "prompt_id": "2b51e2f1-7306-4d5c-acc1-18109538d595",
+      "image": "wdv3-acceptance/tag_managing3.png",
+      "status": "success"
+    },
+    {
+      "prompt_id": "4174ca01-b82f-48ae-93d3-d588230674cc",
+      "image": "wdv3-acceptance/tag_managing4.jpg",
+      "status": "success"
+    }
+  ],
+  "originals_unchanged": true,
+  "device": "cpu"
+}

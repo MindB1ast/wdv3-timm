@@ -21,6 +21,30 @@ def parse_tags(value: TagInput) -> list[str]:
     return list(dict.fromkeys(tag for item in values if (tag := canonical_tag(item))))
 
 
+def parse_additions(value):
+    """Accept tag or tag:score without losing assigned scores during UI import."""
+    import math
+    if isinstance(value, Mapping):
+        pairs=value.items()
+    else:
+        pairs=[]
+        for item in parse_tags(value):
+            tag,colon,score=item.rpartition(':')
+            if colon:
+                try: number=float(score)
+                except ValueError as error: raise ValueError('Manual tag score must be a number') from error
+                pairs.append((tag,number))
+            else: pairs.append((item,1.0))
+    result={}
+    for tag,score in pairs:
+        if isinstance(score,bool) or not isinstance(score,(int,float)) or not math.isfinite(score) or not 0<=score<=1:
+            raise ValueError('Manual tag score must be between 0 and 1')
+        name=canonical_tag(tag)
+        if not name:raise ValueError('Manual tag name cannot be empty')
+        result[name]=max(result.get(name,score),score)
+    return result
+
+
 def normalized_scores(scores: Mapping[str, Score]) -> Scores:
     """Merge equivalent names without losing the maximum score."""
     result: Scores = {}
@@ -29,6 +53,43 @@ def normalized_scores(scores: Mapping[str, Score]) -> Scores:
         if tag:
             result[tag] = max(result.get(tag, score), score)
     return result
+
+
+def source_owners(configs):
+    owners = {}
+    for config in configs:
+        for tag in parse_tags(config.only_from_source):
+            owners.setdefault(tag, set()).add(config.name)
+    return owners
+
+
+def restrict_allowed_tags(result, rules):
+    allowed = set(parse_tags(rules.allowed_tags))
+    if not allowed:
+        return result
+    result = copy.deepcopy(result)
+    for category in CATEGORIES:
+        result[category] = {tag: score for tag, score in result[category].items() if tag in allowed}
+    accepted = set(result["general"]) | set(result["character"])
+    result["provenance"] = {tag: item for tag, item in result.get("provenance", {}).items() if tag in accepted}
+    return format_result(result)
+
+
+def enforce_owners(result, configs):
+    """Prevent final manual prefix/suffix additions from bypassing source ownership."""
+    owners = source_owners(configs)
+    if not owners:
+        return result
+    result = copy.deepcopy(result)
+    for category in CATEGORIES:
+        for tag in list(result[category]):
+            origin = result.get("provenance", {}).get(tag, {})
+            source = origin.get("region_source", origin.get("source", ""))
+            name = source.rsplit(":", 1)[0] if ":" in source else ""
+            if tag in owners and name not in owners[tag]:
+                del result[category][tag]
+                result.get("provenance", {}).pop(tag, None)
+    return format_result(result, result.get("caption"))
 
 
 def format_result(result: _Result, order: TagInput = None) -> _Result:

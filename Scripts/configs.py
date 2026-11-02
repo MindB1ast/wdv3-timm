@@ -29,6 +29,11 @@ class DetectorConfig:  # pylint: disable=R0902  # Public configuration fields.
     # specific_excluded_tags: List[str] = None
     region_gen_threshold: Optional[float] = None  # Порог для общих тегов в регионах
     region_char_threshold: Optional[float] = None  # Порог для тегов персонажей в регионах
+    only_from_source: Optional[List[str]] = None
+    allowed_tags: Optional[List[str]] = None
+    device: str = "auto"
+    download_missing: bool = True
+    full_image_only_tags: Optional[List[str]] = None
 
     def __post_init__(self):
         if self.classes is None:
@@ -41,6 +46,18 @@ class DetectorConfig:  # pylint: disable=R0902  # Public configuration fields.
             self.add_tags_to_region = {}
         if self.exclude_from_region is None:
             self.exclude_from_region = []
+        from .tag_utils import parse_tags
+        self.only_from_source = parse_tags(self.only_from_source)
+        self.allowed_tags = parse_tags(self.allowed_tags)
+        if self.full_image_only_tags is not None:
+            self.full_image_only_tags = parse_tags(self.full_image_only_tags)
+
+    @classmethod
+    def from_dict(cls, values):
+        config=cls(**values)
+        if 'classes' in values:
+            config.classes=values['classes']
+        return config
 
 
 #        if self.specific_excluded_tags is None:

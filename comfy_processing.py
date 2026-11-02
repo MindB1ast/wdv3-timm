@@ -14,7 +14,7 @@ from .Scripts.region_tagging import RegionTagger
 from .Scripts.regions import prepare_region_view
 from .Scripts.sam_config import RegionViewConfig
 from .Scripts.sam_masks import select_masks
-from .Scripts.tag_utils import apply_tag_rules
+from .Scripts.tag_utils import apply_tag_rules, enforce_owners
 from .Scripts.wdv3_timm import pil_ensure_rgb
 
 
@@ -23,6 +23,8 @@ def frame_digest(image):
 
 
 def tensor_frame(tensor):
+    if tensor.ndim != 3 or tensor.shape[-1] not in (3,4) or any(s<1 for s in tensor.shape):
+        raise ValueError('Expected image [H,W,3/4]')
     pixels = (tensor.detach().cpu().float().clamp(0, 1).numpy() * 255).round().astype(np.uint8)
     with Image.fromarray(pixels) as original:
         rgb = pil_ensure_rgb(original)
@@ -71,6 +73,10 @@ def segment_frames(frames, settings, sources, batch_size=1, progress=None):
     if batch_size < 1 or not sources:
         raise ValueError("SAM needs positive batch_size and at least one source")
     from .Scripts.sam_runtime import create_backend
+    from .comfy_evidence import interrupt
+    from .comfy_config import validate_config
+    sources=validate_config({'schema_version':1,'sam_sources':sources})['sam_sources']
+    interrupt()
     if settings.get("model_id") == "unsloth/sam3.1":
         settings = dict(settings)
         folder = sam_folder(settings["checkpoint"], settings["checkpoint"], settings.get("allow_download", False))
@@ -81,14 +87,17 @@ def segment_frames(frames, settings, sources, batch_size=1, progress=None):
         backend.load()
         with torch.inference_mode():
             for start in range(0, len(frames), batch_size):
+                interrupt()
                 if progress:
                     progress(start, len(frames))
                 chunk = frames[start:start + batch_size]
                 state = backend._encode_images(chunk)
-                records = [{"digest": frame_digest(image), "size": list(image.size),
+                records = [{"digest": frame_digest(image), "size": list(image.size), "model_settings": dict(settings),
                             "sources": sources, "regions": {}} for image in chunk]
                 for source in sources:
+                    interrupt()
                     predictions = backend._predict_source(state, source, len(chunk))
+                    interrupt()
                     for index, image in enumerate(chunk):
                         candidates = backend._candidates(predictions, index, image.size, source["confidence"])
                         try:
@@ -132,57 +141,12 @@ def sam_tag_regions(image, record, tagger, batch_size):
 
 def tag_frames(frames, runtime, *, detectors=None, sam_regions=None, options=None,
                progress=None, image_paths=None):
-    from .comfy_nodes import tag_regions
-    options = options or {}
-    general = options.get("general_threshold", .35)
-    character = options.get("character_threshold", .75)
-    region_batch = options.get("region_batch_size", 8)
-    image_batch = options.get("image_batch_size", 4)
-    if region_batch < 1 or image_batch < 1:
-        raise ValueError("Batch sizes must be positive")
-    if sam_regions is not None and len(sam_regions) != len(frames):
-        raise ValueError("SAM and WD image counts differ")
-    configs, models = detectors if detectors is not None else ([], {})
-    all_configs = list(configs)
-    if sam_regions:
-        all_configs.extend(DetectorConfig(s["name"], "sam3", **s["rules"]) for s in sam_regions[0]["sources"])
-    if len({c.name for c in all_configs}) != len(all_configs):
-        raise ValueError("YOLO/SAM source names must be unique")
-    tagger = RegionTagger(runtime.model, runtime.transform, runtime.labels, runtime.device, general, character)
-    characters = [runtime.labels.names[i] for i in runtime.labels.character]
-    tags, details = [], []
-    try:
-        if torch.device(runtime.device).type != "cpu":
-            import comfy.model_management as management
-            management.free_memory(sum(p.numel() * p.element_size() for p in runtime.model.parameters()) * 1.3,
-                                   runtime.device)
-        runtime.model.to(runtime.device)
-        for start in range(0, len(frames), image_batch):
-            if progress:
-                progress(start, len(frames))
-            chunk = frames[start:start + image_batch]
-            full = tagger.tag_batch(chunk, DetectorConfig("full", ""))
-            for offset, (image, tagged) in enumerate(zip(chunk, full)):
-                index = start + offset
-                detected = tag_regions(image, tagger, configs, models, region_batch)
-                if sam_regions is not None:
-                    detected.update(sam_tag_regions(image, sam_regions[index], tagger, region_batch))
-                detail = {"image_index": index, "full_image": tagged, "detectors": detected}
-                if image_paths is not None:
-                    detail["image_path"] = str(image_paths[index])
-                merged = apply_tag_rules(merge_tags_from_regions(detail, all_configs),
-                    remove=options.get("remove_tags", ""), before=options.get("prefix_tags", ""),
-                    after=options.get("suffix_tags", ""), character_names=characters)
-                text = merged["taglist"] if options.get("replace_underscores", True) else merged["caption"]
-                if options.get("escape_parentheses", True):
-                    text = text.replace("(", r"\(").replace(")", r"\)")
-                tags.append(text)
-                details.append({**detail, "merged_tags": merged})
-        if progress:
-            progress(len(frames), len(frames))
-        return tags, details
-    finally:
-        runtime.model.to("cpu")
+    from .comfy_evidence import collect, apply_filters, outputs
+    evidence = collect(frames, runtime, detectors=detectors, sam_regions=sam_regions,
+                       options=options, image_paths=image_paths, progress=progress)
+    results = apply_filters(evidence, options)
+    texts, encoded = outputs(results)
+    return texts, [json.loads(row) for row in encoded]
 
 
 def json_result(detail):
@@ -234,7 +198,8 @@ def tag_folder(files, runtime, options, *, detectors=None, sam_settings=None, so
         chunk = paths[start:start + batch_size]
         with ExitStack() as stack:
             frames = [stack.enter_context(file_frame(path)) for path in chunk]
-            regions = segment_frames(frames, sam_settings, sources, sam_batch_size, progress) if sam_settings else None
+            from .comfy_evidence import cached_segment
+            regions = cached_segment(frames, runtime, sam_settings, sources, sam_batch_size, progress) if sam_settings else None
             texts, records = tag_frames(frames, runtime, detectors=detectors, sam_regions=regions,
                                        options=options, image_paths=chunk, progress=progress)
         for offset, (path, text, record) in enumerate(zip(chunk, texts, records)):

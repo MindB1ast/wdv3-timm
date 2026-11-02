@@ -12,7 +12,9 @@ from comfy.utils import ProgressBar
 from .comfy_nodes import ROOT, model_directory
 from .comfy_processing import (file_frame, scan_folder,
                                segment_frames, tag_folder, tensor_frame)
-from .Scripts.tag_utils import parse_tags
+from .Scripts.tag_utils import parse_tags, parse_additions
+from .Scripts.evidence import Bundle
+from .Scripts.preprocess import GLOBAL_EXCLUDED_REGION_TAGS
 
 RULES = io.Custom("WDV3_RULES")
 OPTIONS = io.Custom("WDV3_OPTIONS")
@@ -47,7 +49,9 @@ class WDTaggingOptions(io.ComfyNode):
 
     @classmethod
     def execute(cls, **kwargs):
-        return io.NodeOutput(kwargs)
+        from .comfy_config import validate_config
+        validate_config({'schema_version':1,'options':kwargs})
+        return io.NodeOutput(Bundle.pack('rules',kwargs))
 
 
 class WDRegionRules(io.ComfyNode):
@@ -59,21 +63,41 @@ class WDRegionRules(io.ComfyNode):
                     io.Float.Input("character_threshold", default=.75, min=0, max=1, step=.01),
                     io.String.Input("remove_from_full", default="", multiline=True),
                     io.String.Input("remove_from_regions", default="", multiline=True),
-                    io.String.Input("add_to_regions", default="", multiline=True),
-                    io.String.Input("require_full_confirmation", default="", multiline=True)],
+                    io.String.Input("add_to_regions", default="", multiline=True, tooltip="tag or tag:score (0..1), separated by commas/newlines"),
+                    io.String.Input("require_full_confirmation", default="", multiline=True),
+                    io.String.Input("only_from_source", default="", multiline=True,
+                        tooltip="These tags may come only from this source and other declared owners. No full-image fallback."),
+                    io.String.Input("allowed_tags", default="", multiline=True,
+                        tooltip="Accept only these tags from this source. Empty means unrestricted."),
+                    io.String.Input('full_image_only_tags', default=', '.join(sorted(GLOBAL_EXCLUDED_REGION_TAGS)),multiline=True,
+                        tooltip='Composition tags that may come only from the full image. Clear to allow them from this source.')],
             outputs=[RULES.Output("rules")])
 
     @classmethod
     def execute(cls, general_threshold, character_threshold, remove_from_full,
-                remove_from_regions, add_to_regions, require_full_confirmation):
-        return io.NodeOutput({"region_gen_threshold": general_threshold, "region_char_threshold": character_threshold,
+                remove_from_regions, add_to_regions, require_full_confirmation,
+                only_from_source="", allowed_tags="", full_image_only_tags=None):
+        rules={"region_gen_threshold": general_threshold, "region_char_threshold": character_threshold,
             "remove_tags_from_full": parse_tags(remove_from_full),
             "remove_tags_from_region": parse_tags(remove_from_regions),
-            "add_tags_to_region": dict.fromkeys(parse_tags(add_to_regions), 1.),
-            "exclude_from_region": parse_tags(require_full_confirmation)})
+            "add_tags_to_region": parse_additions(add_to_regions),
+            "exclude_from_region": parse_tags(require_full_confirmation),
+            "only_from_source": parse_tags(only_from_source), "allowed_tags": parse_tags(allowed_tags),
+            "full_image_only_tags": None if full_image_only_tags is None else parse_tags(full_image_only_tags)}
+        from .comfy_config import validate_rules
+        validate_rules(rules)
+        return io.NodeOutput(Bundle.pack('rules',rules))
 
 
 class WDYOLODetector(io.ComfyNode):
+    @classmethod
+    def fingerprint_inputs(cls, model, custom_model_path='', **kwargs):
+        from .comfy_evidence import digest, file_stamp
+        candidates = [Path(custom_model_path)] if custom_model_path.strip() else [
+            directory / model for directory in (model_directory('yolo'), ROOT/'models'/'yolo',
+                Path(folder_paths.models_dir)/'ultralytics'/'bbox',Path(folder_paths.models_dir)/'ultralytics'/'segm')]
+        return digest([file_stamp(path) for path in candidates])
+
     @classmethod
     def define_schema(cls):
         known = ["person_yolov8m-seg.pt", "face_yolov9c.pt", "hand_yolov9c.pt", "yolov8n.pt"]
@@ -89,11 +113,14 @@ class WDYOLODetector(io.ComfyNode):
                     io.Float.Input("confidence", default=.35, min=0, max=1, step=.01),
                     io.String.Input("classes", default="0", tooltip="Comma-separated class IDs; empty means all classes."),
                     io.String.Input("custom_model_path", default="", tooltip="Optional explicit weights path; overrides model."),
-                    RULES.Input("rules", optional=True), DETECTORS.Input("previous_detectors", optional=True)],
+                    RULES.Input("rules", optional=True), DETECTORS.Input("previous_detectors", optional=True),
+                    io.Combo.Input('device', options=['auto','cpu','cuda'], default='auto', optional=True),
+                    io.Boolean.Input('download_missing', default=True, optional=True)],
             outputs=[DETECTORS.Output("detectors")])
 
     @classmethod
-    def execute(cls, model, source_name, confidence, classes, custom_model_path, rules=None, previous_detectors=None):
+    def execute(cls, model, source_name, confidence, classes, custom_model_path, rules=None, previous_detectors=None,
+                device='auto', download_missing=True):
         from .Scripts.configs import DetectorConfig
         choices = cls.define_schema().inputs[0].options
         if model not in choices:
@@ -112,10 +139,12 @@ class WDYOLODetector(io.ComfyNode):
                 if (directory / model).is_file():
                     path = str(directory / model)
                     break
+        if device == 'cuda' and not torch.cuda.is_available(): raise ValueError('CUDA is unavailable; select cpu or auto')
         configs, models = previous_detectors if previous_detectors is not None else ([], {})
         if name in {cfg.name for cfg in configs}:
             raise ValueError("Detector source names must be unique")
-        config = DetectorConfig(name, path, confidence=confidence, classes=ids, **(rules or {}))
+        config = DetectorConfig(name, path, confidence=confidence, classes=ids,
+                                device=device, download_missing=download_missing, **(rules or {}))
         # The existing dataclass turns None into class 0; an empty selection explicitly means all.
         config.classes = ids or None
         models = dict(models)
@@ -146,10 +175,10 @@ def sam_model_settings(model, device, download_missing, local_model_path):
     default = Path(folder_paths.models_dir) / "sam3" / "unsloth-sam3.1"
     if not local_model_path.strip() and (ROOT / "models" / "sam3" / "model.safetensors").is_file():
         default = ROOT / "models" / "sam3"
-    return {"checkpoint": local_model_path.strip() or str(default), "model_id": model,
+    return Bundle.pack('model', {"checkpoint": local_model_path.strip() or str(default), "model_id": model,
             "backend": "transformers", "device": selected, "allow_download": download_missing,
             "loader_options": dict(model=model, device=device, download_missing=download_missing,
-                                   local_model_path=local_model_path)}
+                                   local_model_path=local_model_path)})
 
 
 class WDSAMSource(io.ComfyNode):
@@ -177,7 +206,9 @@ class WDSAMSource(io.ComfyNode):
             raise ValueError("SAM source names must be unique")
         sources.append(dict(name=name, prompt=prompt.strip(), confidence=confidence, mask_threshold=mask_threshold,
             min_mask_area_px=min_mask_area_px, max_regions=max_regions, view_mode=view_mode,
-            padding_px=padding_px, rules=rules or {}))
+            padding_px=padding_px, rules=dict(rules or {})))
+        from .comfy_config import validate_config
+        sources=validate_config({'schema_version':1,'sam_sources':sources})['sam_sources']
         return io.NodeOutput(sources)
 
 
@@ -246,6 +277,29 @@ class WDTagFolder(io.ComfyNode):
             sources=sources, sam_batch_size=sam_batch_size, output_directory=output_directory,
             save_txt=save_txt, save_json=save_json, overwrite=overwrite, progress=progress)
         return io.NodeOutput(tags, details)
+
+
+class WDSaveResult(io.ComfyNode):
+    @classmethod
+    def define_schema(cls):
+        return io.Schema(node_id="WDV3SaveResult", display_name="WDV3 Save Result", category="WDV3/Output",
+            description="Save one result as TXT and/or JSON. Connect tags too to preserve the tagger's exact text formatting. result_index selects one image from a batch (0 = first).",
+            is_output_node=True, is_input_list=True, not_idempotent=True,
+            inputs=[io.String.Input("results_json", force_input=True),
+                    io.String.Input("output_directory", default=str(Path(folder_paths.get_output_directory()) / "wdv3")),
+                    io.String.Input("filename", default="result"),
+                    io.Int.Input("result_index", default=0, min=0, max=10000000),
+                    io.Boolean.Input("save_txt", default=True), io.Boolean.Input("save_json", default=True),
+                    io.Boolean.Input("overwrite", default=False),
+                    io.String.Input("tags", force_input=True, optional=True)],
+            outputs=[io.String.Output("txt_path"), io.String.Output("json_path")])
+
+    @classmethod
+    def execute(cls, results_json, output_directory, filename, result_index, save_txt, save_json, overwrite, tags=None):
+        from .comfy_export import save_result
+        txt_path, json_path = save_result(results_json, output_directory[0], filename[0],
+            result_index=result_index[0], tags=tags, save_txt=save_txt[0], save_json=save_json[0], overwrite=overwrite[0])
+        return io.NodeOutput(txt_path, json_path, ui={"text": [f"Saved: {path}" for path in (txt_path, json_path) if path]})
 
 
 class WDPreview(io.ComfyNode):
@@ -365,9 +419,12 @@ class WDLoadConfig(io.ComfyNode):
         if path is None:
             raise ValueError("Unknown preset. Refresh ComfyUI to update the preset dropdown.")
         options, detectors, sources, model = config_values(json.loads(path.read_text(encoding="utf-8")))
-        return io.NodeOutput(options, detectors, sources, sam_model_settings(**model) if model else None)
+        return io.NodeOutput(Bundle.pack('rules',options), detectors, sources, sam_model_settings(**model) if model else None)
 
 
 NODE_CLASSES = [WDTaggingOptions, WDRegionRules, WDYOLODetector, WDSAMLoader, WDSAMSource,
                 WDSAMSegment, WDLoadFolder, WDTagFolder, WDPreview, WDCombineDetectors, WDCombineSAMSources,
-                WDSaveConfig, WDLoadConfig]
+                WDSaveConfig, WDLoadConfig, WDSaveResult]
+
+from .comfy_pipeline_nodes import NODE_CLASSES as PIPELINE_CLASSES
+NODE_CLASSES += PIPELINE_CLASSES

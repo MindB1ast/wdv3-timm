@@ -50,7 +50,9 @@ def build(root):
             widgets.append("image")
         height = 430 if kind in ("WDV3Tagger", "WDV3Options", "WDV3RegionRules") else max(120, 70 + 32 * len(widgets))
         if kind == "WDV3RegionRules":
-            height = 610
+            height = 1000
+        if kind == "WDV3Options":
+            height = 640
         if kind == "LoadImage":
             height = 340
         return {"id": number, "type": kind, "pos": position,
@@ -108,7 +110,7 @@ def build(root):
         if not folder:
             link(image, "IMAGE", viewer, "images")
         if yolo or sam:
-            rules = add("WDV3RegionRules", [410, 500])
+            rules = add("WDV3RegionRules", [410, 720])
             if yolo:
                 detector = add("WDV3YOLODetector", [820, 530])
                 link(rules, "rules", detector, "rules")
@@ -126,12 +128,17 @@ def build(root):
         return graph
 
     def rule_values(rules):
-        return dict(general_threshold=rules.get("region_gen_threshold", .35),
+        values = dict(general_threshold=rules.get("region_gen_threshold", .35),
                     character_threshold=rules.get("region_char_threshold", .75),
                     remove_from_full=", ".join(rules.get("remove_tags_from_full", [])),
                     remove_from_regions=", ".join(rules.get("remove_tags_from_region", [])),
-                    add_to_regions=", ".join(rules.get("add_tags_to_region", {})),
-                    require_full_confirmation=", ".join(rules.get("exclude_from_region", [])))
+                    add_to_regions=", ".join(tag if score == 1 else f'{tag}:{score}' for tag,score in rules.get("add_tags_to_region", {}).items()),
+                    require_full_confirmation=", ".join(rules.get("exclude_from_region", [])),
+                    only_from_source=", ".join(rules.get("only_from_source", [])),
+                    allowed_tags=", ".join(rules.get("allowed_tags", [])))
+        if rules.get('full_image_only_tags') is not None:
+            values['full_image_only_tags']=', '.join(rules['full_image_only_tags'])
+        return values
 
     def multi_workflow(sam):
         graph = workflow(sam=sam, yolo=not sam)
@@ -205,6 +212,27 @@ def build(root):
         "comfyui_wdv3_save_config.json": config_workflow(save=True),
         "comfyui_wdv3_from_config.json": config_workflow(save=False),
     }
+    pipeline = workflow(yolo=True)
+    by_id = {n['id']: n for n in pipeline['nodes']}
+    remove_nodes(pipeline, {4, 5})
+    collect_node = node(20, 'WDV3CollectEvidence', [820, 20])
+    filtered = node(21, 'WDV3ApplyFilters', [1230, 20])
+    inspect = node(22, 'WDV3Inspect', [1640, 20])
+    export = node(23, 'WDV3ExportReport', [2400, 20], {'output_directory': 'output/wdv3'})
+    face_rules = node(24, 'WDV3RegionRules', [20, 720], {'add_to_regions':'face', 'require_full_confirmation':'portrait, upper_body'})
+    face_rules['title'] = 'Face / tag rules'
+    face = node(25, 'WDV3YOLODetector', [820, 1000], {'model':'face_yolov9c.pt','source_name':'face'})
+    pipeline['nodes'].extend([collect_node, filtered, inspect, export, face_rules, face])
+    for src, output, dst, target in [(by_id[1], 'IMAGE', collect_node, 'images'),
+        (by_id[2], 'wd_model', collect_node, 'wd_model'), (by_id[3], 'options', collect_node, 'options'),
+        (by_id[7], 'detectors', face, 'previous_detectors'), (face_rules, 'rules', face, 'rules'),
+        (face, 'detectors', collect_node, 'detectors'), (collect_node, 'evidence', filtered, 'evidence'),
+        (by_id[3], 'options', filtered, 'options'), (face, 'detectors', filtered, 'detectors'),
+        (filtered, 'results', inspect, 'results'), (inspect, 'report', export, 'report')]:
+        wire(pipeline, src, output, dst, target)
+    pipeline['last_node_id'] = 25
+    pipeline['last_link_id'] = max(row[0] for row in pipeline['links'])
+    variants['comfyui_wdv3_evidence.json'] = pipeline
     for name, graph in variants.items():
         path = root / "examples" / name
         path.write_text(json.dumps(graph, ensure_ascii=False, indent=2), encoding="utf-8")

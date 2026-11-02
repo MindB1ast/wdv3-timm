@@ -6,6 +6,7 @@ from pathlib import Path
 
 from .Scripts.configs import DetectorConfig
 from .Scripts.sam_config import finite_number, positive_integer
+from .Scripts.tag_utils import parse_tags
 
 
 DEFAULT_SAM_MODEL = {"model": "unsloth/sam3.1", "device": "auto", "download_missing": True,
@@ -17,6 +18,8 @@ def unique_names(names):
         raise ValueError("Source names must be nonempty text")
     if len(set(names)) != len(names):
         raise ValueError("Source names must be unique across YOLO and SAM")
+    if 'full' in names:
+        raise ValueError("Source name 'full' is reserved for the full image")
 
 
 def combine_detectors(groups):
@@ -66,6 +69,8 @@ def validate_config(data):
         if not isinstance(config.model_path, str) or not config.model_path.strip():
             raise ValueError("YOLO model_path must be nonempty")
         finite_number(config.confidence, "YOLO confidence", maximum=1)
+        if config.device not in ('auto','cpu','cuda') or not isinstance(config.download_missing, bool):
+            raise ValueError('Invalid YOLO device or download_missing')
         classes = row.get("classes")
         if classes is not None and (not isinstance(classes, list) or any(
             isinstance(item, bool) or not isinstance(item, int) or item < 0 for item in classes)):
@@ -107,10 +112,12 @@ def validate_rules(rules):
     for name in ("region_gen_threshold", "region_char_threshold"):
         if rules.get(name) is not None:
             finite_number(rules[name], name, maximum=1)
-    for name in ("remove_tags_from_full", "remove_tags_from_region", "exclude_from_region"):
+    for name in ("remove_tags_from_full", "remove_tags_from_region", "exclude_from_region", "only_from_source", "allowed_tags", "full_image_only_tags"):
         value = rules.get(name)
         if value is not None and (not isinstance(value, list) or any(not isinstance(tag, str) for tag in value)):
             raise ValueError(f"{name} must be a list of tags")
+        if name in ("only_from_source", "allowed_tags"):
+            rules[name] = parse_tags(value)
     for name, value in (rules.get("add_tags_to_region") or {}).items():
         if not isinstance(name, str):
             raise ValueError("Tag name must be text")
@@ -119,7 +126,7 @@ def validate_rules(rules):
 
 def config_data(options=None, detectors=None, sources=None, sam_model=None):
     configs = detectors[0] if detectors is not None else []
-    return validate_config({"schema_version": 1, "options": options or {},
+    return validate_config({"schema_version": 1, "options": dict(options or {}),
                             "detectors": [asdict(config) for config in configs],
                             "sam_sources": sources or [],
                             "sam_model": sam_model.get("loader_options") if sam_model is not None else None})

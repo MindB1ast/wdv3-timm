@@ -19,7 +19,7 @@ from .model import (download_model_files, ensure_model_folder,
 from .preprocess import merge_tags_from_regions, save_results_to_json
 from .savingProc import save_tags_to_txt
 from .sam_config import positive_integer
-from .tag_utils import apply_tag_rules
+from .tag_utils import apply_tag_rules, parse_tags
 from .tagging import process_image_with_multiple_detectors
 from .types import (BatchResult, DetailedResult, ImageTransform, MergedResult,
                     PathInput)
@@ -110,14 +110,18 @@ def _postprocess_result(
         after=opts.add_tags_after.strip(),
         character_names=character_names,
     )
+    from .tag_utils import enforce_owners
+    merged = enforce_owners(merged, resources.detectors)
     combined: MergedResult = {"image_path": result["image_path"], "merged_tags": merged}
     if opts.save_txt:
         combined["txt_path"] = save_tags_to_txt(
             result["image_path"],
             merged,
             append_tags=opts.append_txt,
-            add_tags_before=opts.add_tags_before,
-            add_tags_after=opts.add_tags_after,
+            add_tags_before=", ".join(t for t in parse_tags(opts.add_tags_before)
+                                      if t in merged['general'] or t in merged['character']),
+            add_tags_after=", ".join(t for t in parse_tags(opts.add_tags_after)
+                                     if t in merged['general'] or t in merged['character']),
         )
     return result, combined
 
@@ -150,6 +154,8 @@ def BatchTagging(opts: ScriptOptions) -> BatchResult | None:
     search = image_folder.rglob if opts.recursive else image_folder.glob
     image_files = [path for extension in ("*.jpg", "*.jpeg", "*.png") for path in search(extension)]
     if not image_files:
+        # Validate config without loading models, including a SAM config in the YOLO field.
+        load_detectors_config(opts.detectors_config)
         print("Изображения не найдены в указанной директории.")
         return None
     resources = _load_batch_resources(opts)

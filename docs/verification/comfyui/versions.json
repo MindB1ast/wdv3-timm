@@ -1,0 +1,69 @@
+{
+  "system": {
+    "os": "win32",
+    "ram_total": 7879585792,
+    "ram_free": 871145472,
+    "comfyui_version": "0.43.2",
+    "required_frontend_version": "1.57.4",
+    "installed_templates_version": "0.11.100",
+    "required_templates_version": "0.11.100",
+    "comfy_package_versions": [
+      {
+        "name": "comfyui-frontend-package",
+        "installed": "1.57.4",
+        "required": "1.57.4"
+      },
+      {
+        "name": "comfyui-workflow-templates",
+        "installed": "0.11.100",
+        "required": "0.11.100"
+      },
+      {
+        "name": "comfyui-embedded-docs",
+        "installed": "0.5.15",
+        "required": "0.5.15"
+      },
+      {
+        "name": "comfy-aimdo",
+        "installed": "0.6.0",
+        "required": "0.6.0"
+      },
+      {
+        "name": "comfy-kitchen",
+        "installed": "0.2.40",
+        "required": "0.2.40"
+      }
+    ],
+    "python_version": "3.13.12 (main, Feb 12 2026, 00:38:53) [MSC v.1944 64 bit (AMD64)]",
+    "pytorch_version": "2.12.1+cpu",
+    "embedded_python": false,
+    "deploy_environment": "local-desktop2-standalone",
+    "argv": [
+      "ComfyUI\\main.py",
+      "--feature-flag",
+      "show_signin_button=true",
+      "--feature-flag",
+      "enable_telemetry=true",
+      "--enable-assets",
+      "--enable-manager",
+      "--cpu",
+      "--extra-model-paths-config",
+      "C:\\Users\\annak\\AppData\\Roaming\\Comfy Desktop\\instance-model-paths\\inst-1793485855245.yaml",
+      "--input-directory",
+      "C:\\Users\\annak\\AppData\\Local\\Comfy-Desktop\\ComfyUI-Shared\\input",
+      "--output-directory",
+      "C:\\Users\\annak\\AppData\\Local\\Comfy-Desktop\\ComfyUI-Shared\\output"
+    ]
+  },
+  "devices": [
+    {
+      "name": "cpu",
+      "type": "cpu",
+      "index": null,
+      "vram_total": 7879585792,
+      "vram_free": 871116800,
+      "torch_vram_total": 7879585792,
+      "torch_vram_free": 871116800
+    }
+  ]
+}

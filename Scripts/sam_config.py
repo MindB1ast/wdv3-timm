@@ -115,6 +115,8 @@ def load_sam_config(path: PathInput, detector_names=()) -> SamConfig:
         raise ValueError("sources must be a nonempty list")
     names, ids, sources = set(detector_names), set(), []
     rule_fields = (
+        "only_from_source", "allowed_tags",
+        "full_image_only_tags",
         "remove_tags_from_full", "remove_tags_from_region", "add_tags_to_region",
         "exclude_from_region", "region_gen_threshold", "region_char_threshold",
     )
@@ -145,8 +147,8 @@ def load_sam_config(path: PathInput, detector_names=()) -> SamConfig:
         for key in ("region_gen_threshold", "region_char_threshold"):
             if key in rules_data and rules_data[key] is not None:
                 finite_number(rules_data[key], key, maximum=1)
-        for key in ("remove_tags_from_full", "remove_tags_from_region", "exclude_from_region"):
-            if key in rules_data and (not isinstance(rules_data[key], list) or
+        for key in ("remove_tags_from_full", "remove_tags_from_region", "exclude_from_region", "only_from_source", "allowed_tags", "full_image_only_tags"):
+            if key in rules_data and rules_data[key] is not None and (not isinstance(rules_data[key], list) or
                                      not all(isinstance(t, str) for t in rules_data[key])):
                 raise ValueError(f"{key}: expected list of tags")
         if "add_tags_to_region" in rules_data:
