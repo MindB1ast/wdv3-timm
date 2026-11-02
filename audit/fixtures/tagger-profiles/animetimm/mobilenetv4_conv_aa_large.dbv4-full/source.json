@@ -1,0 +1,8 @@
+{
+  "repo_id": "animetimm/mobilenetv4_conv_aa_large.dbv4-full",
+  "revision": "1e8954a50d296855c55b0ac0c288680e2d13d3ef",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/animetimm/mobilenetv4_conv_aa_large.dbv4-full"
+}

@@ -27,6 +27,7 @@ def digest(value):
 
 
 def model_identity(runtime):
+    from .Scripts.tagger_preprocessing import transform_metadata
     state = runtime.model.state_dict()
     def version(value):
         try: return value._version
@@ -39,7 +40,7 @@ def model_identity(runtime):
         runtime._model_hash = h.hexdigest()
         runtime._model_versions = versions
     return dict(model_id=getattr(runtime, 'model_id', 'custom-wd'), weights_sha256=runtime._model_hash,
-                device=str(runtime.device), transform=repr(runtime.transform), labels_count=len(runtime.labels.names),
+                device=str(runtime.device), transform=transform_metadata(runtime.transform), labels_count=len(runtime.labels.names),
                 labels_sha256=digest([runtime.labels.names,runtime.labels.general,runtime.labels.character,runtime.labels.rating]))
 
 

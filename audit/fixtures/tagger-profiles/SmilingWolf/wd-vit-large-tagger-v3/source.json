@@ -1,0 +1,8 @@
+{
+  "repo_id": "SmilingWolf/wd-vit-large-tagger-v3",
+  "revision": "ae469aa2e4706a3af08d3673cf73a11d1add314c",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/SmilingWolf/wd-vit-large-tagger-v3"
+}

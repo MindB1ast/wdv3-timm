@@ -3,19 +3,17 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, cast
+from typing import List
 
 import torch
-#from timm.data import create_transform, resolve_data_config
-from timm.data.config import resolve_data_config
-from timm.data.transforms_factory import create_transform
 from ultralytics import YOLO
 
 from .configs import DetectorConfig, ScriptOptions
 from .detection import load_detectors_config
-from .model import (download_model_files, ensure_model_folder,
-                    load_labels_local_or_remote, load_model_local_or_remote,
-                    load_yolo_model)
+from .model import ensure_model_folder, load_yolo_model
+from .tagger_catalog import resolve_model_id
+from .tagger_resources import load_tagger
+from .tagger_preprocessing import transform_metadata
 from .preprocess import merge_tags_from_regions, save_results_to_json
 from .savingProc import save_tags_to_txt
 from .sam_config import positive_integer
@@ -23,7 +21,7 @@ from .tag_utils import apply_tag_rules, parse_tags
 from .tagging import process_image_with_multiple_detectors
 from .types import (BatchResult, DetailedResult, ImageTransform, MergedResult,
                     PathInput)
-from .wdv3_timm import MODEL_REPO_MAP, LabelData
+from .wdv3_timm import LabelData
 
 
 @dataclass
@@ -59,17 +57,11 @@ def _load_batch_resources(opts: ScriptOptions) -> _BatchResources:
     """Load model resources independently of file iteration and output formatting."""
     print(f"Загрузка конфигурации детекторов из {opts.detectors_config}...")
     detectors = load_detectors_config(opts.detectors_config)
-    repo_id = MODEL_REPO_MAP[opts.model]
+    repo_id = resolve_model_id(opts.model)
     model_folder = ensure_model_folder(Path(opts.model_folder))
     yolo_folder = ensure_model_folder(Path(opts.yolo_model_dir))
-    download_model_files(repo_id, model_folder)
     print(f"Загрузка модели тегирования '{opts.model}' из '{repo_id}'...")
-    model = load_model_local_or_remote(repo_id, model_folder)
-    print("Загрузка списка тегов...")
-    labels = load_labels_local_or_remote(repo_id, model_folder)
-    print("Создание трансформации данных...")
-    transform = cast(ImageTransform, create_transform(
-        **resolve_data_config(model.pretrained_cfg, model=model)))
+    model, labels, transform, _ = load_tagger(repo_id, model_folder)
     return _BatchResources(
         model, transform, labels, detectors, _load_yolo_models(detectors, yolo_folder)
     )
@@ -93,6 +85,7 @@ def _process_image(
     )
     if not result:
         return None
+    result['model_profile'] = transform_metadata(resources.transform)
     return _postprocess_result(result, resources, opts)
 
 
@@ -142,9 +135,7 @@ def _save_batch_results(
 def BatchTagging(opts: ScriptOptions) -> BatchResult | None:
     """Run a batch, retaining the legacy public name and two-list result."""
     positive_integer(opts.region_batch_size, "region_batch_size")
-    if opts.model not in MODEL_REPO_MAP:
-        print(f"Доступные модели: {list(MODEL_REPO_MAP.keys())}")
-        raise ValueError(f"Неизвестная модель: {opts.model}")
+    resolve_model_id(opts.model)
     image_folder = Path(opts.ImageFolder).resolve()
     if not image_folder.is_dir():
         raise FileNotFoundError(f"Директория не найдена: {image_folder}")

@@ -98,6 +98,7 @@ class DetailedResult(TypedDict):
     export_root: NotRequired[str]
     canonical_path: NotRequired[str]
     tagging_fingerprint: NotRequired[str]
+    model_profile: NotRequired[dict[str, object]]
 
 
 class MergedResult(TypedDict):

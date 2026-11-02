@@ -1,0 +1,8 @@
+{
+  "repo_id": "animetimm/mobilevitv2_200.dbv4-full",
+  "revision": "c90eed8e138a6f62258c2539a0313355c125d145",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/animetimm/mobilevitv2_200.dbv4-full"
+}

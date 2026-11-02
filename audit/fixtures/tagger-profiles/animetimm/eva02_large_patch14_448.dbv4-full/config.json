@@ -1,0 +1,48 @@
+{
+  "architecture": "eva02_large_patch14_448",
+  "num_classes": 12476,
+  "num_features": 1024,
+  "global_pool": "avg",
+  "model_args": {
+    "drop_path_rate": 0.4,
+    "ref_feat_shape": [
+      32,
+      32
+    ],
+    "img_size": 448
+  },
+  "pretrained_cfg": {
+    "tag": "dbv4-full",
+    "custom_load": false,
+    "input_size": [
+      3,
+      448,
+      448
+    ],
+    "test_input_size": [
+      3,
+      448,
+      448
+    ],
+    "fixed_input_size": true,
+    "interpolation": "bicubic",
+    "crop_pct": 1.0,
+    "test_crop_pct": 1.0,
+    "crop_mode": "squash",
+    "mean": [
+      0.48145466,
+      0.4578275,
+      0.40821073
+    ],
+    "std": [
+      0.26862954,
+      0.26130258,
+      0.27577711
+    ],
+    "num_classes": 12476,
+    "pool_size": null,
+    "first_conv": "patch_embed.proj",
+    "classifier": "head",
+    "license": "gpl-3.0"
+  }
+}

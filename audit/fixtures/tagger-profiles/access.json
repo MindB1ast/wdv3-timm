@@ -1,0 +1,86 @@
+[
+  {
+    "repo_id": "animetimm/mobilenetv3_large_100.dbv4-full.r224",
+    "file": "config.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/mobilenetv3_large_100.dbv4-full.r224",
+    "file": "preprocess.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/mobilevitv2_200.dbv4-full",
+    "file": "config.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/mobilevitv2_200.dbv4-full",
+    "file": "preprocess.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/convformer_s36.dbv4-full",
+    "file": "config.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/convformer_s36.dbv4-full",
+    "file": "preprocess.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/repvit_m2_3.dbv4-full",
+    "file": "config.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/repvit_m2_3.dbv4-full",
+    "file": "preprocess.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/convformer_b36.dbv4-full",
+    "file": "config.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/convformer_b36.dbv4-full",
+    "file": "preprocess.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/eva_giant_patch14_560.dbv4-full",
+    "file": "config.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/eva_giant_patch14_560.dbv4-full",
+    "file": "preprocess.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/vit_giantopt_patch16_siglip_384.dbv4-full",
+    "file": "config.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  },
+  {
+    "repo_id": "animetimm/vit_giantopt_patch16_siglip_384.dbv4-full",
+    "file": "preprocess.json",
+    "status": 403,
+    "error": "GatedRepoError"
+  }
+]

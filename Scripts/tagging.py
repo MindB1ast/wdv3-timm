@@ -16,7 +16,8 @@ from .sam_config import positive_integer
 from .tag_utils import format_result
 from .types import (Crop, DetailedResult, ImageTransform, PathInput,
                     RegionResult, WDTagResult)
-from .wdv3_timm import LabelData, get_tags, pil_ensure_rgb, pil_pad_square
+from .wdv3_timm import LabelData, get_tags
+from .tagger_preprocessing import prepare_tensor
 
 
 # Preserve the existing notebook calling convention.
@@ -45,14 +46,13 @@ def tag_image(
     Returns:
         Dict с результатами тегирования
     """
-    img = pil_ensure_rgb(img)
-    img_padded = pil_pad_square(img)
-    input_tensor = transform(img_padded)
-    input_tensor = input_tensor[[2, 1, 0], :, :]
+    input_tensor = prepare_tensor(img, transform)
     with torch.inference_mode():
         input_batch = input_tensor.unsqueeze(0).to(torch_device)
         output = model(input_batch)
         output = F.sigmoid(output).to("cpu")
+    if output.ndim != 2 or output.shape != (1, len(labels.names)):
+        raise ValueError('Tagger output shape does not match image/labels')
     tagged = get_tags(
         probs=output[0], labels=labels, gen_threshold=gen_threshold, char_threshold=char_threshold
     )

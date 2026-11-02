@@ -1,4 +1,5 @@
 import importlib
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -13,7 +14,7 @@ class LoaderTests(unittest.TestCase):
     def test_wd_offline_missing_files_no_network_and_only_one_weight_format(self):
         with tempfile.TemporaryDirectory(dir='temp') as directory:
             target=Path(directory).resolve()
-            with patch('huggingface_hub.hf_hub_download') as download:
+            with patch('wdv3_comfy_test.Scripts.tagger_resources.hf_hub_download') as download:
                 with self.assertRaisesRegex(FileNotFoundError,'config.json'):
                     nodes.WDModelLoader().load('vit','cpu',False,str(target))
                 download.assert_not_called()
@@ -21,13 +22,15 @@ class LoaderTests(unittest.TestCase):
             fetched=[]
             def fetch(repo,filename,local_dir):
                 fetched.append(filename);path=Path(local_dir)/filename
-                path.write_text('name,category\nlight_tag,0\ndark_tag,0\nhero,4' if filename=='selected_tags.csv' else '{}')
+                path.write_text('name,category\nlight_tag,0\ndark_tag,0\nhero,4' if filename=='selected_tags.csv' else
+                                json.dumps({'num_classes': 3, 'pretrained_cfg': {'input_size': [3,4,4],
+                                            'mean': [0,0,0], 'std': [1,1,1], 'interpolation': 'bicubic'}}))
                 return str(path)
-            with patch('huggingface_hub.hf_hub_download',side_effect=fetch), \
+            with patch('wdv3_comfy_test.Scripts.tagger_resources.hf_hub_download',side_effect=fetch), \
                  patch('timm.create_model',return_value=network), \
                  patch('safetensors.torch.load_file',return_value={}), \
-                 patch('timm.data.resolve_data_config',return_value={}), \
-                 patch('timm.data.create_transform',return_value=transform):
+                 patch('timm.data.config.resolve_data_config',return_value={'input_size': (3,4,4), 'mean': (0,0,0), 'std': (1,1,1), 'interpolation': 'bicubic'}), \
+                 patch('timm.data.transforms_factory.create_transform',return_value=transform):
                 loaded=nodes.WDModelLoader().load('vit','cpu',True,str(target))[0]
                 self.assertEqual(set(fetched),{'model.safetensors','config.json','selected_tags.csv'})
                 self.assertEqual(loaded.model_id,'SmilingWolf/wd-vit-tagger-v3')

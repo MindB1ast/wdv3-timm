@@ -6,7 +6,7 @@ from pathlib import Path
 import torch
 
 from .Scripts.configs import DetectorConfig
-from .Scripts.wdv3_timm import MODEL_REPO_MAP
+from .Scripts.tagger_catalog import model_choices, model_path, resolve_model_id
 
 ROOT = Path(__file__).resolve().parent
 
@@ -31,31 +31,35 @@ class WDModelLoader:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "model": (list(MODEL_REPO_MAP),),
+            "model": (model_choices(), {"default": "vit", "tooltip": "Ranklist Macro F1@0.40 descending; unranked models follow by publication date."}),
             "device": (["auto", "cpu", "cuda"],),
         }, "optional": {
             "download_missing": ("BOOLEAN", {"default": True}),
             "local_model_path": ("STRING", {"default": ""}),
+            "repo_id": ("STRING", {"default": "", "tooltip": "Optional Hugging Face owner/model; overrides model selection"}),
         }}
 
-    RETURN_TYPES = ("WDV3_MODEL",)
-    RETURN_NAMES = ("wd_model",)
+    RETURN_TYPES = ("WDV3_MODEL", "STRING")
+    RETURN_NAMES = ("wd_model", "model_info")
     FUNCTION = "load"
     CATEGORY = "WDV3"
 
     @classmethod
-    def IS_CHANGED(cls, model, device, download_missing=True, local_model_path=""):
+    def IS_CHANGED(cls, model, device, download_missing=True, local_model_path="", repo_id=""):
         from .comfy_evidence import digest, file_stamp
+        from .Scripts.tagger_resources import RESOURCE_FILES
+        selected_id = resolve_model_id(repo_id.strip() or model)
         candidates = [Path(local_model_path)] if local_model_path.strip() else [
-            ROOT / "models" / "taggers" / MODEL_REPO_MAP[model].split('/')[-1],
-            model_directory('taggers') / MODEL_REPO_MAP[model].split('/')[-1]]
-        candidates=[p.parent if p.suffix=='.safetensors' else p for p in candidates]
-        return digest([[file_stamp(p / n) for n in ('config.json', 'selected_tags.csv', 'model.safetensors')] for p in candidates])
+            model_path(ROOT / 'models' / 'taggers', selected_id),
+            model_path(model_directory('taggers'), selected_id)]
+        candidates = [p.parent if p.suffix in ('.safetensors', '.bin') else p for p in candidates]
+        return digest([selected_id, device, download_missing,
+                       [[file_stamp(p / name) for name in RESOURCE_FILES] for p in candidates]])
 
-    def load(self, model, device, download_missing=True, local_model_path=""):
-        from timm.data import create_transform, resolve_data_config
-        from .Scripts.model import load_labels_local_or_remote, load_model_local_or_remote
-
+    def load(self, model, device, download_missing=True, local_model_path="", repo_id=""):
+        from .Scripts.tagger_resources import load_tagger
+        from .Scripts.tagger_preprocessing import transform_metadata
+        selected_id = resolve_model_id(repo_id.strip() or model)
         if device == "auto":
             import comfy.model_management as management
             selected = management.get_torch_device()
@@ -63,38 +67,20 @@ class WDModelLoader:
             if device == "cuda" and not torch.cuda.is_available():
                 raise ValueError("CUDA is unavailable; select cpu or auto")
             selected = torch.device(device)
-        # Reuse notebook weights when this checkout already contains them.
         local = ROOT / "models" / "taggers"
-        directory = local if (local / MODEL_REPO_MAP[model].split("/")[-1] /
-                              "model.safetensors").is_file() else model_directory("taggers")
-        directory.mkdir(parents=True, exist_ok=True)
-        target = Path(local_model_path).expanduser().resolve() if local_model_path.strip() else directory / MODEL_REPO_MAP[model].split('/')[-1]
-        if target.suffix == '.safetensors': target = target.parent
-        required = ['config.json', 'selected_tags.csv', 'model.safetensors']
-        missing = [name for name in required if not (target / name).is_file()]
-        if missing and not download_missing:
-            raise FileNotFoundError(f"Incomplete WD model folder: {target}. Missing {', '.join(missing)}. Enable download_missing.")
-        if missing:
-            from huggingface_hub import hf_hub_download
-            target.mkdir(parents=True, exist_ok=True)
-            for name in missing:
-                hf_hub_download(MODEL_REPO_MAP[model], name, local_dir=str(target))
-        if local_model_path.strip():
-            import timm
-            import safetensors.torch
-            from .Scripts.wdv3_timm import load_labels_csv
-            network = timm.create_model(f'local-dir:{target}', pretrained=False).eval()
-            network.load_state_dict(safetensors.torch.load_file(target / 'model.safetensors'))
-            labels = load_labels_csv(target / 'selected_tags.csv')
-        else:
-            network = load_model_local_or_remote(MODEL_REPO_MAP[model], directory)
-            labels = load_labels_local_or_remote(MODEL_REPO_MAP[model], directory)
-        transform = create_transform(**resolve_data_config(network.pretrained_cfg, model=network))
-        # Weights live on CPU between executions to avoid pinning GPU memory.
+        local_target = model_path(local, selected_id)
+        directory = local if any((local_target / name).is_file() for name in
+                                 ('model.safetensors', 'pytorch_model.bin')) else model_directory('taggers')
+        network, labels, transform, target = load_tagger(
+            selected_id, directory, allow_download=download_missing,
+            local_path=Path(local_model_path).expanduser().resolve() if local_model_path.strip() else None)
         from .Scripts.evidence import Bundle
-        metadata = Bundle.pack('model', dict(model_id=MODEL_REPO_MAP[model], directory=str(target), device=str(selected),
-                    download_missing=download_missing, labels=len(labels.names)))
-        return (WDRuntime(network.cpu().eval(), transform, labels, selected, MODEL_REPO_MAP[model], metadata),)
+        profile = transform_metadata(transform)
+        metadata = Bundle.pack('model', dict(model_id=selected_id, directory=str(target), device=str(selected),
+                    download_missing=download_missing, labels=len(labels.names), profile=profile))
+        print(f"Tagger {selected_id}: {profile['input_size']} {profile['color_order']} ({profile['source']})")
+        return (WDRuntime(network.cpu().eval(), transform, labels, selected, selected_id, metadata),
+                json.dumps(profile, ensure_ascii=False, indent=2))
 
 
 class WDDetectorLoader:

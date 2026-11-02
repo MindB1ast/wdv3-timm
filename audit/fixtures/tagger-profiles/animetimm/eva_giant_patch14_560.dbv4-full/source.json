@@ -1,0 +1,8 @@
+{
+  "repo_id": "animetimm/eva_giant_patch14_560.dbv4-full",
+  "revision": "40c2fab2fa9251660faefcb971d3aa8a56dc44a8",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/animetimm/eva_giant_patch14_560.dbv4-full"
+}

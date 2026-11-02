@@ -1,0 +1,8 @@
+{
+  "repo_id": "animetimm/swinv2_base_window8_256.dbv4-full",
+  "revision": "e09b265f59b8cec01101f01ec380a7a6dd4db733",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/animetimm/swinv2_base_window8_256.dbv4-full"
+}

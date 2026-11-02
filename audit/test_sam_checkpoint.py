@@ -26,7 +26,7 @@ class CheckpointTests(unittest.TestCase):
         config.write_text(json.dumps({"schema_version": 1, "model": {}, "sources": []}), encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "sam_config"):
             load_detectors_config(config)
-        with patch("Scripts.main.download_model_files") as download, self.assertRaisesRegex(ValueError, "sam_config"):
+        with patch("Scripts.main.load_tagger") as download, self.assertRaisesRegex(ValueError, "sam_config"):
             BatchTagging(ScriptOptions(self.directory, detectors_config=config, save_txt=False))
         download.assert_not_called()
 

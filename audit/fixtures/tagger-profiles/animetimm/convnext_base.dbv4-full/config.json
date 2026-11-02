@@ -1,0 +1,46 @@
+{
+  "architecture": "convnext_base",
+  "num_classes": 12476,
+  "num_features": 1024,
+  "model_args": {
+    "drop_path_rate": 0.4,
+    "act_layer": "gelu_tanh"
+  },
+  "pretrained_cfg": {
+    "tag": "dbv4-full",
+    "custom_load": false,
+    "input_size": [
+      3,
+      448,
+      448
+    ],
+    "test_input_size": [
+      3,
+      448,
+      448
+    ],
+    "fixed_input_size": false,
+    "interpolation": "bicubic",
+    "crop_pct": 1.0,
+    "test_crop_pct": 1.0,
+    "crop_mode": "center",
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ],
+    "num_classes": 1000,
+    "pool_size": [
+      7,
+      7
+    ],
+    "first_conv": "stem.0",
+    "classifier": "head.fc",
+    "license": "gpl-3.0"
+  }
+}

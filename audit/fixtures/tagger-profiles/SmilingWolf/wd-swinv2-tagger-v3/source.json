@@ -1,0 +1,8 @@
+{
+  "repo_id": "SmilingWolf/wd-swinv2-tagger-v3",
+  "revision": "627aef95638667ddcaa3ac8ae625e88ea5b02f51",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/SmilingWolf/wd-swinv2-tagger-v3"
+}

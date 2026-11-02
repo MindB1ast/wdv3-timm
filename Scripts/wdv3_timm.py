@@ -13,15 +13,10 @@ from PIL import Image
 from torch import Tensor
 
 from .types import PathInput, Scores
+from .tagger_catalog import WD_ALIASES
 
 torch_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-MODEL_REPO_MAP = {
-    "vit": "SmilingWolf/wd-vit-tagger-v3",
-    "swinv2": "SmilingWolf/wd-swinv2-tagger-v3",
-    "convnext": "SmilingWolf/wd-convnext-tagger-v3",
-    "big": "SmilingWolf/wd-eva02-large-tagger-v3",
-    "bigvit": "SmilingWolf/wd-vit-large-tagger-v3",
-}
+MODEL_REPO_MAP = WD_ALIASES
 
 
 def pil_ensure_rgb(image: Image.Image) -> Image.Image:
@@ -81,6 +76,8 @@ def get_tags(
 ) -> tuple[str, str, Scores, Scores, Scores]:
     # Convert indices+probs to labels
     """Select model probabilities and format thresholded tag categories."""
+    if probs.ndim != 1 or len(probs) != len(labels.names):
+        raise ValueError('Tagger probabilities do not match selected_tags.csv')
     probabilities = list(zip(labels.names, probs.numpy()))
 
     # First 4 labels are actually ratings
@@ -111,7 +108,10 @@ def get_tags(
 
 def load_labels_csv(csv_path: PathInput) -> LabelData:
     """Read one label dictionary consistently for local and Hub loaders."""
-    df: pd.DataFrame = pd.read_csv(csv_path, usecols=["name", "category"])
+    df: pd.DataFrame = pd.read_csv(csv_path, usecols=["name", "category"], keep_default_na=False)
+    if (df.empty or not df['name'].map(lambda name: isinstance(name, str) and bool(name)).all()
+            or df['name'].duplicated().any() or not df['category'].isin([0, 4, 9]).all()):
+        raise ValueError('selected_tags.csv requires unique nonempty names and categories 0/4/9')
     tag_data = LabelData(
         names=df["name"].tolist(),
         rating=list(np.where(df["category"] == 9)[0]),

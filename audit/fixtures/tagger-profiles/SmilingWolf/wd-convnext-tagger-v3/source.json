@@ -1,0 +1,8 @@
+{
+  "repo_id": "SmilingWolf/wd-convnext-tagger-v3",
+  "revision": "d39e46de298d27340111b64965e20b8185c407e6",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/SmilingWolf/wd-convnext-tagger-v3"
+}

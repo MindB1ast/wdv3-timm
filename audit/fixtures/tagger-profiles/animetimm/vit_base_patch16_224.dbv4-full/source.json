@@ -1,0 +1,8 @@
+{
+  "repo_id": "animetimm/vit_base_patch16_224.dbv4-full",
+  "revision": "055ad45c6c2531561e59b054ddef216ba204e407",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/animetimm/vit_base_patch16_224.dbv4-full"
+}

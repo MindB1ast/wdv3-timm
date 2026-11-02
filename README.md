@@ -47,6 +47,14 @@ pip install -r requirements.txt
 ```
 
 ## Usage
+The tagger catalogue includes all 21 AnimeTimm dbv4-full ranklist entries, five
+newer dbv4-full releases and five SmilingWolf WD v3 taggers. Select a full Hugging
+Face repo ID or keep an existing alias (`vit`, `swinv2`, `convnext`, `big`, `bigvit`).
+Each model uses its own complete preprocessing profile: for example, ConvNeXtV2
+Huge receives 512×512 RGB inputs and CAFormer B36 receives 384×384 RGB inputs.
+WD keeps its original BGR preprocessing. See [model support, access and offline
+setup](docs/tagger-models.md) and [Python example](examples/tagger_models.py).
+
 Usage example in BatchWork.ipynb
 
 ### Basic Example

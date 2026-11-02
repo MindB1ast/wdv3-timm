@@ -1,0 +1,8 @@
+{
+  "repo_id": "animetimm/eva02_large_patch14_448.dbv4-full",
+  "revision": "7f11ec9fdb54dfbfd7cd7fad2ecc452a25b57acb",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/animetimm/eva02_large_patch14_448.dbv4-full"
+}

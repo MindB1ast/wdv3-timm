@@ -1,0 +1,8 @@
+{
+  "repo_id": "animetimm/vit_giantopt_patch16_siglip_384.dbv4-full",
+  "revision": "5f6fdd2604b581ea7e2e5f904b67160c04f355dc",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/animetimm/vit_giantopt_patch16_siglip_384.dbv4-full"
+}

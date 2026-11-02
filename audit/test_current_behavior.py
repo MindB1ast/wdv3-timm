@@ -71,11 +71,7 @@ class AuditFixture(unittest.TestCase):
         fake_model = SimpleNamespace(pretrained_cfg={}, to=lambda _: fake_model)
         replacements = dict(
             ensure_model_folder=lambda path: path,
-            download_model_files=lambda *args: None,
-            load_model_local_or_remote=lambda *args: fake_model,
-            load_labels_local_or_remote=lambda *args: None,
-            create_transform=lambda **kwargs: None,
-            resolve_data_config=lambda *args, **kwargs: {},
+            load_tagger=lambda *args: (fake_model, None, None, self.directory),
             load_detectors_config=lambda *args: [],
             process_image_with_multiple_detectors=lambda *args, **kwargs: copy.deepcopy(image_result),
         )

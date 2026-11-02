@@ -15,6 +15,7 @@ from .regions import canonical_image, prepare_region_view, read_mask, rectangle_
 from .sam3_adapter import SamWorker
 from .sam_config import RegionViewConfig, load_sam_config, sam_python_executable, validate_batch_options
 from .types import BatchResult, DetailedResult
+from .tagger_preprocessing import transform_metadata
 
 
 def _region_inputs(frame, geometries, view, masks_root):
@@ -139,6 +140,7 @@ def run_sam_batch(options: ScriptOptions, *, cancelled=None) -> BatchResult | No
                                 result["detectors"][detector.name] = tagger.tag_regions(
                                     _region_inputs(frame, geometries, RegionViewConfig(), directory),
                                     detector, options.region_batch_size)
+                        result['model_profile'] = transform_metadata(resources.transform)
                         result["tagging_fingerprint"] = hashlib.sha256(json_text([
                             image["source_sha256"], wd_identity, [asdict(rule) for rule in resources.detectors],
                             [r.get("view") for regions in result["detectors"].values() for r in regions],

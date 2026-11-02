@@ -1,0 +1,95 @@
+{
+  "pre": [
+    {
+      "background_color": "white",
+      "interpolation": "bilinear",
+      "size": [
+        512,
+        512
+      ],
+      "type": "pad_to_size"
+    }
+  ],
+  "test": [
+    {
+      "background_color": "white",
+      "interpolation": "bilinear",
+      "size": [
+        512,
+        512
+      ],
+      "type": "pad_to_size"
+    },
+    {
+      "antialias": true,
+      "interpolation": "bicubic",
+      "max_size": null,
+      "size": 448,
+      "type": "resize"
+    },
+    {
+      "size": [
+        448,
+        448
+      ],
+      "type": "center_crop"
+    },
+    {
+      "type": "maybe_to_tensor"
+    },
+    {
+      "mean": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "std": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "type": "normalize"
+    }
+  ],
+  "val": [
+    {
+      "background_color": "white",
+      "interpolation": "bilinear",
+      "size": [
+        512,
+        512
+      ],
+      "type": "pad_to_size"
+    },
+    {
+      "antialias": true,
+      "interpolation": "bicubic",
+      "max_size": null,
+      "size": 448,
+      "type": "resize"
+    },
+    {
+      "size": [
+        448,
+        448
+      ],
+      "type": "center_crop"
+    },
+    {
+      "type": "maybe_to_tensor"
+    },
+    {
+      "mean": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "std": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "type": "normalize"
+    }
+  ]
+}

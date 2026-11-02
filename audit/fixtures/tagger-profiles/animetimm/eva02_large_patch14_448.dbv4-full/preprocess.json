@@ -1,0 +1,101 @@
+{
+  "pre": [
+    {
+      "background_color": "white",
+      "interpolation": "bilinear",
+      "size": [
+        512,
+        512
+      ],
+      "type": "pad_to_size"
+    }
+  ],
+  "test": [
+    {
+      "background_color": "white",
+      "interpolation": "bilinear",
+      "size": [
+        512,
+        512
+      ],
+      "type": "pad_to_size"
+    },
+    {
+      "antialias": true,
+      "interpolation": "bicubic",
+      "max_size": null,
+      "size": [
+        448,
+        448
+      ],
+      "type": "resize"
+    },
+    {
+      "size": [
+        448,
+        448
+      ],
+      "type": "center_crop"
+    },
+    {
+      "type": "maybe_to_tensor"
+    },
+    {
+      "mean": [
+        0.48145467042922974,
+        0.45782750844955444,
+        0.40821072459220886
+      ],
+      "std": [
+        0.2686295509338379,
+        0.2613025903701782,
+        0.27577710151672363
+      ],
+      "type": "normalize"
+    }
+  ],
+  "val": [
+    {
+      "background_color": "white",
+      "interpolation": "bilinear",
+      "size": [
+        512,
+        512
+      ],
+      "type": "pad_to_size"
+    },
+    {
+      "antialias": true,
+      "interpolation": "bicubic",
+      "max_size": null,
+      "size": [
+        448,
+        448
+      ],
+      "type": "resize"
+    },
+    {
+      "size": [
+        448,
+        448
+      ],
+      "type": "center_crop"
+    },
+    {
+      "type": "maybe_to_tensor"
+    },
+    {
+      "mean": [
+        0.48145467042922974,
+        0.45782750844955444,
+        0.40821072459220886
+      ],
+      "std": [
+        0.2686295509338379,
+        0.2613025903701782,
+        0.27577710151672363
+      ],
+      "type": "normalize"
+    }
+  ]
+}

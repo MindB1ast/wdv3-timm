@@ -1,5 +1,6 @@
 """Exercise the ComfyUI package loader and real tensor adapter without downloads."""
 import importlib.util
+import importlib
 import json
 from pathlib import Path
 import sys
@@ -16,7 +17,7 @@ PACKAGE = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = PACKAGE
 SPEC.loader.exec_module(PACKAGE)
 nodes = sys.modules["wdv3_comfy_test.comfy_nodes"]
-LabelData = sys.modules["wdv3_comfy_test.Scripts.wdv3_timm"].LabelData
+LabelData = importlib.import_module("wdv3_comfy_test.Scripts.wdv3_timm").LabelData
 
 
 class RecordingModel(torch.nn.Module):

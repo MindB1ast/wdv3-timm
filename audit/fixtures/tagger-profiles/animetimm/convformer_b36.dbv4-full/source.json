@@ -1,0 +1,8 @@
+{
+  "repo_id": "animetimm/convformer_b36.dbv4-full",
+  "revision": "e027fd88525ed313e2f96585d43256f26ec5bd67",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/animetimm/convformer_b36.dbv4-full"
+}

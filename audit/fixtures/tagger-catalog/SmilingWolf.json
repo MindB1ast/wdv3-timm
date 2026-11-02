@@ -1,0 +1,211 @@
+[
+  {
+    "_id": "66a6ae02fe9e31ae0b30ca04",
+    "id": "SmilingWolf/wd-eva02-large-tagger-v3",
+    "likes": 222,
+    "trendingScore": 1,
+    "private": false,
+    "downloads": 36565,
+    "tags": [
+      "timm",
+      "onnx",
+      "safetensors",
+      "license:apache-2.0",
+      "region:us"
+    ],
+    "library_name": "timm",
+    "createdAt": "2024-07-28T20:45:54.000Z",
+    "modelId": "SmilingWolf/wd-eva02-large-tagger-v3"
+  },
+  {
+    "_id": "637a2f13d80a83def7d89faa",
+    "id": "SmilingWolf/wd-v1-4-vit-tagger",
+    "likes": 66,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 22,
+    "tags": [
+      "tf-keras",
+      "onnx",
+      "region:us"
+    ],
+    "library_name": "tf-keras",
+    "createdAt": "2022-11-20T13:43:47.000Z",
+    "modelId": "SmilingWolf/wd-v1-4-vit-tagger"
+  },
+  {
+    "_id": "6398b73634e10db20193fe73",
+    "id": "SmilingWolf/wd-v1-4-convnext-tagger",
+    "likes": 12,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 27,
+    "tags": [
+      "tf-keras",
+      "onnx",
+      "region:us"
+    ],
+    "library_name": "tf-keras",
+    "createdAt": "2022-12-13T17:32:38.000Z",
+    "modelId": "SmilingWolf/wd-v1-4-convnext-tagger"
+  },
+  {
+    "_id": "63cbc704df168f678c5b49de",
+    "id": "SmilingWolf/wd-v1-4-convnext-tagger-v2",
+    "likes": 36,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 332,
+    "tags": [
+      "tf-keras",
+      "onnx",
+      "license:apache-2.0",
+      "region:us"
+    ],
+    "library_name": "tf-keras",
+    "createdAt": "2023-01-21T11:05:40.000Z",
+    "modelId": "SmilingWolf/wd-v1-4-convnext-tagger-v2"
+  },
+  {
+    "_id": "63cbc71745d959488742ff64",
+    "id": "SmilingWolf/wd-v1-4-vit-tagger-v2",
+    "likes": 70,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 52,
+    "tags": [
+      "tf-keras",
+      "onnx",
+      "license:apache-2.0",
+      "region:us"
+    ],
+    "library_name": "tf-keras",
+    "createdAt": "2023-01-21T11:05:59.000Z",
+    "modelId": "SmilingWolf/wd-v1-4-vit-tagger-v2"
+  },
+  {
+    "_id": "63cbd371df168f678c5c3672",
+    "id": "SmilingWolf/wd-v1-4-swinv2-tagger-v2",
+    "likes": 82,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 98,
+    "tags": [
+      "tf-keras",
+      "onnx",
+      "safetensors",
+      "license:apache-2.0",
+      "region:us"
+    ],
+    "library_name": "tf-keras",
+    "createdAt": "2023-01-21T11:58:41.000Z",
+    "modelId": "SmilingWolf/wd-v1-4-swinv2-tagger-v2"
+  },
+  {
+    "_id": "6416efca699419b1d36ee397",
+    "id": "SmilingWolf/wd-v1-4-convnextv2-tagger-v2",
+    "likes": 47,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 125,
+    "tags": [
+      "tf-keras",
+      "onnx",
+      "license:apache-2.0",
+      "region:us"
+    ],
+    "library_name": "tf-keras",
+    "createdAt": "2023-03-19T11:19:38.000Z",
+    "modelId": "SmilingWolf/wd-v1-4-convnextv2-tagger-v2"
+  },
+  {
+    "_id": "646866f97407ab1cff2b484b",
+    "id": "SmilingWolf/wd-v1-4-moat-tagger-v2",
+    "likes": 112,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 137,
+    "tags": [
+      "tf-keras",
+      "onnx",
+      "arxiv:2210.01820",
+      "license:apache-2.0",
+      "region:us"
+    ],
+    "library_name": "tf-keras",
+    "createdAt": "2023-05-20T06:21:45.000Z",
+    "modelId": "SmilingWolf/wd-v1-4-moat-tagger-v2"
+  },
+  {
+    "_id": "65e62abe50c2dc19fe9ecadd",
+    "id": "SmilingWolf/wd-vit-tagger-v3",
+    "likes": 96,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 8776,
+    "tags": [
+      "timm",
+      "onnx",
+      "safetensors",
+      "license:apache-2.0",
+      "region:us"
+    ],
+    "library_name": "timm",
+    "createdAt": "2024-03-04T20:10:38.000Z",
+    "modelId": "SmilingWolf/wd-vit-tagger-v3"
+  },
+  {
+    "_id": "65e63244ed78c87a0448b2c9",
+    "id": "SmilingWolf/wd-convnext-tagger-v3",
+    "likes": 28,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 4809,
+    "tags": [
+      "timm",
+      "onnx",
+      "safetensors",
+      "license:apache-2.0",
+      "region:us"
+    ],
+    "library_name": "timm",
+    "createdAt": "2024-03-04T20:42:44.000Z",
+    "modelId": "SmilingWolf/wd-convnext-tagger-v3"
+  },
+  {
+    "_id": "65e8a17b2987b5e66055c832",
+    "id": "SmilingWolf/wd-swinv2-tagger-v3",
+    "likes": 99,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 559171,
+    "tags": [
+      "timm",
+      "onnx",
+      "safetensors",
+      "license:apache-2.0",
+      "region:us"
+    ],
+    "library_name": "timm",
+    "createdAt": "2024-03-06T17:01:47.000Z",
+    "modelId": "SmilingWolf/wd-swinv2-tagger-v3"
+  },
+  {
+    "_id": "66a3d91824756d98e7addfd6",
+    "id": "SmilingWolf/wd-vit-large-tagger-v3",
+    "likes": 94,
+    "trendingScore": 0,
+    "private": false,
+    "downloads": 1765,
+    "tags": [
+      "timm",
+      "onnx",
+      "safetensors",
+      "license:apache-2.0",
+      "region:us"
+    ],
+    "library_name": "timm",
+    "createdAt": "2024-07-26T17:12:56.000Z",
+    "modelId": "SmilingWolf/wd-vit-large-tagger-v3"
+  }
+]

@@ -11,7 +11,8 @@ from .regions import prepare_saved_region
 from .sam_config import RegionViewConfig, positive_integer
 from .tag_utils import apply_tag_rules, format_result, restrict_allowed_tags
 from .types import ImageTransform, RegionResult, WDTagResult
-from .wdv3_timm import LabelData, get_tags, pil_ensure_rgb, pil_pad_square
+from .wdv3_timm import LabelData, get_tags
+from .tagger_preprocessing import prepare_tensor, transform_metadata
 
 
 @dataclass
@@ -26,15 +27,7 @@ class RegionTagger:
     def score_batch(self, images) -> list[WDTagResult]:
         if not images:
             return []
-        tensors = []
-        for image in images:
-            rgb = pil_ensure_rgb(image)
-            try:
-                with pil_pad_square(rgb) as square:
-                    tensors.append(self.transform(square)[[2, 1, 0], :, :])
-            finally:
-                if rgb is not image:
-                    rgb.close()
+        tensors = [prepare_tensor(image, self.transform) for image in images]
         with torch.inference_mode():
             batch = torch.stack(tensors).to(self.device)
             output = self.model(batch).sigmoid().cpu()
@@ -91,7 +84,7 @@ class RegionTagger:
         return {"weights_sha256": digest.hexdigest(), "labels": {
                     "names": self.labels.names, "rating": self.labels.rating,
                     "general": self.labels.general, "character": self.labels.character},
-                "transform": repr(self.transform), "torch": torch.__version__,
+                "transform": transform_metadata(self.transform), "torch": torch.__version__,
                 "gen_threshold": self.gen_threshold, "char_threshold": self.char_threshold}
 
 

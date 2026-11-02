@@ -1,0 +1,8 @@
+{
+  "repo_id": "animetimm/repvit_m2_3.dbv4-full",
+  "revision": "79fda5683cbf9bf7432b581eeab197e38b1b1936",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/animetimm/repvit_m2_3.dbv4-full"
+}

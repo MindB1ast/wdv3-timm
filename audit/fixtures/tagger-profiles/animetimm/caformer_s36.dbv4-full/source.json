@@ -1,0 +1,8 @@
+{
+  "repo_id": "animetimm/caformer_s36.dbv4-full",
+  "revision": "cf78051a91e54f01b27bd7903ec4ef88403a626f",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/animetimm/caformer_s36.dbv4-full"
+}

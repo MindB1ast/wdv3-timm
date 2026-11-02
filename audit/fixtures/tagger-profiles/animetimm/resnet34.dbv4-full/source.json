@@ -1,0 +1,8 @@
+{
+  "repo_id": "animetimm/resnet34.dbv4-full",
+  "revision": "7dca81c4d84b7bbf70c0d9fbe29336026aefcbc3",
+  "config_omits": [
+    "tags"
+  ],
+  "source": "https://huggingface.co/animetimm/resnet34.dbv4-full"
+}
