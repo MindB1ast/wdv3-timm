@@ -169,6 +169,7 @@ def scan_folder(directory, recursive, start, limit):
 def tag_folder(files, runtime, options, *, detectors=None, sam_settings=None, sources=None,
                sam_batch_size=1, output_directory=None, save_txt=False, save_json=False,
                overwrite=False, progress=None):
+    sam_batch_size = options.get('sam_batch_size', sam_batch_size)
     paths = files["paths"]
     root = Path(files["root"])
     destinations = {}

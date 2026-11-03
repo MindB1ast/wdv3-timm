@@ -12,7 +12,8 @@ from .Scripts.configs import DetectorConfig
 from .Scripts.evidence import Bundle
 from .Scripts.region_tagging import RegionTagger
 from .Scripts.tag_utils import (apply_tag_rules, enforce_owners, format_result,
-                               parse_tags, parse_additions, restrict_allowed_tags, source_owners)
+                               parse_tags, parse_additions, restrict_allowed_tags, source_owners,
+                               rule_matcher, TagMatcher, REGEX_RULE_FIELDS)
 from .Scripts.preprocess import composition_tags, merge_tags_from_regions
 
 
@@ -225,15 +226,16 @@ def filter_record(raw, rules, general, character, character_names):
                                       reason='threshold_pass' if score > threshold else 'below_threshold')
                                for tag, score in raw.get(category, {}).items()}
     result = restrict_allowed_tags(apply_tag_rules(result, remove=rules.remove_tags_from_region,
-                                  add=rules.add_tags_to_region, character_names=character_names), rules)
+                                  add=rules.add_tags_to_region, character_names=character_names,
+                                  remove_regex=rules.remove_tags_from_region_regex), rules)
     for category in ('general', 'character'):
         for tag in set(decisions[category]) | set(result[category]) | set(additions):
             manual_category='character' if tag in character_names else 'general'
             if tag not in raw.get(category, {}) and tag not in result[category] and (tag not in additions or category!=manual_category): continue
             item = decisions[category].setdefault(tag, {'score': result[category].get(tag, additions.get(tag))})
-            if tag in set(parse_tags(rules.remove_tags_from_region)):
+            if tag in rule_matcher(rules, 'remove_tags_from_region'):
                 item.update(status='rejected', reason='remove_from_regions')
-            elif rules.allowed_tags and tag not in rules.allowed_tags:
+            elif rule_matcher(rules, 'allowed_tags') and tag not in rule_matcher(rules, 'allowed_tags'):
                 item.update(status='rejected', reason='not_in_allowed_tags')
             elif tag in result[category]:
                 item.update(status='accepted', reason='manual_rule' if tag in result.get('provenance', {}) else 'threshold_pass')
@@ -269,9 +271,16 @@ def apply_filters(evidence, options=None, configs=None):
         detail = {**original, 'full_image': full, 'detectors': detected}
         merged = enforce_owners(apply_tag_rules(merge_tags_from_regions(detail, settings),
             remove=options.get('remove_tags',''), before=options.get('prefix_tags',''), after=options.get('suffix_tags',''),
-            character_names=characters), settings)
-        owners = source_owners(settings)
-        excluded_full = {t for c in settings if detected[c.name] for t in parse_tags(c.remove_tags_from_full)}
+            character_names=characters, remove_regex=options.get('remove_tags_regex', [])), settings)
+        candidates = set(full['general']) | set(full['character'])
+        candidates.update(parse_tags(options.get('prefix_tags','')) + parse_tags(options.get('suffix_tags','')))
+        for rows in detected.values():
+            for row in rows:
+                candidates.update(row['general']); candidates.update(row['character'])
+        owners = source_owners(settings, candidates)
+        excluded_full = {t for c in settings if detected[c.name] for t in candidates
+                         if t in rule_matcher(c, 'remove_tags_from_full')}
+        global_remove = TagMatcher(options.get('remove_tags',''), options.get('remove_tags_regex', []))
         decisions = []
         for name, region, result in [('full',None,full)] + [(name,r['region_id'],r) for name,rows in detected.items() for r in rows]:
             rule = next((c for c in settings if c.name == name), None)
@@ -282,9 +291,9 @@ def apply_filters(evidence, options=None, configs=None):
                         reason = None
                         if tag in owners and name not in owners[tag]: reason='owned_by_other_sources'
                         elif name=='full' and tag in excluded_full: reason='remove_from_full'
-                        elif rule and tag in parse_tags(rule.exclude_from_region) and tag not in full['general'] and tag not in full['character']: reason='requires_full_confirmation'
-                        elif rule and (category=='general' or rule.full_image_only_tags is not None) and tag in composition_tags(rule): reason='composition_full_only'
-                        elif tag in parse_tags(options.get('remove_tags','')): reason='global_remove'
+                        elif rule and tag in rule_matcher(rule, 'exclude_from_region') and tag not in full['general'] and tag not in full['character']: reason='requires_full_confirmation'
+                        elif rule and (category=='general' or rule.full_image_only_tags is not None or rule.full_image_only_tags_regex) and tag in rule_matcher(rule, 'full_image_only_tags', composition_tags(rule)): reason='composition_full_only'
+                        elif tag in global_remove: reason='global_remove'
                         if reason: item.update(status='rejected',reason=reason)
                         else: item['reason']='merged' if merged.get(category,{}).get(tag)==item['score'] else 'lower_score'
                     decisions.append(item)
@@ -293,9 +302,33 @@ def apply_filters(evidence, options=None, configs=None):
             provenance=merged.get('provenance',{}).get(tag,{})
             if tag in merged[category] and (provenance.get('source')!='manual_rule' or provenance.get('region_source')):
                 continue
-            reason='global_remove' if tag in parse_tags(options.get('remove_tags','')) else 'owned_by_other_sources' if tag in owners and tag not in merged[category] else 'manual_rule'
+            reason='global_remove' if tag in global_remove else 'owned_by_other_sources' if tag in owners and tag not in merged[category] else 'manual_rule'
             decisions.append(dict(tag=tag,category=category,source='manual_rule',region_id=None,
                 score=provenance.get('assigned_score',1.0),status='accepted' if tag in merged[category] else 'rejected',reason=reason))
+        for item in decisions:
+            matches = []
+            for config in settings:
+                for field in REGEX_RULE_FIELDS:
+                    applies = (
+                        field == 'only_from_source'
+                        or (field == 'remove_tags_from_full' and item['source'] == 'full' and detected[config.name])
+                        or (field not in ('only_from_source', 'remove_tags_from_full') and item['source'] == config.name)
+                    )
+                    if not applies:
+                        continue
+                    literals = composition_tags(config) if field == 'full_image_only_tags' else None
+                    for match in rule_matcher(config, field, literals).matches(item['tag']):
+                        if match['kind'] == 'regex':
+                            matches.append(dict(match, action=field, source=config.name))
+            for match in global_remove.matches(item['tag']):
+                if match['kind'] == 'regex':
+                    matches.append(dict(match, action='remove_tags', source='global'))
+            if matches:
+                item['matched_rules'] = matches
+                local = full if item['source'] == 'full' else next(
+                    (r for r in detected.get(item['source'], []) if r['region_id'] == item['region_id']), None)
+                if local is not None and item['tag'] in local['decisions'][item['category']]:
+                    local['decisions'][item['category']][item['tag']]['matched_rules'] = deepcopy(matches)
         detail.update(merged_tags=merged, decisions=decisions, settings={'options':options,'sources':[asdict(c) for c in settings],
                       'sam_model':original['geometry'].get('sam_model')},
                       schema_version=1, stage='results', model=data['model'])
@@ -306,9 +339,16 @@ def apply_filters(evidence, options=None, configs=None):
 def formatted_text(frame, result=None):
     options=frame.get('settings',{}).get('options',{})
     result=result if result is not None else frame.get('merged_tags',frame.get('full_image',{}))
-    text=result.get('taglist','') if options.get('replace_underscores',True) else result.get('caption',result.get('taglist',''))
-    if options.get('escape_parentheses',True):text=text.replace('(',r'\(').replace(')',r'\)')
-    return text
+    names = set(result.get('general', {})) | set(result.get('character', {}))
+    ordered = [tag for tag in parse_tags(result.get('caption', '')) if tag in names]
+    ordered.extend(sorted(names - set(ordered)))
+    def render(tag):
+        if options.get('replace_underscores', True):
+            tag = tag.replace('_', ' ')
+        if options.get('escape_parentheses', True):
+            tag = tag.replace('(', r'\(').replace(')', r'\)')
+        return tag
+    return options.get('tag_separator', ', ').join(render(tag) for tag in ordered)
 
 
 def outputs(results):
@@ -333,7 +373,8 @@ def merge_results(left, right):
     for index,(p,q) in enumerate(zip(merged['frames'],y['frames'])):
         if (p['image_id'],p['image_size'],p['full_image']) != (q['image_id'],q['image_size'],q['full_image']):
             raise ValueError('Cannot merge results of different images or full-image evidence')
-        if a['frames'][index]['settings']['options'] != b['frames'][index]['settings']['options']:
+        if ({'tag_separator': ', ', **a['frames'][index]['settings']['options']}
+                != {'tag_separator': ', ', **b['frames'][index]['settings']['options']}):
             raise ValueError('Cannot merge different global filter settings')
         sources={c['name']:c for c in a['frames'][index]['settings']['sources']}
         for row in b['frames'][index]['settings']['sources']:

@@ -10,6 +10,17 @@ save_result = importlib.import_module(f"{PACKAGE.__name__}.comfy_export").save_r
 
 
 class SaveResultTests(unittest.TestCase):
+    def test_saved_output_settings_without_tags(self):
+        result = {'general': {'blue_eyes': .9}, 'character': {'hero_(series)': .8},
+                  'caption': 'hero_(series), blue_eyes', 'taglist': 'hero (series), blue eyes'}
+        detail = {'merged_tags': result, 'settings': {'options': {
+            'tag_separator': ' | ', 'replace_underscores': False, 'escape_parentheses': True}}}
+        with tempfile.TemporaryDirectory(dir='temp') as folder:
+            txt, _ = save_result([json.dumps(detail)], folder, 'formatted')
+            self.assertEqual(Path(txt).read_text(encoding='utf-8'), r'hero_\(series\) | blue_eyes')
+            txt, _ = save_result([json.dumps(detail)], folder, 'literal', tags=['literal text'])
+            self.assertEqual(Path(txt).read_text(encoding='utf-8'), 'literal text')
+
     def test_selected_result_and_exact_tag_text(self):
         records = [json.dumps({"image_index": i, "merged_tags": {"taglist": f"тег {i}"},
                               "detectors": {"person": []}}) for i in range(2)]

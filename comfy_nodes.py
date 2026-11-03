@@ -31,16 +31,17 @@ class WDModelLoader:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "model": (model_choices(), {"default": "vit", "tooltip": "Ranklist Macro F1@0.40 descending; unranked models follow by publication date."}),
-            "device": (["auto", "cpu", "cuda"],),
+            "model": (model_choices(), {"default": "vit", "tooltip": 'Выберите WD-модель для распознавания тегов. Список отсортирован по Macro F1@0.40: сначала модели с рейтингом, затем остальные по дате публикации. repo_id или local_model_path позволяют использовать другую модель.'}),
+            "device": (["auto", "cpu", "cuda"], {"tooltip": 'Где выполнять вычисления: auto — устройство, выбранное окружением; cpu — процессор; cuda — видеокарта NVIDIA с доступной CUDA. При нехватке видеопамяти выберите cpu или уменьшите батч.'}),
         }, "optional": {
-            "download_missing": ("BOOLEAN", {"default": True}),
-            "local_model_path": ("STRING", {"default": ""}),
-            "repo_id": ("STRING", {"default": "", "tooltip": "Optional Hugging Face owner/model; overrides model selection"}),
+            "download_missing": ("BOOLEAN", {"default": True, "tooltip": 'Разрешить скачивание недостающих файлов модели. Выключите для работы только с локальными файлами: если их нет или комплект неполон, выполнение завершится ошибкой.'}),
+            "local_model_path": ("STRING", {"default": "", "tooltip": 'Путь к локальной папке WD-модели или файлу model.safetensors / pytorch_model.bin в ней. Нужны также конфигурация и файл меток. Пусто — искать выбранную модель в стандартных папках models/wdv3/taggers или models/taggers проекта.'}),
+            "repo_id": ("STRING", {"default": "", "tooltip": 'Необязательно: репозиторий Hugging Face в формате owner/model. Если заполнен, заменяет model; оставьте пустым для выбора из списка.'}),
         }}
 
     RETURN_TYPES = ("WDV3_MODEL", "STRING")
     RETURN_NAMES = ("wd_model", "model_info")
+    OUTPUT_TOOLTIPS = ('Загруженная модель WD с метками и подготовкой изображений. Подключите к wd_model у Tag Image / Regions, Tag Folder или Collect Evidence.', 'JSON с параметрами подготовки изображений для выбранной WD-модели: размер входа, порядок цветовых каналов и источник профиля. Для просмотра подключите к ноде отображения текста.')
     FUNCTION = "load"
     CATEGORY = "WDV3"
 
@@ -90,10 +91,11 @@ class WDDetectorLoader:
                     "confidence": 0.35, "classes": [0],
                     "region_gen_threshold": 0.35, "region_char_threshold": 0.75}]
         return {"required": {"detectors_json": ("STRING", {
-            "default": json.dumps(example, indent=2), "multiline": True})}}
+            "default": json.dumps(example, indent=2), "multiline": True, "tooltip": 'JSON-массив источников YOLO. Для каждого укажите уникальный name, model_path, confidence и classes; можно добавить правила тегов. Пример уже заполнен. Для настройки без JSON используйте YOLO Detector и Region Tag Rules.'})}}
 
     RETURN_TYPES = ("WDV3_DETECTORS",)
     RETURN_NAMES = ("detectors",)
+    OUTPUT_TOOLTIPS = ('Список источников YOLO с индивидуальными настройками. Подключите к detectors у ноды тегирования или Collect Evidence; объединить ветки можно через Combine YOLO Detectors.',)
     FUNCTION = "load"
     CATEGORY = "WDV3"
 
@@ -178,24 +180,17 @@ class WDTagger:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "images": ("IMAGE",), "wd_model": ("WDV3_MODEL",),
-            "general_threshold": ("FLOAT", {"default": 0.35, "min": 0., "max": 1., "step": 0.01}),
-            "character_threshold": ("FLOAT", {"default": 0.75, "min": 0., "max": 1., "step": 0.01}),
-            "region_batch_size": ("INT", {"default": 8, "min": 1, "max": 128}),
-            "replace_underscores": ("BOOLEAN", {"default": True}),
-            "escape_parentheses": ("BOOLEAN", {"default": True}),
-            "remove_tags": ("STRING", {"default": "", "multiline": True}),
-            "prefix_tags": ("STRING", {"default": ""}),
-            "suffix_tags": ("STRING", {"default": ""}),
-        }, "optional": {"detectors": ("WDV3_DETECTORS",),
-                          "sam_regions": ("WDV3_SAM_REGIONS",),
-                          "options": ("WDV3_OPTIONS",),
-                          "sam_model": ("WDV3_SAM_MODEL",),
-                          "sources": ("WDV3_SAM_SOURCES",),
-                          "sam_batch_size": ("INT", {"default": 1, "min": 1, "max": 16})}}
+            "images": ("IMAGE", {"tooltip": 'Исходное изображение или батч IMAGE, например из Load Image. Для SAM Segment и тегирования подключайте одни и те же изображения в одинаковом порядке, чтобы маски соответствовали картинкам.'}), "wd_model": ("WDV3_MODEL", {"tooltip": 'Модель WD из Load Tagger Model. Она распознаёт теги на полном изображении и вырезанных регионах; YOLO/SAM только находят эти регионы.'}),
+        }, "optional": {"detectors": ("WDV3_DETECTORS", {"tooltip": 'Источники YOLO из YOLO Detector / Combine YOLO Detectors / Load Pipeline Config. Их прямоугольные вырезки тегируются WD вместе с полным изображением; фон внутри вырезок сохраняется.'}),
+                          "sam_regions": ("WDV3_SAM_REGIONS", {"tooltip": 'Готовые маски и регионы из SAM Segment Images для этих же изображений и в том же порядке. В Tag Image / Regions используйте либо этот вход, либо пару sam_model + sources. Для просмотра масок подключите также к Results Viewer.'}),
+                          "options": ("WDV3_OPTIONS", {"tooltip": 'Настройки из Tagging Settings или Load Pipeline Config. Задают глобальные пороги WD, формат текста и батчи. В Tag Image / Regions эти настройки задаются только через options; без подключения используются стандартные значения.'}),
+                          "sam_model": ("WDV3_SAM_MODEL", {"tooltip": 'Настройки SAM из Load SAM 3.1 или Load Pipeline Config. Подключайте вместе с sources. SAM ищет объекты по тексту; для получения тегов также нужна модель WD.'}),
+                          "sources": ("WDV3_SAM_SOURCES", {"tooltip": 'Текстовые запросы SAM и настройки регионов из SAM Text / Region Settings, Combine SAM Sources или Load Pipeline Config. Подключайте вместе с sam_model. Каждый источник сохраняет собственные пороги, режим вырезки и правила.'})}}
+
 
     RETURN_TYPES = ("STRING", "STRING", "WDV3_SAM_REGIONS")
     RETURN_NAMES = ("tags", "results_json", "sam_regions")
+    OUTPUT_TOOLTIPS = ('Готовый текст тегов: отдельная строка на каждое изображение, с выбранным форматированием. Можно передать в текстовый промпт или tags у Save Result вместе с results_json из той же ветки.', 'Подробный JSON для каждого изображения: теги полного кадра и регионов, оценки и происхождение итоговых тегов. Подключите к Results Viewer или Save Result. Это содержимое JSON, а не путь к файлу.', 'Маски SAM и данные регионов для каждого исходного изображения, со всеми источниками. Подключите к sam_regions у Tag Image / Regions или Results Viewer; передавайте те же изображения в том же порядке. Это не обычный выход MASK.')
     OUTPUT_IS_LIST = (True, True, False)
     OUTPUT_NODE = True
     FUNCTION = "tag"
@@ -204,7 +199,7 @@ class WDTagger:
     def tag(self, images, wd_model, general_threshold=0.35, character_threshold=0.75,
             region_batch_size=8, replace_underscores=True, escape_parentheses=True,
             remove_tags="", prefix_tags="", suffix_tags="", detectors=None,
-            sam_regions=None, options=None, sam_model=None, sources=None, sam_batch_size=1):
+            sam_regions=None, options=None, sam_model=None, sources=None, sam_batch_size=1, tag_separator=', '):
         from contextlib import ExitStack
         from .comfy_processing import tensor_frame, tag_frames, json_result
         from .comfy_evidence import cached_segment, interrupt
@@ -214,13 +209,14 @@ class WDTagger:
         if sam_regions is not None and (sam_model is not None or sources is not None):
             raise ValueError("Use either precomputed sam_regions or sam_model + sources")
         if sources and sam_model is None:
-            raise ValueError("SAM sources need sam_model")
+            raise ValueError("SAM sources need sam_model. Подключите Load SAM 3.1 к sam_model "
+                             "или отключите sources для тегирования без SAM. YOLO detectors не обязательны.")
         if sam_model is not None and sources is None:
             raise ValueError("SAM model needs sources")
         settings = dict(general_threshold=general_threshold, character_threshold=character_threshold,
                         region_batch_size=region_batch_size, replace_underscores=replace_underscores,
                         escape_parentheses=escape_parentheses, remove_tags=remove_tags,
-                        prefix_tags=prefix_tags, suffix_tags=suffix_tags)
+                        prefix_tags=prefix_tags, suffix_tags=suffix_tags, tag_separator=tag_separator)
         settings.update(options or {})
         from .comfy_config import unique_names
         unique_names([c.name for c in (detectors[0] if detectors else [])]+[s['name'] for s in (sources or [])])
@@ -228,7 +224,7 @@ class WDTagger:
             interrupt()
             frames = [stack.enter_context(tensor_frame(tensor)) for tensor in images]
             if sources:
-                sam_regions = cached_segment(frames, wd_model, sam_model, sources, sam_batch_size)
+                sam_regions = cached_segment(frames, wd_model, sam_model, sources, settings.get('sam_batch_size', sam_batch_size))
             tags, records = tag_frames(frames, wd_model, detectors=detectors, sam_regions=sam_regions,
                                        options=settings)
         return {"ui": {"text": tags}, "result": (tags, [json_result(row) for row in records], sam_regions or [])}

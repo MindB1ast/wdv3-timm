@@ -1,0 +1,24 @@
+{
+  "python": "3.13.12 (main, Feb 12 2026, 00:38:53) [MSC v.1944 64 bit (AMD64)]",
+  "schemas": "actual installed ComfyUI",
+  "inference": "deterministic test doubles",
+  "sources": [
+    "eyes",
+    "face"
+  ],
+  "calls_before_filter": [
+    3,
+    1,
+    1
+  ],
+  "calls_after_two_filters": [
+    3,
+    1,
+    1
+  ],
+  "text": "blue_eyes | hero_\\(series\\) | long_hair",
+  "immutable_evidence": true,
+  "inspect_viewer_export_folder_save_result": true,
+  "legacy_workflow_defaults": true,
+  "report_html": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\tag-regex-acceptance\\wdv3-regex-29a3610cbe674fd1b7bffe7bbb6ced49\\report.html"
+}

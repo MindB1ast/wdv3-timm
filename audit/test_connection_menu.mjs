@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {buildCatalog} from '../web/connection_suggestions.mjs';
+import {connectionContext, installCanvasSuggestions} from '../web/connection_menu.mjs';
+
+const catalog=buildCatalog(JSON.parse(readFileSync(new URL('./fixtures/connection_nodes.json',import.meta.url))));
+const menus=[], native=[];
+const litegraph={ContextMenu:class {constructor(items,options){this.items=items;this.options=options;menus.push(this);}}};
+const canvas={showConnectionMenu:(...args)=>{native.push(['menu',...args]);return 'native-menu';},
+    showSearchBox:(...args)=>{native.push(['search',...args]);return 'native-search';}};
+assert.equal(installCanvasSuggestions({}, {litegraph,catalog:()=>catalog}),false);
+assert.equal(installCanvasSuggestions(canvas,{litegraph,catalog:()=>catalog,limit:()=>1}),true);
+const wrapped=canvas.showConnectionMenu;
+installCanvasSuggestions(canvas,{litegraph,catalog:()=>catalog});assert.equal(canvas.showConnectionMenu,wrapped);
+const node={type:'WDV3Tagger',inputs:[{name:'wd_model',type:'WDV3_MODEL',link:null}],outputs:[]};
+canvas.showConnectionMenu({nodeTo:node,slotTo:0,e:{canvasX:200,canvasY:100}});
+assert.match(menus.at(-1).items[0].content,/Load Tagger Model/);
+node.inputs.push({name:'sources',type:'WDV3_SAM_SOURCES',link:null});
+canvas.showConnectionMenu({nodeTo:node,slotTo:node.inputs[1]});
+assert.match(menus.at(-1).items[0].content,/SAM Text/);
+assert.equal(menus.at(-1).items[1].content,'Все совместимые ноды WDV3');
+menus.at(-1).items.at(-2).callback();assert.equal(native.at(-1)[0],'search');
+menus.at(-1).items.at(-1).callback();assert.equal(native.at(-1)[0],'menu');
+canvas.showSearchBox({}, {node_to:node,slot_to:node.inputs[0]});
+assert.match(menus.at(-1).items[0].content,/Load Tagger Model/);
+const outsider={type:'ThirdParty',inputs:[{name:'text',type:'STRING'}]};
+assert.equal(canvas.showConnectionMenu({nodeTo:outsider,slotTo:0}),'native-menu');
+assert.equal(canvas.showSearchBox({},{}),'native-search');
+assert.equal(connectionContext(node,'input','not-present'),null);
+console.log('Connection menus: primary suggestions, short limits, native search, fallback and registration passed');

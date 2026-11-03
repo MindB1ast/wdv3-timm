@@ -50,7 +50,7 @@
       ],
       "size": [
         340,
-        198
+        230
       ],
       "flags": {},
       "order": 1,
@@ -64,6 +64,12 @@
             1
           ],
           "slot_index": 0
+        },
+        {
+          "name": "model_info",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 1
         }
       ],
       "properties": {
@@ -73,6 +79,7 @@
         "vit",
         "auto",
         true,
+        "",
         ""
       ]
     },
@@ -113,7 +120,10 @@
         true,
         "",
         "",
-        ""
+        "",
+        "",
+        ", ",
+        1
       ]
     },
     {

@@ -26,17 +26,26 @@ export function ruleWidgetValues(rules){
             out[name]=[...new Set(tags.map(tag=>tag.trim().replaceAll(" ","_")).filter(Boolean))].join(", ");
         }
     }
+    for(const field of ["remove_tags_from_full","remove_tags_from_region","exclude_from_region",
+                        "only_from_source","allowed_tags","full_image_only_tags"]){
+        const key=field+"_regex", patterns=rules[key]??[];
+        if(!Array.isArray(patterns)||!patterns.every(p=>typeof p==="string"))throw new Error(`${key}: expected patterns`);
+        out[key]=patterns.join("\n");
+    }
     return out;
 }
 
 export function taggingWidgetValues(options={}){
     const values={general_threshold:.35,character_threshold:.75,image_batch_size:2,region_batch_size:8,
-        replace_underscores:true,escape_parentheses:true,remove_tags:"",prefix_tags:"",suffix_tags:"",...options};
+        replace_underscores:true,escape_parentheses:true,remove_tags:"",prefix_tags:"",suffix_tags:"",
+        remove_tags_regex:[],tag_separator:", ",sam_batch_size:1,...options};
+    if(!Array.isArray(values.remove_tags_regex)||!values.remove_tags_regex.every(p=>typeof p==="string"))throw new Error("remove_tags_regex: expected patterns");
+    values.remove_tags_regex=values.remove_tags_regex.join("\n");
     for(const [name,value] of Object.entries(values)){
         if(name.endsWith("threshold")&&(typeof value!=="number"||!Number.isFinite(value)||value<0||value>1))throw new Error(`${name}: expected 0..1`);
         if(name.endsWith("batch_size")&&(!Number.isInteger(value)||value<1))throw new Error(`${name}: expected a positive integer`);
         if(["replace_underscores","escape_parentheses"].includes(name)&&typeof value!=="boolean")throw new Error(`${name}: expected boolean`);
-        if(["remove_tags","prefix_tags","suffix_tags"].includes(name)&&typeof value!=="string")throw new Error(`${name}: expected text`);
+        if(["remove_tags","prefix_tags","suffix_tags","tag_separator"].includes(name)&&typeof value!=="string")throw new Error(`${name}: expected text`);
     }
     return values;
 }

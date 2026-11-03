@@ -1,0 +1,1087 @@
+{
+  "WDV3ModelLoader": {
+    "name": "WDV3ModelLoader",
+    "display_name": "WDV3 Load Tagger Model",
+    "input": {
+      "required": {
+        "model": [
+          [
+            "animetimm/convnextv2_huge.dbv4-full",
+            "animetimm/eva02_large_patch14_448.dbv4-full",
+            "animetimm/caformer_b36.dbv4-full",
+            "animetimm/swinv2_base_window8_256.dbv4-full",
+            "animetimm/convnext_base.dbv4-full",
+            "animetimm/caformer_m36.dbv4-full",
+            "animetimm/caformer_s36.dbv4-full",
+            "animetimm/vit_base_patch16_224.dbv4-full",
+            "animetimm/caformer_s18.dbv4-full",
+            "animetimm/mobilenetv4_conv_aa_large.dbv4-full",
+            "animetimm/resnet152.dbv4-full",
+            "animetimm/resnet101.dbv4-full",
+            "animetimm/mobilevitv2_200.dbv4-full",
+            "animetimm/mobilenetv3_large_150d.dbv4-full",
+            "animetimm/resnet50.dbv4-full",
+            "animetimm/mobilenetv4_conv_small.dbv4-full",
+            "animetimm/mobilenetv3_large_100.dbv4-full",
+            "animetimm/resnet34.dbv4-full",
+            "animetimm/resnet18.dbv4-full",
+            "animetimm/mobilenetv3_large_100.dbv4-full.r224",
+            "animetimm/mobilenetv4_conv_small_050.dbv4-full",
+            "animetimm/vit_giantopt_patch16_siglip_384.dbv4-full",
+            "animetimm/eva_giant_patch14_560.dbv4-full",
+            "animetimm/convformer_b36.dbv4-full",
+            "animetimm/repvit_m2_3.dbv4-full",
+            "animetimm/convformer_s36.dbv4-full",
+            "big",
+            "bigvit",
+            "swinv2",
+            "convnext",
+            "vit"
+          ],
+          {}
+        ],
+        "device": [
+          [
+            "auto",
+            "cpu",
+            "cuda"
+          ],
+          {}
+        ]
+      },
+      "optional": {
+        "download_missing": [
+          "BOOLEAN",
+          {}
+        ],
+        "local_model_path": [
+          "STRING",
+          {}
+        ],
+        "repo_id": [
+          "STRING",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_MODEL",
+      "STRING"
+    ],
+    "output_name": [
+      "wd_model",
+      "model_info"
+    ]
+  },
+  "WDV3DetectorLoader": {
+    "name": "WDV3DetectorLoader",
+    "display_name": "WDV3 Load YOLO Detectors",
+    "input": {
+      "required": {
+        "detectors_json": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_DETECTORS"
+    ],
+    "output_name": [
+      "detectors"
+    ]
+  },
+  "WDV3Tagger": {
+    "name": "WDV3Tagger",
+    "display_name": "WDV3 Tag Image / Regions",
+    "input": {
+      "required": {
+        "images": [
+          "IMAGE",
+          {}
+        ],
+        "wd_model": [
+          "WDV3_MODEL",
+          {}
+        ]
+      },
+      "optional": {
+        "detectors": [
+          "WDV3_DETECTORS",
+          {}
+        ],
+        "sam_regions": [
+          "WDV3_SAM_REGIONS",
+          {}
+        ],
+        "options": [
+          "WDV3_OPTIONS",
+          {}
+        ],
+        "sam_model": [
+          "WDV3_SAM_MODEL",
+          {}
+        ],
+        "sources": [
+          "WDV3_SAM_SOURCES",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "STRING",
+      "STRING",
+      "WDV3_SAM_REGIONS"
+    ],
+    "output_name": [
+      "tags",
+      "results_json",
+      "sam_regions"
+    ]
+  },
+  "WDV3Options": {
+    "name": "WDV3Options",
+    "display_name": "WDV3 Tagging Settings",
+    "input": {
+      "required": {
+        "general_threshold": [
+          "FLOAT",
+          {}
+        ],
+        "character_threshold": [
+          "FLOAT",
+          {}
+        ],
+        "image_batch_size": [
+          "INT",
+          {}
+        ],
+        "region_batch_size": [
+          "INT",
+          {}
+        ],
+        "replace_underscores": [
+          "BOOLEAN",
+          {}
+        ],
+        "escape_parentheses": [
+          "BOOLEAN",
+          {}
+        ],
+        "remove_tags": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "prefix_tags": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "suffix_tags": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "remove_tags_regex": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "tag_separator": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "sam_batch_size": [
+          "INT",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_OPTIONS"
+    ],
+    "output_name": [
+      "options"
+    ]
+  },
+  "WDV3RegionRules": {
+    "name": "WDV3RegionRules",
+    "display_name": "WDV3 Region Tag Rules",
+    "input": {
+      "required": {
+        "general_threshold": [
+          "FLOAT",
+          {}
+        ],
+        "character_threshold": [
+          "FLOAT",
+          {}
+        ],
+        "remove_from_full": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "remove_from_regions": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "add_to_regions": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "require_full_confirmation": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "only_from_source": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "allowed_tags": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "full_image_only_tags": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "remove_tags_from_full_regex": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "remove_tags_from_region_regex": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "exclude_from_region_regex": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "only_from_source_regex": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "allowed_tags_regex": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ],
+        "full_image_only_tags_regex": [
+          "STRING",
+          {
+            "multiline": true
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_RULES"
+    ],
+    "output_name": [
+      "rules"
+    ]
+  },
+  "WDV3YOLODetector": {
+    "name": "WDV3YOLODetector",
+    "display_name": "WDV3 YOLO Detector",
+    "input": {
+      "required": {
+        "model": [
+          "COMBO",
+          {
+            "multiselect": false,
+            "options": [
+              "person_yolov8m-seg.pt",
+              "face_yolov9c.pt",
+              "hand_yolov9c.pt",
+              "yolov8n.pt",
+              "person_yolov8s-seg.pt"
+            ]
+          }
+        ],
+        "source_name": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "confidence": [
+          "FLOAT",
+          {}
+        ],
+        "classes": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "custom_model_path": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ]
+      },
+      "optional": {
+        "rules": [
+          "WDV3_RULES",
+          {}
+        ],
+        "previous_detectors": [
+          "WDV3_DETECTORS",
+          {}
+        ],
+        "device": [
+          "COMBO",
+          {
+            "multiselect": false,
+            "options": [
+              "auto",
+              "cpu",
+              "cuda"
+            ]
+          }
+        ],
+        "download_missing": [
+          "BOOLEAN",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_DETECTORS"
+    ],
+    "output_name": [
+      "detectors"
+    ]
+  },
+  "WDV3SAMLoader": {
+    "name": "WDV3SAMLoader",
+    "display_name": "WDV3 Load SAM 3.1",
+    "input": {
+      "required": {
+        "model": [
+          "COMBO",
+          {
+            "multiselect": false,
+            "options": [
+              "unsloth/sam3.1"
+            ]
+          }
+        ],
+        "device": [
+          "COMBO",
+          {
+            "multiselect": false,
+            "options": [
+              "auto",
+              "cpu",
+              "cuda"
+            ]
+          }
+        ],
+        "download_missing": [
+          "BOOLEAN",
+          {}
+        ],
+        "local_model_path": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_SAM_MODEL"
+    ],
+    "output_name": [
+      "sam_model"
+    ]
+  },
+  "WDV3SAMSource": {
+    "name": "WDV3SAMSource",
+    "display_name": "WDV3 SAM Text / Region Settings",
+    "input": {
+      "required": {
+        "source_name": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "prompt": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "confidence": [
+          "FLOAT",
+          {}
+        ],
+        "mask_threshold": [
+          "FLOAT",
+          {}
+        ],
+        "min_mask_area_px": [
+          "INT",
+          {}
+        ],
+        "max_regions": [
+          "INT",
+          {}
+        ],
+        "view_mode": [
+          "COMBO",
+          {
+            "multiselect": false,
+            "options": [
+              "bbox",
+              "mask"
+            ]
+          }
+        ],
+        "padding_px": [
+          "INT",
+          {}
+        ]
+      },
+      "optional": {
+        "rules": [
+          "WDV3_RULES",
+          {}
+        ],
+        "previous_sources": [
+          "WDV3_SAM_SOURCES",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_SAM_SOURCES"
+    ],
+    "output_name": [
+      "sources"
+    ]
+  },
+  "WDV3SAMSegment": {
+    "name": "WDV3SAMSegment",
+    "display_name": "WDV3 SAM Segment Images",
+    "input": {
+      "required": {
+        "images": [
+          "IMAGE",
+          {}
+        ],
+        "sam_model": [
+          "WDV3_SAM_MODEL",
+          {}
+        ],
+        "sources": [
+          "WDV3_SAM_SOURCES",
+          {}
+        ],
+        "sam_batch_size": [
+          "INT",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_SAM_REGIONS",
+      "MASK"
+    ],
+    "output_name": [
+      "sam_regions",
+      "combined_mask"
+    ]
+  },
+  "WDV3LoadFolder": {
+    "name": "WDV3LoadFolder",
+    "display_name": "WDV3 Image Folder",
+    "input": {
+      "required": {
+        "directory": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "recursive": [
+          "BOOLEAN",
+          {}
+        ],
+        "start_index": [
+          "INT",
+          {}
+        ],
+        "limit": [
+          "INT",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_FILES",
+      "INT"
+    ],
+    "output_name": [
+      "files",
+      "image_count"
+    ]
+  },
+  "WDV3TagFolder": {
+    "name": "WDV3TagFolder",
+    "display_name": "WDV3 Tag Folder",
+    "input": {
+      "required": {
+        "files": [
+          "WDV3_FILES",
+          {}
+        ],
+        "wd_model": [
+          "WDV3_MODEL",
+          {}
+        ],
+        "options": [
+          "WDV3_OPTIONS",
+          {}
+        ],
+        "save_txt": [
+          "BOOLEAN",
+          {}
+        ],
+        "save_json": [
+          "BOOLEAN",
+          {}
+        ],
+        "output_directory": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "overwrite": [
+          "BOOLEAN",
+          {}
+        ],
+        "sam_batch_size": [
+          "INT",
+          {}
+        ]
+      },
+      "optional": {
+        "detectors": [
+          "WDV3_DETECTORS",
+          {}
+        ],
+        "sam_model": [
+          "WDV3_SAM_MODEL",
+          {}
+        ],
+        "sources": [
+          "WDV3_SAM_SOURCES",
+          {}
+        ]
+      },
+      "hidden": {
+        "prompt": [
+          "PROMPT"
+        ],
+        "extra_pnginfo": [
+          "EXTRA_PNGINFO"
+        ]
+      }
+    },
+    "output": [
+      "STRING",
+      "STRING"
+    ],
+    "output_name": [
+      "tags",
+      "results_json"
+    ]
+  },
+  "WDV3Preview": {
+    "name": "WDV3Preview",
+    "display_name": "WDV3 Results Viewer",
+    "input": {
+      "required": {
+        "results_json": [
+          "STRING",
+          {
+            "forceInput": true,
+            "multiline": false
+          }
+        ],
+        "preview_limit": [
+          "INT",
+          {}
+        ]
+      },
+      "optional": {
+        "images": [
+          "IMAGE",
+          {}
+        ],
+        "sam_regions": [
+          "WDV3_SAM_REGIONS",
+          {}
+        ]
+      },
+      "hidden": {
+        "prompt": [
+          "PROMPT"
+        ],
+        "extra_pnginfo": [
+          "EXTRA_PNGINFO"
+        ]
+      }
+    },
+    "output": [],
+    "output_name": []
+  },
+  "WDV3CombineDetectors": {
+    "name": "WDV3CombineDetectors",
+    "display_name": "WDV3 Combine YOLO Detectors",
+    "input": {
+      "required": {
+        "detectors": [
+          "COMFY_AUTOGROW_V3",
+          {
+            "template": {
+              "input": {
+                "required": {
+                  "detector": [
+                    "WDV3_DETECTORS",
+                    {}
+                  ]
+                }
+              },
+              "prefix": "detector"
+            }
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_DETECTORS"
+    ],
+    "output_name": [
+      "detectors"
+    ]
+  },
+  "WDV3CombineSAMSources": {
+    "name": "WDV3CombineSAMSources",
+    "display_name": "WDV3 Combine SAM Sources",
+    "input": {
+      "required": {
+        "sources": [
+          "COMFY_AUTOGROW_V3",
+          {
+            "template": {
+              "input": {
+                "required": {
+                  "source": [
+                    "WDV3_SAM_SOURCES",
+                    {}
+                  ]
+                }
+              },
+              "prefix": "source"
+            }
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_SAM_SOURCES"
+    ],
+    "output_name": [
+      "sources"
+    ]
+  },
+  "WDV3SaveConfig": {
+    "name": "WDV3SaveConfig",
+    "display_name": "WDV3 Save Pipeline Config",
+    "input": {
+      "required": {
+        "preset_name": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "overwrite": [
+          "BOOLEAN",
+          {}
+        ]
+      },
+      "optional": {
+        "options": [
+          "WDV3_OPTIONS",
+          {}
+        ],
+        "detectors": [
+          "WDV3_DETECTORS",
+          {}
+        ],
+        "sources": [
+          "WDV3_SAM_SOURCES",
+          {}
+        ],
+        "sam_model": [
+          "WDV3_SAM_MODEL",
+          {}
+        ]
+      },
+      "hidden": {
+        "prompt": [
+          "PROMPT"
+        ],
+        "extra_pnginfo": [
+          "EXTRA_PNGINFO"
+        ]
+      }
+    },
+    "output": [
+      "STRING"
+    ],
+    "output_name": [
+      "config_path"
+    ]
+  },
+  "WDV3LoadConfig": {
+    "name": "WDV3LoadConfig",
+    "display_name": "WDV3 Load Pipeline Config",
+    "input": {
+      "required": {
+        "preset": [
+          "COMBO",
+          {
+            "multiselect": false,
+            "options": [
+              "Example: multi_all",
+              "Example: multi_sam",
+              "Example: multi_yolo"
+            ]
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_OPTIONS",
+      "WDV3_DETECTORS",
+      "WDV3_SAM_SOURCES",
+      "WDV3_SAM_MODEL"
+    ],
+    "output_name": [
+      "options",
+      "detectors",
+      "sources",
+      "sam_model"
+    ]
+  },
+  "WDV3SaveResult": {
+    "name": "WDV3SaveResult",
+    "display_name": "WDV3 Save Result",
+    "input": {
+      "required": {
+        "results_json": [
+          "STRING",
+          {
+            "forceInput": true,
+            "multiline": false
+          }
+        ],
+        "output_directory": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "filename": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "result_index": [
+          "INT",
+          {}
+        ],
+        "save_txt": [
+          "BOOLEAN",
+          {}
+        ],
+        "save_json": [
+          "BOOLEAN",
+          {}
+        ],
+        "overwrite": [
+          "BOOLEAN",
+          {}
+        ]
+      },
+      "optional": {
+        "tags": [
+          "STRING",
+          {
+            "forceInput": true,
+            "multiline": false
+          }
+        ]
+      },
+      "hidden": {
+        "prompt": [
+          "PROMPT"
+        ],
+        "extra_pnginfo": [
+          "EXTRA_PNGINFO"
+        ]
+      }
+    },
+    "output": [
+      "STRING",
+      "STRING"
+    ],
+    "output_name": [
+      "txt_path",
+      "json_path"
+    ]
+  },
+  "WDV3CollectEvidence": {
+    "name": "WDV3CollectEvidence",
+    "display_name": "WDV3 Collect Evidence",
+    "input": {
+      "required": {
+        "images": [
+          "IMAGE",
+          {}
+        ],
+        "wd_model": [
+          "WDV3_MODEL",
+          {}
+        ],
+        "sam_batch_size": [
+          "INT",
+          {}
+        ]
+      },
+      "optional": {
+        "options": [
+          "WDV3_OPTIONS",
+          {}
+        ],
+        "detectors": [
+          "WDV3_DETECTORS",
+          {}
+        ],
+        "sam_model": [
+          "WDV3_SAM_MODEL",
+          {}
+        ],
+        "sources": [
+          "WDV3_SAM_SOURCES",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_EVIDENCE",
+      "WDV3_REGIONS"
+    ],
+    "output_name": [
+      "evidence",
+      "regions"
+    ]
+  },
+  "WDV3ApplyFilters": {
+    "name": "WDV3ApplyFilters",
+    "display_name": "WDV3 Apply Filters",
+    "input": {
+      "required": {
+        "evidence": [
+          "WDV3_EVIDENCE",
+          {}
+        ]
+      },
+      "optional": {
+        "options": [
+          "WDV3_OPTIONS",
+          {}
+        ],
+        "detectors": [
+          "WDV3_DETECTORS",
+          {}
+        ],
+        "sources": [
+          "WDV3_SAM_SOURCES",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_RESULTS",
+      "STRING",
+      "STRING"
+    ],
+    "output_name": [
+      "results",
+      "tags",
+      "results_json"
+    ]
+  },
+  "WDV3MergeResults": {
+    "name": "WDV3MergeResults",
+    "display_name": "WDV3 Merge Results",
+    "input": {
+      "required": {
+        "left": [
+          "WDV3_RESULTS",
+          {}
+        ],
+        "right": [
+          "WDV3_RESULTS",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_RESULTS",
+      "STRING",
+      "STRING"
+    ],
+    "output_name": [
+      "results",
+      "tags",
+      "results_json"
+    ]
+  },
+  "WDV3Inspect": {
+    "name": "WDV3Inspect",
+    "display_name": "WDV3 Inspect",
+    "input": {
+      "required": {},
+      "optional": {
+        "results": [
+          "WDV3_RESULTS",
+          {}
+        ],
+        "evidence": [
+          "WDV3_EVIDENCE",
+          {}
+        ],
+        "regions": [
+          "WDV3_REGIONS",
+          {}
+        ]
+      },
+      "hidden": {
+        "prompt": [
+          "PROMPT"
+        ],
+        "extra_pnginfo": [
+          "EXTRA_PNGINFO"
+        ]
+      }
+    },
+    "output": [
+      "WDV3_REPORT",
+      "IMAGE",
+      "STRING"
+    ],
+    "output_name": [
+      "report",
+      "images",
+      "tags"
+    ]
+  },
+  "WDV3ExportReport": {
+    "name": "WDV3ExportReport",
+    "display_name": "WDV3 Export Report",
+    "input": {
+      "required": {
+        "report": [
+          "WDV3_REPORT",
+          {}
+        ],
+        "output_directory": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "prefix": [
+          "STRING",
+          {
+            "multiline": false
+          }
+        ],
+        "save_json": [
+          "BOOLEAN",
+          {}
+        ],
+        "save_html": [
+          "BOOLEAN",
+          {}
+        ],
+        "save_txt": [
+          "BOOLEAN",
+          {}
+        ]
+      },
+      "hidden": {
+        "prompt": [
+          "PROMPT"
+        ],
+        "extra_pnginfo": [
+          "EXTRA_PNGINFO"
+        ]
+      }
+    },
+    "output": [
+      "STRING",
+      "STRING",
+      "STRING"
+    ],
+    "output_name": [
+      "json_path",
+      "html_path",
+      "txt_path"
+    ]
+  }
+}

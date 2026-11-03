@@ -1,0 +1,20 @@
+import assert from "node:assert/strict";
+import {migrateTaggerOptions} from "../web/tagger_options.mjs";
+const legacy=()=>({nodes:[{id:1,type:"WDV3Tagger",pos:[500,0],inputs:[],
+    widgets_values:[.4,.8,3,false,false,"remove","prefix","suffix",2," | "]}],links:[]});
+const graph=legacy();migrateTaggerOptions(graph);
+assert.deepEqual(graph.nodes[0].widgets_values,[]);
+assert.deepEqual(graph.nodes[1].widgets_values,[.4,.8,2,3,false,false,"remove","prefix","suffix",""," | ",2]);
+assert.equal(graph.nodes[0].inputs[0].link,graph.links[0][0]);
+const snapshot=JSON.stringify(graph);migrateTaggerOptions(graph);assert.equal(JSON.stringify(graph),snapshot);
+const linked=legacy();linked.nodes.push({id:2,type:"WDV3Options",widgets_values:[.6,.9],outputs:[{links:[1]}]});
+linked.nodes[0].inputs=[{name:"options",link:1}];linked.links=[[1,2,0,1,0,"WDV3_OPTIONS"]];
+migrateTaggerOptions(linked);
+assert.equal(linked.nodes[2].widgets_values[0],.6);
+assert.equal(linked.nodes[2].widgets_values[11],2);
+assert.deepEqual(linked.nodes[1].widgets_values,[.6,.9]);
+assert.equal(linked.links.length,1);
+const config=legacy();config.nodes.push({id:2,type:"WDV3LoadConfig"});config.nodes[0].inputs=[{name:"options",link:1}];
+config.links=[[1,2,0,1,0,"WDV3_OPTIONS"]];migrateTaggerOptions(config);
+assert.equal(config.nodes.length,2);assert.equal(config.nodes[0].inputs[0].link,1);
+console.log("Tagger settings migration preserves literals, formatting, shared options and connections");

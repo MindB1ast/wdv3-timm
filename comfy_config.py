@@ -6,7 +6,7 @@ from pathlib import Path
 
 from .Scripts.configs import DetectorConfig
 from .Scripts.sam_config import finite_number, positive_integer
-from .Scripts.tag_utils import parse_tags
+from .Scripts.tag_utils import parse_tags, TagMatcher, REGEX_RULE_FIELDS
 
 
 DEFAULT_SAM_MODEL = {"model": "unsloth/sam3.1", "device": "auto", "download_missing": True,
@@ -45,11 +45,16 @@ def validate_config(data):
     data = deepcopy(data)
     options = data.setdefault("options", {})
     allowed = {"general_threshold", "character_threshold", "image_batch_size", "region_batch_size",
-               "replace_underscores", "escape_parentheses", "remove_tags", "prefix_tags", "suffix_tags"}
+               "replace_underscores", "escape_parentheses", "remove_tags", "prefix_tags", "suffix_tags",
+               "remove_tags_regex", "tag_separator", "sam_batch_size"}
     if not isinstance(options, dict) or set(options) - allowed:
         raise ValueError("Unknown tagging settings in config")
     for name, value in options.items():
-        if name.endswith("threshold"):
+        if name == 'remove_tags_regex':
+            if not isinstance(value, list):
+                raise ValueError('remove_tags_regex must be a list of patterns')
+            TagMatcher(patterns=value, field=name)
+        elif name.endswith("threshold"):
             finite_number(value, name, maximum=1)
         elif name.endswith("batch_size"):
             positive_integer(value, name)
@@ -109,6 +114,12 @@ def validate_config(data):
 def validate_rules(rules):
     if not isinstance(rules, dict):
         raise ValueError("Region rules must be an object")
+    for field in REGEX_RULE_FIELDS:
+        name = field + '_regex'
+        value = rules.get(name, [])
+        if value is not None and not isinstance(value, list):
+            raise ValueError(f'{name} must be a list of patterns')
+        TagMatcher(patterns=value, field=name, source=rules.get('name'))
     for name in ("region_gen_threshold", "region_char_threshold"):
         if rules.get(name) is not None:
             finite_number(rules[name], name, maximum=1)

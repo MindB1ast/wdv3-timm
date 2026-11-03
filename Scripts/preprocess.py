@@ -8,7 +8,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from .configs import DetectorConfig
-from .tag_utils import format_result, normalized_scores, parse_tags, source_owners
+from .tag_utils import format_result, normalized_scores, parse_tags, source_owners, rule_matcher
 from .types import (CATEGORIES, Category, DetailedResult, MergedResult,
                     PathInput, Provenance, Score, Scores, TagInput,
                     WDTagResult)
@@ -192,13 +192,19 @@ def merge_tags_from_regions(
 ) -> WDTagResult:
     """Union active exclusions; merge scores without mutating source evidence."""
     configs = {detector.name: detector for detector in detectors}
-    owners = source_owners(detectors)
+    candidates = set(image_result['full_image']['general']) | set(image_result['full_image']['character'])
+    for rows in image_result['detectors'].values():
+        for row in rows:
+            candidates.update(row['general'])
+            candidates.update(row['character'])
+    owners = source_owners(detectors, candidates)
     full = image_result["full_image"]
     full_tags = set(normalized_scores(full["general"])) | set(normalized_scores(full["character"]))
     excluded: set[str] = set()
     for name, regions in image_result["detectors"].items():
         if regions and name in configs:
-            excluded.update(parse_tags(configs[name].remove_tags_from_full))
+            matcher = rule_matcher(configs[name], 'remove_tags_from_full')
+            excluded.update(t for t in full_tags if t in matcher)
     output: WDTagResult = {
         "general": {},
         "character": {},
@@ -221,12 +227,15 @@ def merge_tags_from_regions(
         detector = configs[name]
         for region in sorted(regions, key=lambda row: row.get("region_id", 0)):
             for category in CATEGORIES:
-                blocked = set(parse_tags(detector.remove_tags_from_region))
+                removed = rule_matcher(detector, 'remove_tags_from_region')
+                blocked = {t for t in region[category] if t in removed}
                 blocked.update(tag for tag, names in owners.items() if name not in names)
-                if detector.allowed_tags:
-                    blocked.update(set(normalized_scores(region[category])) - set(detector.allowed_tags))
-                if category == "general" or detector.full_image_only_tags is not None:
-                    blocked.update(composition_tags(detector))
+                allowed = rule_matcher(detector, 'allowed_tags')
+                if allowed:
+                    blocked.update(t for t in region[category] if t not in allowed)
+                if category == "general" or detector.full_image_only_tags is not None or detector.full_image_only_tags_regex:
+                    composition = rule_matcher(detector, 'full_image_only_tags', composition_tags(detector))
+                    blocked.update(t for t in region[category] if t in composition)
                 _merge_source(
                     output,
                     category,
@@ -234,7 +243,7 @@ def merge_tags_from_regions(
                     f"{name}:{region.get('region_id', 0)}",
                     _MergePolicy(
                         removed=blocked,
-                        confirmation=detector.exclude_from_region,
+                        confirmation=[t for t in region[category] if t in rule_matcher(detector, 'exclude_from_region')],
                         full_tags=full_tags,
                         provenance=region.get("provenance"),
                     ),

@@ -2,12 +2,65 @@
 
 import copy
 import re
+from functools import lru_cache
 from collections.abc import Mapping
 from typing import TypeVar
 
 from .types import CATEGORIES, Score, Scores, TagInput, WDTagResult
 
 _Result = TypeVar("_Result", bound=WDTagResult)
+
+REGEX_RULE_FIELDS = (
+    'remove_tags_from_full', 'remove_tags_from_region', 'exclude_from_region',
+    'only_from_source', 'allowed_tags', 'full_image_only_tags',
+)
+
+
+def parse_regex(value):
+    """One unchanged pattern per line; commas and spaces belong to patterns."""
+    values = value.splitlines() if isinstance(value, str) else (value or [])
+    if not isinstance(values, (list, tuple)) or any(not isinstance(v, str) for v in values):
+        raise ValueError('Regex patterns must be a list of strings')
+    return list(dict.fromkeys(v for v in values if v.strip()))
+
+
+@lru_cache(maxsize=512)
+def compile_regex(pattern):
+    """Reuse compiled patterns across tag comparisons."""
+    return re.compile(pattern)
+
+
+class TagMatcher:
+    """Literal union with explicit full-name regex patterns."""
+
+    def __init__(self, literals=(), patterns=(), field='regex', source=None):
+        self.literals = set(parse_tags(literals))
+        self.patterns = parse_regex(patterns)
+        self.compiled = []
+        for index, pattern in enumerate(self.patterns, 1):
+            try:
+                self.compiled.append(compile_regex(pattern))
+            except (re.error, OverflowError) as error:
+                raise ValueError(f'{source or "global"}.{field} pattern {index}: {error}') from error
+
+    def __bool__(self):
+        return bool(self.literals or self.patterns)
+
+    def __contains__(self, tag):
+        return bool(self.matches(tag))
+
+    def matches(self, tag):
+        tag = canonical_tag(tag)
+        matches = [{'kind': 'literal', 'value': tag}] if tag in self.literals else []
+        matches.extend({'kind': 'regex', 'pattern': p.pattern}
+                       for p in self.compiled if p.fullmatch(tag))
+        return matches
+
+
+def rule_matcher(rules, field, literals=None):
+    return TagMatcher(getattr(rules, field, ()) if literals is None else literals,
+                      getattr(rules, field + '_regex', ()), field + '_regex',
+                      getattr(rules, 'name', None))
 
 
 def canonical_tag(tag: str) -> str:
@@ -55,16 +108,18 @@ def normalized_scores(scores: Mapping[str, Score]) -> Scores:
     return result
 
 
-def source_owners(configs):
+def source_owners(configs, tags=()):
     owners = {}
+    tags = {canonical_tag(tag) for tag in tags}
     for config in configs:
-        for tag in parse_tags(config.only_from_source):
+        matcher = rule_matcher(config, 'only_from_source')
+        for tag in matcher.literals | {t for t in tags if t in matcher}:
             owners.setdefault(tag, set()).add(config.name)
     return owners
 
 
 def restrict_allowed_tags(result, rules):
-    allowed = set(parse_tags(rules.allowed_tags))
+    allowed = rule_matcher(rules, 'allowed_tags')
     if not allowed:
         return result
     result = copy.deepcopy(result)
@@ -77,7 +132,7 @@ def restrict_allowed_tags(result, rules):
 
 def enforce_owners(result, configs):
     """Prevent final manual prefix/suffix additions from bypassing source ownership."""
-    owners = source_owners(configs)
+    owners = source_owners(configs, set(result['general']) | set(result['character']))
     if not owners:
         return result
     result = copy.deepcopy(result)
@@ -107,10 +162,15 @@ def format_result(result: _Result, order: TagInput = None) -> _Result:
 def apply_tag_rules(
     result: _Result, remove: TagInput = (), add: Mapping[str, Score] | None = None,
     before: TagInput = (), after: TagInput = (), character_names: TagInput = (),
+    remove_regex: TagInput = (),
 ) -> _Result:
     """Return a new result; explicit removal wins over manual additions."""
     output = copy.deepcopy(result)
-    blocked = set(parse_tags(remove))
+    matcher = TagMatcher(remove, remove_regex, 'remove_tags_regex')
+    candidates = set(normalized_scores(output['general'])) | set(normalized_scores(output['character']))
+    candidates.update(canonical_tag(tag) for tag in (add or {}))
+    candidates.update(parse_tags(before) + parse_tags(after))
+    blocked = matcher.literals | {tag for tag in candidates if tag in matcher}
     for category in CATEGORIES:
         output[category] = {
             tag: score

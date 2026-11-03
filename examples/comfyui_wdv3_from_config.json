@@ -49,7 +49,7 @@
       ],
       "size": [
         340,
-        198
+        230
       ],
       "flags": {},
       "order": 1,
@@ -63,6 +63,12 @@
             1
           ],
           "slot_index": 0
+        },
+        {
+          "name": "model_info",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 1
         }
       ],
       "properties": {
@@ -72,6 +78,7 @@
         "vit",
         "auto",
         true,
+        "",
         ""
       ]
     },
@@ -153,17 +160,7 @@
       "properties": {
         "Node name for S&R": "WDV3Tagger"
       },
-      "widgets_values": [
-        0.35,
-        0.75,
-        8,
-        true,
-        true,
-        "",
-        "",
-        "",
-        1
-      ]
+      "widgets_values": []
     },
     {
       "id": 5,

@@ -34,6 +34,12 @@ class DetectorConfig:  # pylint: disable=R0902  # Public configuration fields.
     device: str = "auto"
     download_missing: bool = True
     full_image_only_tags: Optional[List[str]] = None
+    remove_tags_from_full_regex: Optional[List[str]] = None
+    remove_tags_from_region_regex: Optional[List[str]] = None
+    exclude_from_region_regex: Optional[List[str]] = None
+    only_from_source_regex: Optional[List[str]] = None
+    allowed_tags_regex: Optional[List[str]] = None
+    full_image_only_tags_regex: Optional[List[str]] = None
 
     def __post_init__(self):
         if self.classes is None:
@@ -51,6 +57,10 @@ class DetectorConfig:  # pylint: disable=R0902  # Public configuration fields.
         self.allowed_tags = parse_tags(self.allowed_tags)
         if self.full_image_only_tags is not None:
             self.full_image_only_tags = parse_tags(self.full_image_only_tags)
+        from .tag_utils import REGEX_RULE_FIELDS, parse_regex, rule_matcher
+        for field in REGEX_RULE_FIELDS:
+            setattr(self, field + '_regex', parse_regex(getattr(self, field + '_regex')))
+            rule_matcher(self, field)
 
     @classmethod
     def from_dict(cls, values):

@@ -11,4 +11,7 @@ if find_spec("comfy_api") is not None:
         NODE_CLASS_MAPPINGS[schema.node_id] = node
         NODE_DISPLAY_NAME_MAPPINGS[schema.node_id] = schema.display_name
 
+from .comfy_preflight import register_preflight
+register_preflight(NODE_CLASS_MAPPINGS)
+
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]

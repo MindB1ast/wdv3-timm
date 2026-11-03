@@ -12,7 +12,7 @@ from comfy.utils import ProgressBar
 from .comfy_nodes import ROOT, model_directory
 from .comfy_processing import (file_frame, scan_folder,
                                segment_frames, tag_folder, tensor_frame)
-from .Scripts.tag_utils import parse_tags, parse_additions
+from .Scripts.tag_utils import parse_tags, parse_additions, parse_regex, REGEX_RULE_FIELDS
 from .Scripts.evidence import Bundle
 from .Scripts.preprocess import GLOBAL_EXCLUDED_REGION_TAGS
 
@@ -25,6 +25,22 @@ SAM_REGIONS = io.Custom("WDV3_SAM_REGIONS")
 FILES = io.Custom("WDV3_FILES")
 MODEL = io.Custom("WDV3_MODEL")
 
+LITERAL_HELP = (' Буквальные имена: blue eyes = blue_eyes. Список через запятые или переводы строк; '
+                'пробел внутри имени не разделяет теги. Regex-метасимволы здесь буквальные.')
+REGEX_HELP = ('Regex: один Python-шаблон на строку, полное совпадение с именем с _, '
+              'с учётом регистра. Например .*_eyes. Пробелы и запятые сохраняются. '
+              'Обычные теги вводите в отдельное буквальное поле.')
+
+
+def literal_input(name, **kwargs):
+    kwargs['tooltip'] = kwargs.get('tooltip', '') + LITERAL_HELP
+    return io.String.Input(name, **kwargs)
+
+
+def regex_inputs(fields):
+    return [io.String.Input(field + '_regex', default='', multiline=True,
+                            tooltip=field + ': ' + REGEX_HELP) for field in fields]
+
 
 def progress(done, total):
     import comfy.model_management as management
@@ -36,20 +52,37 @@ class WDTaggingOptions(io.ComfyNode):
     @classmethod
     def define_schema(cls):
         return io.Schema(node_id="WDV3Options", display_name="WDV3 Tagging Settings", category="WDV3/Settings",
-            description="Overrides tagging widgets when connected to options. Batch sizes bound WD tensors.",
-            inputs=[io.Float.Input("general_threshold", default=.35, min=0, max=1, step=.01),
-                    io.Float.Input("character_threshold", default=.75, min=0, max=1, step=.01),
-                    io.Int.Input("image_batch_size", default=2, min=1, max=64),
-                    io.Int.Input("region_batch_size", default=8, min=1, max=128),
-                    io.Boolean.Input("replace_underscores", default=True),
-                    io.Boolean.Input("escape_parentheses", default=True),
-                    io.String.Input("remove_tags", default="", multiline=True),
-                    io.String.Input("prefix_tags", default=""), io.String.Input("suffix_tags", default="")],
-            outputs=[OPTIONS.Output("options")])
+            description="Global tagging and output settings. Connect options to the execution nodes. Batch sizes bound model tensors.",
+            inputs=[io.Float.Input("general_threshold", default=.35, min=0, max=1, step=.01,
+                        tooltip='Порог уверенности WD для обычных тегов: проходят оценки строго выше этого значения. Ниже — больше тегов и ошибок; выше — меньше, но увереннее. Для регионов можно задать отдельный порог в Region Tag Rules.'),
+                    io.Float.Input("character_threshold", default=.75, min=0, max=1, step=.01,
+                        tooltip='Порог WD для имён персонажей, а не для обнаружения людей. Ниже — больше предполагаемых персонажей; выше — меньше ложных имён. Для регионов используйте Region Tag Rules.'),
+                    io.Int.Input("image_batch_size", default=2, min=1, max=64,
+                        tooltip='Сколько полных изображений WD обрабатывает одновременно. Больше — обычно быстрее, но требует больше памяти; при нехватке памяти уменьшите до 1. Размеры батчей SAM и регионов задаются отдельно.'),
+                    io.Int.Input("region_batch_size", default=8, min=1, max=128,
+                        tooltip='Сколько вырезанных областей YOLO/SAM WD тегирует одновременно. При нехватке памяти уменьшите. Не ограничивает число найденных объектов и не задаёт размер батча SAM.'),
+                    io.Boolean.Input("replace_underscores", default=True,
+                        tooltip='Заменять подчёркивания пробелами в итоговом тексте: blue_eyes → blue eyes. Имена тегов в подробных данных остаются каноническими.'),
+                    io.Boolean.Input("escape_parentheses", default=True,
+                        tooltip='Экранировать скобки в итоговом тексте для использования в промпте: hero_(series) → hero_\\(series\\). Отключите, если текст нужен без экранирования.'),
+                    literal_input("remove_tags", default="", multiline=True,
+                        tooltip='Теги, которые нужно удалить из итогового результата независимо от источника. Разделяйте запятыми или переносами строк, например blurry, watermark. Удаление имеет приоритет над ручным добавлением.'),
+                    literal_input("prefix_tags", default="",
+                        tooltip='Вручную добавить теги в начало итогового текста, через запятую. Они не требуют распознавания моделью; глобальное удаление и ограничения источников продолжают действовать.'), literal_input("suffix_tags", default="",
+                        tooltip='Вручную добавить теги в конец итогового текста, через запятую. Они не требуют распознавания моделью; глобальное удаление и ограничения источников продолжают действовать.'),
+                    *regex_inputs(['remove_tags']),
+                    io.String.Input('tag_separator', default=', ',
+                        tooltip='Точная строка между тегами: , или пробел или |. Пробелы сохраняются. Пусто — без разделителя. На ввод правил не влияет.'),
+                    io.Int.Input('sam_batch_size', default=1, min=1, max=16,
+                        tooltip='Сколько исходных изображений SAM сегментирует одновременно. Это не число областей или источников. Сохраняется в options pipeline-конфига.')],
+            outputs=[OPTIONS.Output("options",
+                        tooltip='Глобальные настройки тегирования. Подключите к options у Tag Image / Regions, Tag Folder, Collect Evidence или Apply Filters; также можно сохранить через Save Pipeline Config.')])
 
     @classmethod
     def execute(cls, **kwargs):
         from .comfy_config import validate_config
+        if 'remove_tags_regex' in kwargs:
+            kwargs['remove_tags_regex'] = parse_regex(kwargs['remove_tags_regex'])
         validate_config({'schema_version':1,'options':kwargs})
         return io.NodeOutput(Bundle.pack('rules',kwargs))
 
@@ -58,25 +91,32 @@ class WDRegionRules(io.ComfyNode):
     @classmethod
     def define_schema(cls):
         return io.Schema(node_id="WDV3RegionRules", display_name="WDV3 Region Tag Rules", category="WDV3/Settings",
-            description="Comma/newline separated tags. Removal wins. Manual additions have assigned score 1.0.",
-            inputs=[io.Float.Input("general_threshold", default=.35, min=0, max=1, step=.01),
-                    io.Float.Input("character_threshold", default=.75, min=0, max=1, step=.01),
-                    io.String.Input("remove_from_full", default="", multiline=True),
-                    io.String.Input("remove_from_regions", default="", multiline=True),
-                    io.String.Input("add_to_regions", default="", multiline=True, tooltip="tag or tag:score (0..1), separated by commas/newlines"),
-                    io.String.Input("require_full_confirmation", default="", multiline=True),
-                    io.String.Input("only_from_source", default="", multiline=True,
-                        tooltip="These tags may come only from this source and other declared owners. No full-image fallback."),
-                    io.String.Input("allowed_tags", default="", multiline=True,
-                        tooltip="Accept only these tags from this source. Empty means unrestricted."),
-                    io.String.Input('full_image_only_tags', default=', '.join(sorted(GLOBAL_EXCLUDED_REGION_TAGS)),multiline=True,
-                        tooltip='Composition tags that may come only from the full image. Clear to allow them from this source.')],
-            outputs=[RULES.Output("rules")])
+            description="blue eyes = blue_eyes. Comma/newline separated literal tags. Regex uses separate fields. Removal wins.",
+            inputs=[io.Float.Input("general_threshold", default=.35, min=0, max=1, step=.01,
+                        tooltip='Порог WD для обычных тегов только в регионах этого источника. Проходят оценки строго выше порога; меньшее значение добавляет больше тегов и ошибок. Порог полного изображения задаётся в Tagging Settings.'),
+                    io.Float.Input("character_threshold", default=.75, min=0, max=1, step=.01,
+                        tooltip='Порог WD для имён персонажей только в регионах этого источника. Это не уверенность детектора и не класс person. Выше — меньше ложных имён.'),
+                    literal_input("remove_from_full", default="", multiline=True,
+                        tooltip='Убрать эти теги из вклада полного изображения, если этот источник нашёл хотя бы один регион. Например, перенести определение 1girl на регионы. Другие источники всё ещё могут добавить эти теги.'),
+                    literal_input("remove_from_regions", default="", multiline=True,
+                        tooltip='Не принимать эти теги из регионов данного источника. Запятые или переносы строк. Полное изображение и другие источники сохраняют свои теги; удаление побеждает add_to_regions.'),
+                    literal_input("add_to_regions", default="", multiline=True, tooltip='Добавить теги в каждый найденный регион этого источника. Формат: person или person:0.9, через запятую/перенос строки. Без оценки назначается 1.0; это ручная оценка, не уверенность WD. Если регионов нет, ничего не добавится. Ограничения и удаление продолжают действовать.'),
+                    literal_input("require_full_confirmation", default="", multiline=True,
+                        tooltip='Принимать перечисленные теги из регионов только если они также прошли порог на полном изображении. Например, full_body не попадёт в итог лишь из-за маленького кропа. Запятые или переносы строк.'),
+                    literal_input("only_from_source", default="", multiline=True,
+                        tooltip='Закрепить эти теги за данным источником: полное изображение и источники, не объявившие этот тег своим, не смогут добавить его в итог. Если источник не нашёл/не подтвердил тег, запасного варианта с полного изображения нет.'),
+                    literal_input("allowed_tags", default="", multiline=True,
+                        tooltip='Разрешить из этого источника только перечисленные теги, включая ручные добавления. Пусто — без такого ограничения. Например, для лица оставьте blue_eyes, smile. Запятые или переносы строк.'),
+                    literal_input('full_image_only_tags', default=', '.join(sorted(GLOBAL_EXCLUDED_REGION_TAGS)),multiline=True,
+                        tooltip='Эти теги нельзя добавлять из регионов данного источника: они описывают фон и композицию всей картинки. Они могут прийти с полного изображения. Очистите поле, чтобы разрешить их из этого источника.'),
+                    *regex_inputs(REGEX_RULE_FIELDS)],
+            outputs=[RULES.Output("rules",
+                        tooltip='Правила тегов одного источника регионов. Подключите к rules у YOLO Detector или SAM Text / Region Settings. Это не глобальные Tagging Settings.')])
 
     @classmethod
     def execute(cls, general_threshold, character_threshold, remove_from_full,
                 remove_from_regions, add_to_regions, require_full_confirmation,
-                only_from_source="", allowed_tags="", full_image_only_tags=None):
+                only_from_source="", allowed_tags="", full_image_only_tags=None, **regex_rules):
         rules={"region_gen_threshold": general_threshold, "region_char_threshold": character_threshold,
             "remove_tags_from_full": parse_tags(remove_from_full),
             "remove_tags_from_region": parse_tags(remove_from_regions),
@@ -85,6 +125,11 @@ class WDRegionRules(io.ComfyNode):
             "only_from_source": parse_tags(only_from_source), "allowed_tags": parse_tags(allowed_tags),
             "full_image_only_tags": None if full_image_only_tags is None else parse_tags(full_image_only_tags)}
         from .comfy_config import validate_rules
+        unknown = set(regex_rules) - {field + '_regex' for field in REGEX_RULE_FIELDS}
+        if unknown:
+            raise ValueError('Unknown regex rules: ' + ', '.join(sorted(unknown)))
+        rules.update({field + '_regex': parse_regex(regex_rules.get(field + '_regex', []))
+                      for field in REGEX_RULE_FIELDS})
         validate_rules(rules)
         return io.NodeOutput(Bundle.pack('rules',rules))
 
@@ -108,15 +153,23 @@ class WDYOLODetector(io.ComfyNode):
                 known.extend(p.name for p in directory.glob("*.pt"))
         return io.Schema(node_id="WDV3YOLODetector", display_name="WDV3 YOLO Detector", category="WDV3/Regions",
             description="Configure a YOLO source. Weights are loaded on first tagging, not while saving presets.",
-            inputs=[io.Combo.Input("model", options=list(dict.fromkeys(known))),
-                    io.String.Input("source_name", default="person"),
-                    io.Float.Input("confidence", default=.35, min=0, max=1, step=.01),
-                    io.String.Input("classes", default="0", tooltip="Comma-separated class IDs; empty means all classes."),
-                    io.String.Input("custom_model_path", default="", tooltip="Optional explicit weights path; overrides model."),
-                    RULES.Input("rules", optional=True), DETECTORS.Input("previous_detectors", optional=True),
-                    io.Combo.Input('device', options=['auto','cpu','cuda'], default='auto', optional=True),
-                    io.Boolean.Input('download_missing', default=True, optional=True)],
-            outputs=[DETECTORS.Output("detectors")])
+            inputs=[io.Combo.Input("model", options=list(dict.fromkeys(known)),
+                        tooltip='Веса YOLO для поиска объектов. person/face/hand — специализированные модели; yolov8n — общие классы COCO. Используются прямоугольные вырезки bbox, даже для весов с суффиксом -seg. custom_model_path заменяет выбор.'),
+                    io.String.Input("source_name", default="person",
+                        tooltip='Уникальное имя источника регионов в общей схеме, например person_detail или face. По нему показываются регионы и происхождение тегов в отчётах. Имена YOLO и SAM не должны совпадать.'),
+                    io.Float.Input("confidence", default=.35, min=0, max=1, step=.01,
+                        tooltip='Порог уверенности обнаружения объекта (0–1). Выше — меньше сомнительных объектов, ниже — больше находок и ложных срабатываний. Это не порог уверенности тегов WD.'),
+                    io.String.Input("classes", default="0", tooltip='Числовые ID классов YOLO через запятую; пусто — все классы. Для COCO-модели 0 = person; у специализированных моделей значения могут отличаться. Это не текстовый запрос SAM.'),
+                    io.String.Input("custom_model_path", default="", tooltip='Полный путь к весам YOLO (.pt). Если заполнен, используется вместо model. Оставьте пустым для выбора из списка.'),
+                    RULES.Input("rules", optional=True,
+                        tooltip='Подключите rules из Region Tag Rules: пороги WD, удаление и добавление тегов применятся к регионам этого источника. Без подключения используются стандартные правила.'), DETECTORS.Input("previous_detectors", optional=True,
+                        tooltip='Необязательно: detectors от другой ноды YOLO. Текущий источник будет добавлен к списку. Для отдельных веток используйте Combine YOLO Detectors; имена источников должны быть уникальны.'),
+                    io.Combo.Input('device', options=['auto','cpu','cuda'], default='auto', optional=True,
+                        tooltip='Где выполнять вычисления: auto — устройство, выбранное окружением; cpu — процессор; cuda — видеокарта NVIDIA с доступной CUDA. При нехватке видеопамяти выберите cpu или уменьшите батч.'),
+                    io.Boolean.Input('download_missing', default=True, optional=True,
+                        tooltip='Разрешить скачивание недостающих файлов модели. Выключите для работы только с локальными файлами: если их нет или комплект неполон, выполнение завершится ошибкой.')],
+            outputs=[DETECTORS.Output("detectors",
+                        tooltip='Список источников YOLO с индивидуальными настройками. Подключите к detectors у ноды тегирования или Collect Evidence; объединить ветки можно через Combine YOLO Detectors.')])
 
     @classmethod
     def execute(cls, model, source_name, confidence, classes, custom_model_path, rules=None, previous_detectors=None,
@@ -156,11 +209,15 @@ class WDSAMLoader(io.ComfyNode):
     def define_schema(cls):
         return io.Schema(node_id="WDV3SAMLoader", display_name="WDV3 Load SAM 3.1", category="WDV3/SAM",
             description="Configure SAM 3.1. Missing files are downloaded when segmentation runs; weights are released afterwards.",
-            inputs=[io.Combo.Input("model", options=["unsloth/sam3.1"]),
-                    io.Combo.Input("device", options=["auto", "cpu", "cuda"]),
-                    io.Boolean.Input("download_missing", default=True),
-                    io.String.Input("local_model_path", default="", tooltip="Optional model folder or model.safetensors. Empty uses models/sam3/unsloth-sam3.1.")],
-            outputs=[SAM_MODEL.Output("sam_model")])
+            inputs=[io.Combo.Input("model", options=["unsloth/sam3.1"],
+                        tooltip='Модель сегментации SAM 3.1 (unsloth/sam3.1). Находит объекты по тексту из sources; теги распознаёт отдельная модель WD. Недостающие файлы загружаются при запуске сегментации, если это разрешено.'),
+                    io.Combo.Input("device", options=["auto", "cpu", "cuda"],
+                        tooltip='Где выполнять вычисления: auto — устройство, выбранное окружением; cpu — процессор; cuda — видеокарта NVIDIA с доступной CUDA. При нехватке видеопамяти выберите cpu или уменьшите батч.'),
+                    io.Boolean.Input("download_missing", default=True,
+                        tooltip='Разрешить скачивание недостающих файлов модели. Выключите для работы только с локальными файлами: если их нет или комплект неполон, выполнение завершится ошибкой.'),
+                    io.String.Input("local_model_path", default="", tooltip='Папка SAM 3.1 с весами и сопутствующими JSON/токенизатором либо путь к model.safetensors в ней. Пусто — стандартная папка models/sam3/unsloth-sam3.1 ComfyUI или локальный models/sam3 проекта, если там есть веса.')],
+            outputs=[SAM_MODEL.Output("sam_model",
+                        tooltip='Настройки модели SAM. Подключите к sam_model вместе с sources из SAM Text / Region Settings; отдельная модель WD нужна для распознавания тегов.')])
 
     @classmethod
     def execute(cls, model, device, download_missing, local_model_path):
@@ -185,15 +242,26 @@ class WDSAMSource(io.ComfyNode):
     @classmethod
     def define_schema(cls):
         return io.Schema(node_id="WDV3SAMSource", display_name="WDV3 SAM Text / Region Settings", category="WDV3/SAM",
-            inputs=[io.String.Input("source_name", default="sam_person"), io.String.Input("prompt", default="person"),
-                    io.Float.Input("confidence", default=.5, min=0, max=1, step=.01),
-                    io.Float.Input("mask_threshold", default=.5, min=0, max=1, step=.01),
-                    io.Int.Input("min_mask_area_px", default=32, min=1, max=100000000),
-                    io.Int.Input("max_regions", default=32, min=1, max=256),
-                    io.Combo.Input("view_mode", options=["bbox", "mask"]),
-                    io.Int.Input("padding_px", default=0, min=0, max=4096),
-                    RULES.Input("rules", optional=True), SAM_SOURCES.Input("previous_sources", optional=True)],
-            outputs=[SAM_SOURCES.Output("sources")])
+            inputs=[io.String.Input("source_name", default="sam_person",
+                        tooltip='Уникальное имя источника регионов в общей схеме, например person_detail или face. По нему показываются регионы и происхождение тегов в отчётах. Имена YOLO и SAM не должны совпадать.'), io.String.Input("prompt", default="person",
+                        tooltip='Какой объект должен найти SAM: короткое описание, например person, face или cup. Лучше начать с английского названия. Для нескольких независимых запросов создайте отдельные SAM Sources и объедините их; это не список итоговых тегов.'),
+                    io.Float.Input("confidence", default=.5, min=0, max=1, step=.01,
+                        tooltip='Минимальная уверенность SAM, что найденная область соответствует текстовому prompt. Проходят оценки строго выше порога. Выше — меньше сомнительных объектов. Форму маски задаёт mask_threshold, а отбор тегов WD — Region Tag Rules.'),
+                    io.Float.Input("mask_threshold", default=.5, min=0, max=1, step=.01,
+                        tooltip='Порог включения пикселя в маску SAM: остаются вероятности строго выше значения. Выше — маска обычно меньше и строже, ниже — захватывает больше краёв и фона. Меняет форму маски и её bbox, а не уверенность тегов WD.'),
+                    io.Int.Input("min_mask_area_px", default=32, min=1, max=100000000,
+                        tooltip='Минимальная площадь маски в пикселях исходного изображения. Более мелкие маски отбрасываются. Уменьшите для небольших лиц/предметов; увеличьте для удаления мелкого шума. Это площадь маски, а не прямоугольника bbox.'),
+                    io.Int.Input("max_regions", default=32, min=1, max=256,
+                        tooltip='Максимум регионов этого SAM-источника на одно изображение. После фильтрации и удаления одинаковых масок остаются самые уверенные. Это не размер батча.'),
+                    io.Combo.Input("view_mode", options=["bbox", "mask"],
+                        tooltip='Какой фрагмент получит WD для тегирования региона. mask — вырезка объекта по маске SAM: внутри минимального прямоугольника вокруг маски пиксели вне объекта заливаются белым, поэтому исходный фон меньше влияет на теги. bbox — минимальный прямоугольник вокруг той же маски целиком: исходный фон и соседние объекты внутри сохраняются и могут влиять на теги. padding_px добавляет контекст; в mask он также расширяет видимую область вокруг маски. Сама найденная SAM-маска от выбора режима не меняется.'),
+                    io.Int.Input("padding_px", default=0, min=0, max=4096,
+                        tooltip='Отступ в пикселях исходного изображения вокруг bbox маски, с обрезкой по краям картинки. 0 — плотная вырезка. В bbox добавляет исходный фон; в mask также расширяет видимую маску на этот отступ, сохраняя немного окружения объекта. Остальное в mask заливается белым.'),
+                    RULES.Input("rules", optional=True,
+                        tooltip='Подключите rules из Region Tag Rules: пороги WD, удаление и добавление тегов применятся к регионам этого источника. Без подключения используются стандартные правила.'), SAM_SOURCES.Input("previous_sources", optional=True,
+                        tooltip='Необязательно: sources от другой SAM Text / Region Settings. Текущий запрос добавится к списку. Для отдельных веток используйте Combine SAM Sources; имена источников должны быть уникальны.')],
+            outputs=[SAM_SOURCES.Output("sources",
+                        tooltip='Список запросов SAM с настройками масок, вырезок и правилами тегов. Подключите к sources вместе с sam_model. Несколько веток объединяются через Combine SAM Sources.')])
 
     @classmethod
     def execute(cls, source_name, prompt, confidence, mask_threshold, min_mask_area_px,
@@ -216,9 +284,15 @@ class WDSAMSegment(io.ComfyNode):
     @classmethod
     def define_schema(cls):
         return io.Schema(node_id="WDV3SAMSegment", display_name="WDV3 SAM Segment Images", category="WDV3/SAM",
-            inputs=[io.Image.Input("images"), SAM_MODEL.Input("sam_model"), SAM_SOURCES.Input("sources"),
-                    io.Int.Input("sam_batch_size", default=1, min=1, max=16)],
-            outputs=[SAM_REGIONS.Output("sam_regions"), io.Mask.Output("combined_mask")])
+            inputs=[io.Image.Input("images",
+                        tooltip='Исходное изображение или батч IMAGE, например из Load Image. Для SAM Segment и тегирования подключайте одни и те же изображения в одинаковом порядке, чтобы маски соответствовали картинкам.'), SAM_MODEL.Input("sam_model",
+                        tooltip='Настройки SAM из Load SAM 3.1 или Load Pipeline Config. Подключайте вместе с sources. SAM ищет объекты по тексту; для получения тегов также нужна модель WD.'), SAM_SOURCES.Input("sources",
+                        tooltip='Текстовые запросы SAM и настройки регионов из SAM Text / Region Settings, Combine SAM Sources или Load Pipeline Config. Подключайте вместе с sam_model. Каждый источник сохраняет собственные пороги, режим вырезки и правила.'),
+                    io.Int.Input("sam_batch_size", default=1, min=1, max=16,
+                        tooltip='Сколько исходных изображений SAM сегментирует одновременно. Начните с 1; увеличение требует больше памяти. Это не число объектов на изображении и не батч WD.')],
+            outputs=[SAM_REGIONS.Output("sam_regions",
+                        tooltip='Маски SAM и данные регионов для каждого исходного изображения, со всеми источниками. Подключите к sam_regions у Tag Image / Regions или Results Viewer; передавайте те же изображения в том же порядке. Это не обычный выход MASK.'), io.Mask.Output("combined_mask",
+                        tooltip='Одна объединённая маска на изображение исходного размера: 1 (белое) — попало хотя бы в один принятый регион любого источника, 0 (чёрное) — фон. Подключите к нодам с входом MASK. Отдельные объекты и источники доступны в sam_regions.')])
 
     @classmethod
     def execute(cls, images, sam_model, sources, sam_batch_size):
@@ -242,11 +316,16 @@ class WDLoadFolder(io.ComfyNode):
     def define_schema(cls):
         return io.Schema(node_id="WDV3LoadFolder", display_name="WDV3 Image Folder", category="WDV3/Batch",
             description="Collects paths only. Images of different sizes are decoded in bounded groups by Tag Folder.",
-            inputs=[io.String.Input("directory", default=folder_paths.get_input_directory()),
-                    io.Boolean.Input("recursive", default=False),
-                    io.Int.Input("start_index", default=0, min=0, max=10000000),
-                    io.Int.Input("limit", default=0, min=0, max=10000000, tooltip="0 means all matching images")],
-            outputs=[FILES.Output("files"), io.Int.Output("image_count")], not_idempotent=True)
+            inputs=[io.String.Input("directory", default=folder_paths.get_input_directory(),
+                        tooltip='Папка с исходными изображениями на машине, где работает ComfyUI. Нода собирает пути; для обработки подключите files к Tag Folder. Оригиналы не изменяются.'),
+                    io.Boolean.Input("recursive", default=False,
+                        tooltip='Искать изображения также во всех подпапках. Если выключено, берутся только файлы непосредственно в directory.'),
+                    io.Int.Input("start_index", default=0, min=0, max=10000000,
+                        tooltip='С какого изображения в отсортированном списке начинать: 0 — первое. Удобно для обработки папки по частям; применяется до limit.'),
+                    io.Int.Input("limit", default=0, min=0, max=10000000, tooltip='Сколько изображений взять после start_index. 0 — все оставшиеся подходящие изображения.')],
+            outputs=[FILES.Output("files",
+                        tooltip='Пути к выбранным изображениям, без загрузки всей папки в память. Подключите к files у Tag Folder.'), io.Int.Output("image_count",
+                        tooltip='Количество изображений после применения recursive, start_index и limit. Позволяет проверить размер выбранной части папки до тегирования.')], not_idempotent=True)
 
     @classmethod
     def execute(cls, directory, recursive, start_index, limit):
@@ -259,14 +338,27 @@ class WDTagFolder(io.ComfyNode):
     def define_schema(cls):
         return io.Schema(node_id="WDV3TagFolder", display_name="WDV3 Tag Folder", category="WDV3/Batch",
             is_output_node=True,
-            inputs=[FILES.Input("files"), MODEL.Input("wd_model"), OPTIONS.Input("options"),
-                    io.Boolean.Input("save_txt", default=True), io.Boolean.Input("save_json", default=True),
-                    io.String.Input("output_directory", default=str(Path(folder_paths.get_output_directory()) / "wdv3")),
-                    io.Boolean.Input("overwrite", default=False),
-                    io.Int.Input("sam_batch_size", default=1, min=1, max=16),
-                    DETECTORS.Input("detectors", optional=True), SAM_MODEL.Input("sam_model", optional=True),
-                    SAM_SOURCES.Input("sources", optional=True)],
-            outputs=[io.String.Output("tags", is_output_list=True), io.String.Output("results_json", is_output_list=True)])
+            inputs=[FILES.Input("files",
+                        tooltip='Список файлов из Image Folder. Изображения читаются группами, поэтому папка может содержать картинки разных размеров.'), MODEL.Input("wd_model",
+                        tooltip='Модель WD из Load Tagger Model. Она распознаёт теги на полном изображении и вырезанных регионах; YOLO/SAM только находят эти регионы.'), OPTIONS.Input("options",
+                        tooltip='Настройки из Tagging Settings или Load Pipeline Config. Задают глобальные пороги WD, формат текста и батчи. В Tag Image / Regions эти настройки задаются только через options; без подключения используются стандартные значения.'),
+                    io.Boolean.Input("save_txt", default=True,
+                        tooltip='Сохранить итоговые теги в текстовый файл TXT. Для Export Report нужен отчёт по results из Apply Filters или Merge Results; сырые evidence и геометрия regions не содержат итоговых тегов.'), io.Boolean.Input("save_json", default=True,
+                        tooltip='Сохранить подробные данные в JSON: оценки, регионы и сведения о результате. Формат результата и формат отчёта Inspect различаются.'),
+                    io.String.Input("output_directory", default=str(Path(folder_paths.get_output_directory()) / "wdv3"),
+                        tooltip='Папка сохранения на машине, где работает ComfyUI; при необходимости создаётся автоматически. Это папка, а не имя файла.'),
+                    io.Boolean.Input("overwrite", default=False,
+                        tooltip='Разрешить заменять существующие файлы с теми же именами. Если выключено, при совпадении имён будет ошибка: выберите другое имя или папку.'),
+                    io.Int.Input("sam_batch_size", default=1, min=1, max=16,
+                        tooltip='Сколько исходных изображений SAM сегментирует одновременно. Начните с 1; увеличение требует больше памяти. Это не число объектов на изображении и не батч WD.'),
+                    DETECTORS.Input("detectors", optional=True,
+                        tooltip='Источники YOLO из YOLO Detector / Combine YOLO Detectors / Load Pipeline Config. Их прямоугольные вырезки тегируются WD вместе с полным изображением; фон внутри вырезок сохраняется.'), SAM_MODEL.Input("sam_model", optional=True,
+                        tooltip='Настройки SAM из Load SAM 3.1 или Load Pipeline Config. Подключайте вместе с sources. SAM ищет объекты по тексту; для получения тегов также нужна модель WD.'),
+                    SAM_SOURCES.Input("sources", optional=True,
+                        tooltip='Текстовые запросы SAM и настройки регионов из SAM Text / Region Settings, Combine SAM Sources или Load Pipeline Config. Подключайте вместе с sam_model. Каждый источник сохраняет собственные пороги, режим вырезки и правила.')],
+            outputs=[io.String.Output("tags", is_output_list=True,
+                        tooltip='Готовый текст тегов: отдельная строка на каждое изображение, с выбранным форматированием. Можно передать в текстовый промпт или tags у Save Result вместе с results_json из той же ветки.'), io.String.Output("results_json", is_output_list=True,
+                        tooltip='Подробный JSON для каждого изображения: теги полного кадра и регионов, оценки и происхождение итоговых тегов. Подключите к Results Viewer или Save Result. Это содержимое JSON, а не путь к файлу.')])
 
     @classmethod
     def execute(cls, files, wd_model, options, save_txt, save_json, output_directory, overwrite,
@@ -283,16 +375,26 @@ class WDSaveResult(io.ComfyNode):
     @classmethod
     def define_schema(cls):
         return io.Schema(node_id="WDV3SaveResult", display_name="WDV3 Save Result", category="WDV3/Output",
-            description="Save one result as TXT and/or JSON. Connect tags too to preserve the tagger's exact text formatting. result_index selects one image from a batch (0 = first).",
+            description="Save one result as TXT and/or JSON using saved output settings. Connected tags are saved verbatim. result_index selects one image from a batch (0 = first).",
             is_output_node=True, is_input_list=True, not_idempotent=True,
-            inputs=[io.String.Input("results_json", force_input=True),
-                    io.String.Input("output_directory", default=str(Path(folder_paths.get_output_directory()) / "wdv3")),
-                    io.String.Input("filename", default="result"),
-                    io.Int.Input("result_index", default=0, min=0, max=10000000),
-                    io.Boolean.Input("save_txt", default=True), io.Boolean.Input("save_json", default=True),
-                    io.Boolean.Input("overwrite", default=False),
-                    io.String.Input("tags", force_input=True, optional=True)],
-            outputs=[io.String.Output("txt_path"), io.String.Output("json_path")])
+            inputs=[io.String.Input("results_json", force_input=True,
+                        tooltip='Подробные результаты из выхода results_json ноды тегирования, Apply Filters или Merge Results: один JSON на изображение. Подключайте напрямую; это не путь к файлу и не простой список тегов.'),
+                    io.String.Input("output_directory", default=str(Path(folder_paths.get_output_directory()) / "wdv3"),
+                        tooltip='Папка сохранения на машине, где работает ComfyUI; при необходимости создаётся автоматически. Это папка, а не имя файла.'),
+                    io.String.Input("filename", default="result",
+                        tooltip='Имя сохраняемого результата без папки и расширения, например result_01. Допустимы буквы, цифры, пробелы, _ и -; первый символ — буква или цифра. Расширения .txt и .json добавляются автоматически.'),
+                    io.Int.Input("result_index", default=0, min=0, max=10000000,
+                        tooltip='Какое изображение из батча сохранить: 0 — первое, 1 — второе и т. д. За один запуск сохраняется один выбранный результат; для всей папки используйте Tag Folder.'),
+                    io.Boolean.Input("save_txt", default=True,
+                        tooltip='Сохранить итоговые теги в текстовый файл TXT. Для Export Report нужен отчёт по results из Apply Filters или Merge Results; сырые evidence и геометрия regions не содержат итоговых тегов.'), io.Boolean.Input("save_json", default=True,
+                        tooltip='Сохранить подробные данные в JSON: оценки, регионы и сведения о результате. Формат результата и формат отчёта Inspect различаются.'),
+                    io.Boolean.Input("overwrite", default=False,
+                        tooltip='Разрешить заменять существующие файлы с теми же именами. Если выключено, при совпадении имён будет ошибка: выберите другое имя или папку.'),
+                    io.String.Input("tags", force_input=True, optional=True,
+                        tooltip='Необязательно: tags из той же ноды и ветки, что и results_json. Сохраняет точное форматирование текста, включая пробелы и экранирование скобок. Без подключения текст берётся из JSON.')],
+            outputs=[io.String.Output("txt_path",
+                        tooltip='Полный путь к сохранённому TXT. Пустая строка, если сохранение TXT выключено.'), io.String.Output("json_path",
+                        tooltip='Полный путь к сохранённому JSON. Пустая строка, если сохранение JSON выключено.')])
 
     @classmethod
     def execute(cls, results_json, output_directory, filename, result_index, save_txt, save_json, overwrite, tags=None):
@@ -307,9 +409,13 @@ class WDPreview(io.ComfyNode):
     def define_schema(cls):
         return io.Schema(node_id="WDV3Preview", display_name="WDV3 Results Viewer", category="WDV3",
             is_output_node=True, is_input_list=True,
-            inputs=[io.String.Input("results_json", force_input=True),
-                    io.Int.Input("preview_limit", default=16, min=1, max=256),
-                    io.Image.Input("images", optional=True), SAM_REGIONS.Input("sam_regions", optional=True)], outputs=[])
+            inputs=[io.String.Input("results_json", force_input=True,
+                        tooltip='Подробные результаты из выхода results_json ноды тегирования, Apply Filters или Merge Results: один JSON на изображение. Подключайте напрямую; это не путь к файлу и не простой список тегов.'),
+                    io.Int.Input("preview_limit", default=16, min=1, max=256,
+                        tooltip='Сколько первых результатов показать в просмотрщике. Ограничивает только предпросмотр, а не тегирование или сохранение.'),
+                    io.Image.Input("images", optional=True,
+                        tooltip='Для результатов Tag Image / Regions подключите тот же исходный батч IMAGE: появится предпросмотр картинки и рамок. Для Tag Folder просмотрщик читает оригиналы по путям из results_json.'), SAM_REGIONS.Input("sam_regions", optional=True,
+                        tooltip='Готовые маски и регионы из SAM Segment Images для этих же изображений и в том же порядке. В Tag Image / Regions используйте либо этот вход, либо пару sam_model + sources. Для просмотра масок подключите также к Results Viewer.')], outputs=[])
 
     @classmethod
     def execute(cls, results_json, preview_limit, images=None, sam_regions=None):
@@ -340,8 +446,10 @@ class WDCombineDetectors(io.ComfyNode):
         return io.Schema(node_id="WDV3CombineDetectors", display_name="WDV3 Combine YOLO Detectors", category="WDV3/Regions",
             description="Connect independently configured YOLO sources. New sockets appear as you connect sources.",
             inputs=[io.Autogrow.Input("detectors", template=io.Autogrow.TemplatePrefix(
-                DETECTORS.Input("detector"), prefix="detector", min=1, max=64))],
-            outputs=[DETECTORS.Output("detectors")])
+                DETECTORS.Input("detector",
+                        tooltip='Подключите detectors от отдельно настроенной YOLO-ноды. При подключении появляется следующий вход. Все источники объединяются; их имена должны быть уникальны.'), prefix="detector", min=1, max=64))],
+            outputs=[DETECTORS.Output("detectors",
+                        tooltip='Список источников YOLO с индивидуальными настройками. Подключите к detectors у ноды тегирования или Collect Evidence; объединить ветки можно через Combine YOLO Detectors.')])
 
     @classmethod
     def execute(cls, detectors):
@@ -355,8 +463,10 @@ class WDCombineSAMSources(io.ComfyNode):
         return io.Schema(node_id="WDV3CombineSAMSources", display_name="WDV3 Combine SAM Sources", category="WDV3/SAM",
             description="One SAM model, several prompts/settings. Each source retains its own thresholds and tag rules.",
             inputs=[io.Autogrow.Input("sources", template=io.Autogrow.TemplatePrefix(
-                SAM_SOURCES.Input("source"), prefix="source", min=1, max=64))],
-            outputs=[SAM_SOURCES.Output("sources")])
+                SAM_SOURCES.Input("source",
+                        tooltip='Подключите sources от отдельно настроенного SAM-запроса. При подключении появляется следующий вход. Все запросы используют общую модель SAM, сохраняя свои настройки и уникальные имена.'), prefix="source", min=1, max=64))],
+            outputs=[SAM_SOURCES.Output("sources",
+                        tooltip='Список запросов SAM с настройками масок, вырезок и правилами тегов. Подключите к sources вместе с sam_model. Несколько веток объединяются через Combine SAM Sources.')])
 
     @classmethod
     def execute(cls, sources):
@@ -383,10 +493,17 @@ class WDSaveConfig(io.ComfyNode):
         return io.Schema(node_id="WDV3SaveConfig", display_name="WDV3 Save Pipeline Config", category="WDV3/Settings",
             description="Save connected settings/sources as a portable JSON preset. No image inference or model downloads are needed.",
             is_output_node=True,
-            inputs=[io.String.Input("preset_name", default="my_pipeline"), io.Boolean.Input("overwrite", default=False),
-                    OPTIONS.Input("options", optional=True), DETECTORS.Input("detectors", optional=True),
-                    SAM_SOURCES.Input("sources", optional=True), SAM_MODEL.Input("sam_model", optional=True)],
-            outputs=[io.String.Output("config_path")])
+            inputs=[io.String.Input("preset_name", default="my_pipeline",
+                        tooltip='Имя JSON-пресета настроек, например my_pipeline. Сохраняется в пользовательской папке ComfyUI default/wdv3/configs. Затем выберите его в Load Pipeline Config.'), io.Boolean.Input("overwrite", default=False,
+                        tooltip='Разрешить заменять существующие файлы с теми же именами. Если выключено, при совпадении имён будет ошибка: выберите другое имя или папку.'),
+                    OPTIONS.Input("options", optional=True,
+                        tooltip='Настройки из Tagging Settings или Load Pipeline Config. Задают глобальные пороги WD, формат текста и батчи. В Tag Image / Regions эти настройки задаются только через options; без подключения используются стандартные значения.'), DETECTORS.Input("detectors", optional=True,
+                        tooltip='Источники YOLO из YOLO Detector / Combine YOLO Detectors / Load Pipeline Config. Их прямоугольные вырезки тегируются WD вместе с полным изображением; фон внутри вырезок сохраняется.'),
+                    SAM_SOURCES.Input("sources", optional=True,
+                        tooltip='Текстовые запросы SAM и настройки регионов из SAM Text / Region Settings, Combine SAM Sources или Load Pipeline Config. Подключайте вместе с sam_model. Каждый источник сохраняет собственные пороги, режим вырезки и правила.'), SAM_MODEL.Input("sam_model", optional=True,
+                        tooltip='Настройки SAM из Load SAM 3.1 или Load Pipeline Config. Подключайте вместе с sources. SAM ищет объекты по тексту; для получения тегов также нужна модель WD.')],
+            outputs=[io.String.Output("config_path",
+                        tooltip='Полный путь к JSON-пресету. Загрузите его через Load Pipeline Config; после создания нового пресета может понадобиться обновить ComfyUI.')])
 
     @classmethod
     def execute(cls, preset_name, overwrite, options=None, detectors=None, sources=None, sam_model=None):
@@ -402,9 +519,14 @@ class WDLoadConfig(io.ComfyNode):
     def define_schema(cls):
         return io.Schema(node_id="WDV3LoadConfig", display_name="WDV3 Load Pipeline Config", category="WDV3/Settings",
             description="Load tagging settings, detectors, SAM sources and SAM model settings from one config. No separate SAM Loader is needed.",
-            inputs=[io.Combo.Input("preset", options=list(preset_files()) or ["No saved configs"])],
-            outputs=[OPTIONS.Output("options"), DETECTORS.Output("detectors"), SAM_SOURCES.Output("sources"),
-                     SAM_MODEL.Output("sam_model")])
+            inputs=[io.Combo.Input("preset", options=list(preset_files()) or ["No saved configs"],
+                        tooltip='Сохранённый или примерный JSON-пресет. Подключите его выходы к ноде тегирования. Модели и изображения не хранятся в пресете; если новый файл не появился в списке, обновите ComfyUI.')],
+            outputs=[OPTIONS.Output("options",
+                        tooltip='Глобальные настройки тегирования. Подключите к options у Tag Image / Regions, Tag Folder, Collect Evidence или Apply Filters; также можно сохранить через Save Pipeline Config.'), DETECTORS.Output("detectors",
+                        tooltip='Список источников YOLO с индивидуальными настройками. Подключите к detectors у ноды тегирования или Collect Evidence; объединить ветки можно через Combine YOLO Detectors.'), SAM_SOURCES.Output("sources",
+                        tooltip='Список запросов SAM с настройками масок, вырезок и правилами тегов. Подключите к sources вместе с sam_model. Несколько веток объединяются через Combine SAM Sources.'),
+                     SAM_MODEL.Output("sam_model",
+                        tooltip='Настройки модели SAM. Подключите к sam_model вместе с sources из SAM Text / Region Settings; отдельная модель WD нужна для распознавания тегов.')])
 
     @classmethod
     def fingerprint_inputs(cls, preset):

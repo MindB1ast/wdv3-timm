@@ -202,6 +202,7 @@ def build(root):
         return graph
 
     variants = {
+        "comfyui_wdv3.json": workflow(),
         "comfyui_wdv3_pipeline.json": workflow(),
         "comfyui_wdv3_pipeline_yolo.json": workflow(yolo=True),
         "comfyui_wdv3_sam.json": workflow(sam=True),

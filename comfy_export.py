@@ -24,6 +24,9 @@ def save_result(results_json, directory, filename, *, result_index=0, tags=None,
         raise ValueError("tags and results_json must contain the same number of results")
     text = tags[result_index] if tags is not None else detail["merged_tags"].get(
         "taglist", detail["merged_tags"].get("caption", ""))
+    if tags is None and 'options' in detail.get('settings', {}):
+        from .comfy_evidence import formatted_text
+        text = formatted_text(detail)
     payloads = {}
     root = Path(directory).expanduser().resolve()
     if save_txt:

@@ -50,6 +50,17 @@ def runtime(fail=False):
 
 
 class ComfyTests(unittest.TestCase):
+    def test_full_image_without_detectors_or_sam_and_incomplete_sam_pair(self):
+        images = torch.ones(1, 4, 4, 3)
+        result = nodes.WDTagger().tag(images, runtime(), options={'prefix_tags': 'full'})
+        self.assertTrue(result['result'][0][0].startswith('full, '))
+        self.assertEqual(json.loads(result['result'][1][0])['detectors'], {})
+        self.assertEqual(result['result'][2], [])
+        with self.assertRaisesRegex(ValueError, 'SAM sources need sam_model'):
+            nodes.WDTagger().tag(images, runtime(), sources=[{'name': 'sam'}])
+        with self.assertRaisesRegex(ValueError, 'SAM model needs sources'):
+            nodes.WDTagger().tag(images, runtime(), sam_model={})
+
     def test_registration_and_lazy_imports(self):
         self.assertTrue({"WDV3Tagger", "WDV3ModelLoader", "WDV3DetectorLoader"} <= PACKAGE.NODE_CLASS_MAPPINGS.keys())
         for cls in PACKAGE.NODE_CLASS_MAPPINGS.values():

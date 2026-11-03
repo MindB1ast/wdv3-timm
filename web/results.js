@@ -3,6 +3,7 @@ import { api } from "../../scripts/api.js";
 import { imagePoint, regionsAt, nextRegion } from "./region_selection.mjs";
 import { repairPreviewLimit } from "./preview_limit.mjs";
 import { mergedTagOrigin } from "./tag_origin.mjs";
+import { formattedTags } from "./tag_format.mjs";
 
 const element = (tag, text) => {
     const node = document.createElement(tag);
@@ -230,8 +231,7 @@ app.registerExtension({
                     const result = selected[1];
                     imageView?.select(selected[2] || null, Number(source.value) === 0);
                     const format=detail.settings?.options || {};
-                    text.value = format.replace_underscores === false ? (result.caption ?? result.taglist ?? "") : (result.taglist || result.caption || "");
-                    if(format.escape_parentheses !== false)text.value=text.value.replaceAll("(","\\(").replaceAll(")","\\)");
+                    text.value = formattedTags(result, format);
                     scores.replaceChildren();
                     searchDecisions=()=>{};
                     const decisionRows = Number(source.value) === 0 ? detail.decisions : result.decisions;
@@ -246,6 +246,7 @@ app.registerExtension({
                         for (const name of ["all", "accepted", "rejected", "raw"]) {
                             const option=element("option",name);option.value=name;mode.append(option);
                         }
+                        mode.value = rawStage ? "all" : "accepted";
                         const previous=element("button","Previous"), next=element("button","Next"), count=element("span");
                         const table=element("table"); table.style.cssText="width:100%;font-size:11px;overflow-wrap:anywhere";
                         let page=0;
@@ -258,7 +259,8 @@ app.registerExtension({
                             for(const name of ["Tag","Score","Source","Status / reason"])header.append(element("th",name));table.append(header);
                             for(const record of filtered.slice(page*50,(page+1)*50)){
                                 const tr=element("tr");
-                                for(const value of [record.tag,`${(100*record.score).toFixed(2)}%`,record.source,`${record.status}: ${record.reason}`])tr.append(element("td",value));
+                                const rules=(record.matched_rules||[]).map(r=>`${r.source}.${r.action}: ${r.pattern}`).join("; ");
+                                for(const value of [record.tag,`${(100*record.score).toFixed(2)}%`,record.source,`${record.status}: ${record.reason}${rules ? " · "+rules : ""}`])tr.append(element("td",value));
                                 if(record.region_id!==undefined&&record.region_id!==null)tr.onclick=()=>{
                                     const region=regions.find(r=>r.key===`${record.source}:${record.region_id}`);
                                     if(region){source.value=String(region.option);update();}
