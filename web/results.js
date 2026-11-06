@@ -4,6 +4,7 @@ import { imagePoint, regionsAt, nextRegion } from "./region_selection.mjs";
 import { repairPreviewLimit } from "./preview_limit.mjs";
 import { mergedTagOrigin } from "./tag_origin.mjs";
 import { formattedTags } from "./tag_format.mjs";
+import { addViewerPanel, viewerContentStyle, viewerCanvasStyle } from "./viewer_layout.mjs";
 
 const element = (tag, text) => {
     const node = document.createElement(tag);
@@ -13,6 +14,7 @@ const element = (tag, text) => {
 
 function regionCanvas(row, regions, pick) {
     const wrapper = element("div");
+    wrapper.style.cssText = viewerContentStyle;
     const canvas = element("canvas");
     canvas.className = "wdv3-region-canvas";
     canvas.setAttribute("role", "img");
@@ -92,7 +94,7 @@ function regionCanvas(row, regions, pick) {
     base.onload = () => {
         canvas.width = base.naturalWidth; canvas.height = base.naturalHeight;
         [width, height] = row.image_size || [canvas.width, canvas.height];
-        canvas.style.cssText = `display:block;margin:auto;width:min(100%,${420 * canvas.width / canvas.height}px);height:auto;cursor:crosshair;touch-action:manipulation`;
+        canvas.style.cssText = viewerCanvasStyle;
         draw();
         for (const [key, descriptor] of Object.entries(row.region_masks || {})) {
             const image = new Image();
@@ -164,10 +166,8 @@ app.registerExtension({
             previous?.apply(this, arguments);
             if (!this.wdv3Panel) {
                 const panel = element("div");
-                panel.style.cssText = "overflow:auto;padding:10px;background:#20242c;color:#eee;font:13px sans-serif;box-sizing:border-box;height:100%;border-radius:8px";
-                const widget = this.addDOMWidget("wdv3_results", "wdv3_results", panel, { serialize: false });
                 const inspect = nodeData.name === "WDV3Inspect";
-                widget.computeSize = () => inspect ? [620, 980] : [460, 620];
+                addViewerPanel(this, panel, inspect);
                 this.wdv3Panel = panel;
                 this.setSize([Math.max(inspect ? 660 : 500, this.size[0]), Math.max(inspect ? 1100 : 720, this.size[1])]);
             }
@@ -178,7 +178,7 @@ app.registerExtension({
             panel.append(element("div", `${total} image(s) processed · showing ${rows.length}`));
             if (!rows.length) return;
             const imageChoice = element("select");
-            imageChoice.style.cssText = "width:100%;margin:8px 0;padding:6px";
+            imageChoice.style.cssText = "width:100%;max-width:100%;box-sizing:border-box;margin:8px 0;padding:6px";
             rows.forEach((row, i) => {
                 const detail = row.detail;
                 const option = element("option", detail.image_path || `Image ${detail.image_index + 1}`);
@@ -186,6 +186,7 @@ app.registerExtension({
                 imageChoice.append(option);
             });
             const content = element("div");
+            content.style.cssText = viewerContentStyle;
             panel.append(imageChoice, content);
             const render = () => {
                 const row = rows[Number(imageChoice.value)];
@@ -198,12 +199,18 @@ app.registerExtension({
                     content.append(model);
                 }
                 const source = element("select");
-                source.style.cssText = "width:100%;margin:8px 0;padding:6px";
+                source.style.cssText = "width:100%;max-width:100%;box-sizing:border-box;margin:8px 0;padding:6px";
                 const rawStage = detail.stage && detail.stage !== "results";
-                const evidence = [[rawStage ? (detail.stage === "regions" ? "Regions" : "Raw full image") : "Merged tags", detail.merged_tags], ["Full image", detail.full_image]];
+                const evidence = [[rawStage ? (detail.stage === "regions" ? "Regions" : detail.stage === "tag_sets" ? "Local tags / all decisions" : "Raw full image") : "Merged tags", detail.merged_tags], ["Full image", detail.full_image]];
                 const regions = [];
+                if (detail.cascade) {
+                    const execution = element('details');
+                    execution.append(element('summary', 'Cascade: execution and region tree'));
+                    execution.append(element('pre', JSON.stringify(detail.cascade.report || [], null, 2)));
+                    content.append(execution);
+                }
                 for (const [name, regions] of Object.entries(detail.detectors || {})) {
-                    for (const region of regions) evidence.push([`${name} #${region.region_id} · box ${region.bbox.join(", ")}`, region,
+                    for (const region of regions) evidence.push([`${(region.stage_path || [name]).join(' / ')} #${region.region_id} · box ${region.bbox.join(", ")}`, region,
                         {key: `${name}:${region.region_id}`, name: `${name} #${region.region_id}`, bbox: region.bbox, option: evidence.length}]);
                 }
                 regions.push(...evidence.slice(2).map(entry => entry[2]));
@@ -233,6 +240,28 @@ app.registerExtension({
                     const format=detail.settings?.options || {};
                     text.value = formattedTags(result, format);
                     scores.replaceChildren();
+                    if (result.region_uid) {
+                        const tree = element('details');
+                        tree.append(element('summary', `Region: ${(result.stage_path || []).join(' / ')} · ${result.tag_route || 'separate'}`));
+                        tree.append(element('pre', JSON.stringify({region_uid:result.region_uid,
+                            parent_region_uid:result.parent_region_uid, detector_input_bbox:result.detector_input_bbox,
+                            own:{general:result.general,character:result.character}, aggregate:result.aggregate,
+                            route_history:result.route_history || []}, null, 2)));
+                        scores.append(tree);
+                    }
+                    const history = result.postprocessing_history || [];
+                    if (history.length) {
+                        const container = element('details');
+                        container.append(element('summary', 'Postprocessing: before / after'));
+                        for (const entry of history) {
+                            const before = Object.keys(entry.before).join(', ');
+                            const after = Object.keys(entry.after).join(', ');
+                            const block = element('pre', `Operation ${entry.operation_index + 1}\nBefore: ${before}\nAfter: ${after}`);
+                            block.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere';
+                            container.append(block);
+                        }
+                        scores.append(container);
+                    }
                     searchDecisions=()=>{};
                     const decisionRows = Number(source.value) === 0 ? detail.decisions : result.decisions;
                     const records = Array.isArray(decisionRows) ? decisionRows : decisionRows ?
@@ -259,7 +288,8 @@ app.registerExtension({
                             for(const name of ["Tag","Score","Source","Status / reason"])header.append(element("th",name));table.append(header);
                             for(const record of filtered.slice(page*50,(page+1)*50)){
                                 const tr=element("tr");
-                                const rules=(record.matched_rules||[]).map(r=>`${r.source}.${r.action}: ${r.pattern}`).join("; ");
+                                const rules=[...(record.matched_rules||[]).map(r=>`${r.source}.${r.action}: ${r.pattern}`),
+                                    ...(record.postprocessing?.causes||[]).map(c=>`${c.method}${c.method === 'regex' ? ` [${c.rule.id}] ${c.rule.specific} → ${c.rule.general}` : ''}: ${c.witness} → ${record.tag}`)].join("; ");
                                 for(const value of [record.tag,`${(100*record.score).toFixed(2)}%`,record.source,`${record.status}: ${record.reason}${rules ? " · "+rules : ""}`])tr.append(element("td",value));
                                 if(record.region_id!==undefined&&record.region_id!==null)tr.onclick=()=>{
                                     const region=regions.find(r=>r.key===`${record.source}:${record.region_id}`);

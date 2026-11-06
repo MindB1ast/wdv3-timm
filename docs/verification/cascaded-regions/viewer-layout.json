@@ -1,0 +1,185 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "image": "portrait",
+      "node": [
+        760,
+        900
+      ],
+      "panel": [
+        760,
+        848
+      ],
+      "canvas": [
+        725,
+        1087.5
+      ]
+    },
+    {
+      "image": "landscape",
+      "node": [
+        760,
+        900
+      ],
+      "panel": [
+        760,
+        848
+      ],
+      "canvas": [
+        725,
+        302.078125
+      ]
+    },
+    {
+      "image": "square",
+      "node": [
+        760,
+        900
+      ],
+      "panel": [
+        760,
+        848
+      ],
+      "canvas": [
+        725,
+        725
+      ]
+    },
+    {
+      "image": "portrait-small",
+      "node": [
+        760,
+        900
+      ],
+      "panel": [
+        760,
+        848
+      ],
+      "canvas": [
+        725,
+        1450
+      ]
+    },
+    {
+      "image": "portrait",
+      "node": [
+        760,
+        900
+      ],
+      "panel": [
+        760,
+        848
+      ],
+      "canvas": [
+        725,
+        1087.5
+      ]
+    },
+    {
+      "image": "landscape",
+      "node": [
+        760,
+        900
+      ],
+      "panel": [
+        760,
+        848
+      ],
+      "canvas": [
+        725,
+        302.078125
+      ]
+    },
+    {
+      "image": "square",
+      "node": [
+        760,
+        900
+      ],
+      "panel": [
+        760,
+        848
+      ],
+      "canvas": [
+        725,
+        725
+      ]
+    },
+    {
+      "image": "portrait-small",
+      "node": [
+        760,
+        900
+      ],
+      "panel": [
+        760,
+        848
+      ],
+      "canvas": [
+        725,
+        1450
+      ]
+    },
+    {
+      "image": "landscape",
+      "node": [
+        1000,
+        900
+      ],
+      "panel": [
+        1000,
+        848
+      ],
+      "canvas": [
+        965,
+        402.078125
+      ]
+    },
+    {
+      "image": "portrait",
+      "node": [
+        520,
+        900
+      ],
+      "panel": [
+        520,
+        848
+      ],
+      "canvas": [
+        485,
+        727.5
+      ]
+    },
+    {
+      "image": "square",
+      "node": [
+        520,
+        1200
+      ],
+      "panel": [
+        520,
+        1148
+      ],
+      "canvas": [
+        485,
+        485
+      ]
+    },
+    {
+      "image": "portrait-small",
+      "node": [
+        520,
+        1200
+      ],
+      "panel": [
+        520,
+        1148
+      ],
+      "canvas": [
+        485,
+        970
+      ]
+    }
+  ]
+}

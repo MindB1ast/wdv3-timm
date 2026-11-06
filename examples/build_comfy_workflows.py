@@ -1,5 +1,6 @@
 """Regenerate the ComfyUI examples against the installed V3 API."""
 import importlib.util
+from copy import deepcopy
 import json
 from pathlib import Path
 import sys
@@ -234,6 +235,117 @@ def build(root):
     pipeline['last_node_id'] = 25
     pipeline['last_link_id'] = max(row[0] for row in pipeline['links'])
     variants['comfyui_wdv3_evidence.json'] = pipeline
+    local_graph = deepcopy(pipeline)
+    remove_nodes(local_graph, {21})
+    local_nodes = {n['id']: n for n in local_graph['nodes']}
+    local_filter = node(21, 'WDV3FilterTagSets', [1230, 20])
+    cleanup = node(30, 'WDV3RemoveRedundantTags', [1640, 20], {
+        'regex_enabled': True, 'scope': 'all',
+        'regex_relations_json': json.dumps([
+            {'id': 'colors', 'specific': r'(?:black|white|red|blue)_(?P<base>.+)', 'general': r'\g<base>'},
+            {'id': 'skirt_lengths', 'specific': r'(?:mini|micro)(?P<base>skirt)', 'general': r'\g<base>'}])})
+    local_merge = node(31, 'WDV3MergeTagSets', [2050, 20])
+    local_inspect = node(32, 'WDV3Inspect', [2050, 500])
+    local_inspect['title'] = 'Local tags / before and after'
+    local_nodes[22]['pos'] = [2460, 20]
+    local_nodes[23]['pos'] = [2870, 20]
+    local_graph['nodes'].extend([local_filter, cleanup, local_merge, local_inspect])
+    wire(local_graph, local_nodes[20], 'evidence', local_filter, 'evidence')
+    wire(local_graph, local_nodes[3], 'options', local_filter, 'options')
+    wire(local_graph, local_filter, 'tag_sets', cleanup, 'tag_sets')
+    wire(local_graph, cleanup, 'tag_sets', local_merge, 'tag_sets')
+    wire(local_graph, cleanup, 'tag_sets', local_inspect, 'tag_sets')
+    wire(local_graph, local_merge, 'results', local_nodes[22], 'results')
+    local_graph['last_node_id'] = 32
+    local_graph['last_link_id'] = max(row[0] for row in local_graph['links'])
+    variants['comfyui_wdv3_postprocessing.json'] = local_graph
+    automatic_graph=workflow(yolo=True)
+    for index,existing in enumerate(automatic_graph['nodes']):
+        if existing['type']=='WDV3Options':
+            settings=node(existing['id'],'WDV3Options',existing['pos'],
+                          {'cache_mode':'reuse','cache_dataset_root':'CHANGE_TO_DATASET_FOLDER'})
+            settings['outputs']=existing['outputs']
+            automatic_graph['nodes'][index]=settings
+    variants['comfyui_wdv3_automatic_cache.json']=automatic_graph
+    def dataset_graph(name, append=False, cold=False):
+        graph={'nodes':[], 'links':[], 'groups':[], 'config':{}, 'extra':{}, 'version':0.4}
+        store=node(1,'WDV3CalculationStore',[20,20],{'dataset_root':'CHANGE_TO_DATASET_FOLDER','mode':'reuse_only' if cold else 'reuse'})
+        options=node(2,'WDV3Options',[20,400])
+        graph['nodes']=[store,options]
+        if name=='txt':
+            captions=node(3,'WDV3LoadCaptions',[430,20])
+            editor=node(4,'WDV3EditCaptions',[840,20],{'operations_json':json.dumps([{'remove':['watermark'],'add_after':['dataset_tag']}])})
+            graph['nodes'] += [captions,editor]
+            wire(graph,store,'calculation_store',captions,'calculation_store')
+            wire(graph,captions,'captions',editor,'captions')
+            prepared=editor
+        else:
+            if cold:
+                source=node(3,'WDV3LoadEvidence',[430,20],{'artifact_ids':'PASTE_ARTIFACT_ID'})
+                graph['nodes'].append(source)
+                wire(graph,store,'calculation_store',source,'calculation_store')
+            else:
+                files=node(3,'WDV3DatasetFiles',[20,1100],{'recursive':True})
+                settings=node(4,'WDV3InferenceSettings',[430,400],{'wd_local_path':'CHANGE_TO_LOCAL_WD_FOLDER'})
+                planner=node(5,'WDV3PlanCalculations',[840,20])
+                source=node(6,'WDV3ComputeMissingEvidence',[1250,20])
+                graph['nodes'] += [files,settings,planner,source]
+                wire(graph,store,'calculation_store',files,'calculation_store')
+                wire(graph,store,'calculation_store',planner,'calculation_store')
+                wire(graph,settings,'inference',planner,'inference')
+                wire(graph,files,'files',planner,'files')
+                wire(graph,options,'options',planner,'options')
+                wire(graph,planner,'plan',source,'plan')
+            filtering=node(10,'WDV3FilterTagSets',[1660,20])
+            cleanup=node(11,'WDV3RemoveRedundantTags',[2070,20],{'textual_enabled':True})
+            merged=node(12,'WDV3MergeTagSets',[2480,20])
+            prepared=node(13,'WDV3CombineCaptions',[2890,20])
+            graph['nodes'] += [filtering,cleanup,merged,prepared]
+            wire(graph,source,'evidence',filtering,'evidence')
+            wire(graph,options,'options',filtering,'options')
+            wire(graph,filtering,'tag_sets',cleanup,'tag_sets')
+            wire(graph,cleanup,'tag_sets',merged,'tag_sets')
+            wire(graph,merged,'results',prepared,'results')
+            if append:
+                old=node(14,'WDV3LoadCaptions',[2480,500]);graph['nodes'].append(old)
+                wire(graph,store,'calculation_store',old,'calculation_store')
+                wire(graph,old,'captions',prepared,'captions')
+        export_settings=node(20,'WDV3CaptionExportSettings',[3300,400],{'write_mode':'append' if append else ('overwrite' if name=='txt' else 'error')})
+        preview=node(21,'WDV3PlanCaptionExport',[3710,20])
+        save=node(22,'WDV3SaveCaptions',[4120,20])
+        graph['nodes'] += [export_settings,preview,save]
+        wire(graph,options,'options',export_settings,'options')
+        wire(graph,store,'calculation_store',preview,'calculation_store')
+        wire(graph,prepared,'captions',preview,'captions')
+        wire(graph,export_settings,'caption_export',preview,'caption_export')
+        wire(graph,preview,'caption_plan',save,'caption_plan')
+        graph.update(last_node_id=22,last_link_id=max(row[0] for row in graph['links']))
+        return graph
+    variants['comfyui_wdv3_caption_txt_only.json']=dataset_graph('txt')
+    variants['comfyui_wdv3_caption_append.json']=dataset_graph('append',append=True,cold=True)
+    variants['comfyui_wdv3_cold_restart_refilter.json']=dataset_graph('cold',cold=True)
+    variants['comfyui_wdv3_incremental_folder.json']=dataset_graph('folder')
+    for route, suffix in [('separate', 'separate'), ('merge_to_parent', 'merge')]:
+        loader = node(1, 'LoadImage', [20, 20])
+        wd = node(2, 'WDV3ModelLoader', [20, 400])
+        options = node(3, 'WDV3Options', [410, 20])
+        eyes = node(4, 'WDV3YOLODetector', [800, 20], {'source_name': 'eyes', 'custom_model_path': 'eyes.pt'})
+        face_rules = node(5, 'WDV3RegionRules', [1200, 20], {'child_tag_route': route})
+        face = node(6, 'WDV3YOLODetector', [1600, 20], {'source_name': 'face', 'model': 'face_yolov9c.pt'})
+        body_rules = node(7, 'WDV3RegionRules', [2000, 20], {'child_tag_route': route})
+        body = node(8, 'WDV3YOLODetector', [2400, 20], {'source_name': 'body'})
+        tagger = node(9, 'WDV3Tagger', [2800, 20])
+        preview = node(10, 'WDV3Preview', [3200, 20])
+        graph = dict(nodes=[loader, wd, options, eyes, face_rules, face, body_rules, body, tagger, preview],
+                     links=[], groups=[], config={}, extra={}, version=.4)
+        for src, out, dst, inp in [(eyes, 'detectors', face_rules, 'child_detectors'),
+            (face_rules, 'rules', face, 'rules'), (face, 'detectors', body_rules, 'child_detectors'),
+            (body_rules, 'rules', body, 'rules'), (body, 'detectors', tagger, 'detectors'),
+            (loader, 'IMAGE', tagger, 'images'), (wd, 'wd_model', tagger, 'wd_model'),
+            (options, 'options', tagger, 'options'), (tagger, 'results_json', preview, 'results_json')]:
+            wire(graph, src, out, dst, inp)
+        graph.update(last_node_id=10, last_link_id=len(graph['links']))
+        variants['comfyui_wdv3_cascade_'+suffix+'.json'] = graph
     for name, graph in variants.items():
         path = root / "examples" / name
         path.write_text(json.dumps(graph, ensure_ascii=False, indent=2), encoding="utf-8")

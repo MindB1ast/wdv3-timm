@@ -22,3 +22,11 @@ python audit/run_checks.py --report temp/regression-results.json
 Итог: 50/50 (30 исходных + 20 дополнительных); подробная приёмка и ограничения:
 `docs/verification/fix-audited-tagging-defects/README.md`.
 Реальные модели: `audit/run_integration.py`; ограниченные мутации: `audit/run_mutations.py`.
+
+Persistent evidence и готовые TXT: `audit/test_artifact_store.py`,
+`test_inference_plan.py`, `test_persistent_runtime.py`, `test_persistent_evidence.py`,
+`test_caption_files.py`, `test_workflow_api.py`. Все включены в обычный discovery.
+Проверка настоящего Windows junction требует запуска вне sandbox, создаёт только
+временные каталоги проекта. Сквозные команды: `audit/run_persistent_real.py` и
+`audit/run_persistent_acceptance.py --comfy-root <ComfyUI-root>`.
+Результаты и ограничения: `docs/verification/persistent-evidence/README.md`.

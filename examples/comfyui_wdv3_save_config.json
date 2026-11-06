@@ -40,7 +40,11 @@
         "",
         "",
         ", ",
-        1
+        1,
+        "reuse",
+        "",
+        "",
+        true
       ]
     },
     {
@@ -103,7 +107,33 @@
       "flags": {},
       "order": 10,
       "mode": 0,
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "child_detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        },
+        {
+          "name": "child_sam_model",
+          "type": "WDV3_SAM_MODEL",
+          "link": null
+        },
+        {
+          "name": "child_sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        },
+        {
+          "name": "local_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        },
+        {
+          "name": "aggregate_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        }
+      ],
       "outputs": [
         {
           "name": "rules",
@@ -132,7 +162,9 @@
         "",
         "",
         "",
-        ""
+        "",
+        "separate",
+        true
       ],
       "title": "person_detail / tag rules"
     },
@@ -201,7 +233,33 @@
       "flags": {},
       "order": 12,
       "mode": 0,
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "child_detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        },
+        {
+          "name": "child_sam_model",
+          "type": "WDV3_SAM_MODEL",
+          "link": null
+        },
+        {
+          "name": "child_sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        },
+        {
+          "name": "local_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        },
+        {
+          "name": "aggregate_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        }
+      ],
       "outputs": [
         {
           "name": "rules",
@@ -230,7 +288,9 @@
         "",
         "",
         "",
-        ""
+        "",
+        "separate",
+        true
       ],
       "title": "person_context / tag rules"
     },
@@ -299,7 +359,33 @@
       "flags": {},
       "order": 14,
       "mode": 0,
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "child_detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        },
+        {
+          "name": "child_sam_model",
+          "type": "WDV3_SAM_MODEL",
+          "link": null
+        },
+        {
+          "name": "child_sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        },
+        {
+          "name": "local_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        },
+        {
+          "name": "aggregate_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        }
+      ],
       "outputs": [
         {
           "name": "rules",
@@ -328,7 +414,9 @@
         "",
         "",
         "",
-        ""
+        "",
+        "separate",
+        true
       ],
       "title": "cup / tag rules"
     },
@@ -417,6 +505,36 @@
           "name": "sam_model",
           "type": "WDV3_SAM_MODEL",
           "link": 18
+        },
+        {
+          "name": "postprocessing",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        },
+        {
+          "name": "calculation_store",
+          "type": "WDV3_CALCULATION_STORE",
+          "link": null
+        },
+        {
+          "name": "inference",
+          "type": "WDV3_INFERENCE",
+          "link": null
+        },
+        {
+          "name": "caption_read",
+          "type": "WDV3_CAPTION_READ",
+          "link": null
+        },
+        {
+          "name": "caption_edit",
+          "type": "WDV3_CAPTION_EDIT",
+          "link": null
+        },
+        {
+          "name": "caption_export",
+          "type": "WDV3_CAPTION_EXPORT",
+          "link": null
         }
       ],
       "outputs": [

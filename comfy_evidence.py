@@ -28,6 +28,9 @@ def digest(value):
 
 
 def model_identity(runtime):
+    persistent_identity=getattr(runtime,'persistent_identity',None)
+    if persistent_identity is not None:
+        return persistent_identity
     from .Scripts.tagger_preprocessing import transform_metadata
     state = runtime.model.state_dict()
     def version(value):
@@ -79,7 +82,7 @@ def interrupt():
     throw_exception_if_processing_interrupted()
 
 
-def cached_segment(frames, runtime, settings, sources, batch_size=1, progress=None):
+def cached_segment(frames, runtime, settings, sources, batch_size=1, progress=None, *, low_memory_mode=True):
     from .comfy_processing import frame_digest, segment_frames
     settings=dict(settings)
     checkpoint = Path(settings.get('checkpoint',''))
@@ -91,6 +94,8 @@ def cached_segment(frames, runtime, settings, sources, batch_size=1, progress=No
     if cache is None: cache = runtime._sam_cache = OrderedDict()
     interrupt()
     if key not in cache:
+        if low_memory_mode and hasattr(runtime,'release_weights'):
+            runtime.release_weights()
         cache[key] = segment_frames(frames, settings, sources, batch_size, progress)
         while len(cache)>2: cache.popitem(last=False)
     result = deepcopy(cache[key])
@@ -99,6 +104,12 @@ def cached_segment(frames, runtime, settings, sources, batch_size=1, progress=No
 
 
 def collect(frames, runtime, *, detectors=None, sam_regions=None, image_paths=None, options=None, progress=None):
+    from .comfy_nested import has_nested, collect_nested
+    if has_nested(detectors, sam_regions[0]['sources'] if sam_regions else None):
+        return collect_nested(frames, runtime, detectors=detectors,
+            sam_model=sam_regions[0].get('model_settings') if sam_regions else None,
+            sources=sam_regions[0]['sources'] if sam_regions else None,
+            sam_regions=sam_regions, image_paths=image_paths, options=options, progress=progress)
     from .comfy_processing import frame_digest, sam_tag_regions
     from .comfy_nodes import tag_regions
     from .comfy_config import unique_names
@@ -214,10 +225,16 @@ def collect(frames, runtime, *, detectors=None, sam_regions=None, image_paths=No
 
 
 def filter_record(raw, rules, general, character, character_names):
-    result = deepcopy(raw)
-    result['raw_scores'] = {c: deepcopy(raw.get(c, {})) for c in ('general', 'character', 'ratings')}
+    # Apply rules to the small accepted set before attaching the complete scores
+    # and diagnostic records. Those large immutable values need no rule copies.
+    result = {key: deepcopy(value) for key, value in raw.items()
+              if key not in ('general', 'character', 'ratings')}
+    result['ratings'] = dict(raw.get('ratings', {}))
     decisions = {}
     additions=parse_additions(rules.add_tags_to_region)
+    character_names = set(character_names)
+    remove = rule_matcher(rules, 'remove_tags_from_region')
+    allowed = rule_matcher(rules, 'allowed_tags')
     for category, threshold in [('general', general), ('character', character)]:
         local = getattr(rules, 'region_gen_threshold' if category == 'general' else 'region_char_threshold')
         threshold = threshold if local is None else local
@@ -233,27 +250,33 @@ def filter_record(raw, rules, general, character, character_names):
             manual_category='character' if tag in character_names else 'general'
             if tag not in raw.get(category, {}) and tag not in result[category] and (tag not in additions or category!=manual_category): continue
             item = decisions[category].setdefault(tag, {'score': result[category].get(tag, additions.get(tag))})
-            if tag in rule_matcher(rules, 'remove_tags_from_region'):
+            if tag in remove:
                 item.update(status='rejected', reason='remove_from_regions')
-            elif rule_matcher(rules, 'allowed_tags') and tag not in rule_matcher(rules, 'allowed_tags'):
+            elif allowed and tag not in allowed:
                 item.update(status='rejected', reason='not_in_allowed_tags')
             elif tag in result[category]:
                 item.update(status='accepted', reason='manual_rule' if tag in result.get('provenance', {}) else 'threshold_pass')
                 if tag in result.get('provenance', {}):
                     item.update(model_score=raw.get(category,{}).get(tag),score=result[category][tag],
                                 assigned_score=result['provenance'][tag]['assigned_score'])
+    result['raw_scores'] = {c: dict(raw.get(c, {})) for c in ('general', 'character', 'ratings')}
     result['decisions'] = decisions
     return format_result(result)
 
 
-def apply_filters(evidence, options=None, configs=None):
+def filter_tag_sets(evidence, options=None, configs=None):
     if evidence.kind != 'evidence': raise ValueError('Apply Filters needs evidence')
     data = evidence.data(); options = deepcopy(dict(options or {}))
     from .comfy_config import validate_config, unique_names, validate_rules
     validate_config({'schema_version':1,'options':options})
     frames = []
     for original in data['frames']:
-        settings = [DetectorConfig.from_dict(row) for row in original['source_settings']] if configs is None else list(configs)
+        if configs is not None and original.get('cascade', {}).get('nested_rules'):
+            from .comfy_nested import filter_configs
+            frame_configs = filter_configs(original, list(configs))
+        else:
+            frame_configs = configs
+        settings = [DetectorConfig.from_dict(row) for row in original['source_settings']] if frame_configs is None else list(frame_configs)
         unique_names([c.name for c in settings])
         for config in settings:validate_rules(asdict(config))
         expected = {c.name for c in settings}
@@ -263,12 +286,60 @@ def apply_filters(evidence, options=None, configs=None):
             previous = next(row for row in original['source_settings'] if row['name'] == current.name)
             if geometry_config(current) != geometry_config(DetectorConfig.from_dict(previous)):
                 raise ValueError('Detection parameters changed; collect new evidence before filtering')
-        characters = list(original['full_image'].get('character', {}))
+        characters = set(original['full_image'].get('character', {}))
         full = filter_record(original['full_image'], DetectorConfig('full', ''),
                              options.get('general_threshold', .35), options.get('character_threshold', .75), characters)
         detected = {c.name: [filter_record(r,c,options.get('general_threshold',.35),options.get('character_threshold',.75),characters)
                             for r in original['detectors'][c.name]] for c in settings}
+        for rows in detected.values():
+            for row in rows:
+                if row.get('tag_enabled') is False:
+                    row.update(general={}, character={}, ratings={}, caption='', taglist='',
+                               decisions={'general': {}, 'character': {}}, provenance={})
         detail = {**original, 'full_image': full, 'detectors': detected}
+        detail.update(settings={'options': options, 'sources': [asdict(c) for c in settings],
+                                'sam_model': original['geometry'].get('sam_model')},
+                      schema_version=1, stage='tag_sets', model=data['model'])
+        if detail.get('cascade'):
+            detail['cascade']['routed'] = False
+        frames.append(detail)
+    result = Bundle.pack('tag_sets', dict(frames=frames, model=data['model'],
+                       evidence=dict(schema_version=evidence.schema_version, kind=evidence.kind, payload=data),
+                       postprocessing=[]))
+    if any(frame.get('cascade') for frame in frames):
+        from .comfy_cascade_tags import apply_local_operations
+        result = apply_local_operations(result)
+    return result
+
+
+def apply_filters(evidence, options=None, configs=None):
+    """Compatible shortcut: local filters followed by the unchanged global merge."""
+    return merge_tag_sets(filter_tag_sets(evidence, options, configs))
+
+
+def merge_tag_sets(tag_sets):
+    if tag_sets.kind != 'tag_sets':
+        raise ValueError('Merge Tag Sets needs tag_sets')
+    data = tag_sets.data()
+    if any(frame.get('cascade') for frame in data['frames']):
+        from .comfy_cascade_tags import merge_cascade_tag_sets
+        if all(f.get('cascade', {}).get('nested_rules') for f in data['frames']):
+            from .comfy_cascade_tags import route_cascade_tags
+            if not all(f['cascade'].get('routed') for f in data['frames']):
+                tag_sets = route_cascade_tags(tag_sets)
+        return merge_cascade_tag_sets(tag_sets)
+    frames = []
+    for original in data['frames']:
+        # data() already returned an owned snapshot, separate from the input
+        # Bundle. Mutating it cannot affect the preceding pipeline stage.
+        detail = original
+        options = detail['settings']['options']
+        settings = [DetectorConfig.from_dict(row) for row in detail['settings']['sources']]
+        matchers = {c.name: {field: rule_matcher(c, field,
+                     composition_tags(c) if field == 'full_image_only_tags' else None)
+                     for field in REGEX_RULE_FIELDS} for c in settings}
+        characters = list(original['full_image'].get('raw_scores', {}).get('character', original['full_image']['character']))
+        full, detected = detail['full_image'], detail['detectors']
         merged = enforce_owners(apply_tag_rules(merge_tags_from_regions(detail, settings),
             remove=options.get('remove_tags',''), before=options.get('prefix_tags',''), after=options.get('suffix_tags',''),
             character_names=characters, remove_regex=options.get('remove_tags_regex', [])), settings)
@@ -279,7 +350,7 @@ def apply_filters(evidence, options=None, configs=None):
                 candidates.update(row['general']); candidates.update(row['character'])
         owners = source_owners(settings, candidates)
         excluded_full = {t for c in settings if detected[c.name] for t in candidates
-                         if t in rule_matcher(c, 'remove_tags_from_full')}
+                         if t in matchers[c.name]['remove_tags_from_full']}
         global_remove = TagMatcher(options.get('remove_tags',''), options.get('remove_tags_regex', []))
         decisions = []
         for name, region, result in [('full',None,full)] + [(name,r['region_id'],r) for name,rows in detected.items() for r in rows]:
@@ -291,8 +362,8 @@ def apply_filters(evidence, options=None, configs=None):
                         reason = None
                         if tag in owners and name not in owners[tag]: reason='owned_by_other_sources'
                         elif name=='full' and tag in excluded_full: reason='remove_from_full'
-                        elif rule and tag in rule_matcher(rule, 'exclude_from_region') and tag not in full['general'] and tag not in full['character']: reason='requires_full_confirmation'
-                        elif rule and (category=='general' or rule.full_image_only_tags is not None or rule.full_image_only_tags_regex) and tag in rule_matcher(rule, 'full_image_only_tags', composition_tags(rule)): reason='composition_full_only'
+                        elif rule and tag in matchers[name]['exclude_from_region'] and tag not in full['general'] and tag not in full['character']: reason='requires_full_confirmation'
+                        elif rule and (category=='general' or rule.full_image_only_tags is not None or rule.full_image_only_tags_regex) and tag in matchers[name]['full_image_only_tags']: reason='composition_full_only'
                         elif tag in global_remove: reason='global_remove'
                         if reason: item.update(status='rejected',reason=reason)
                         else: item['reason']='merged' if merged.get(category,{}).get(tag)==item['score'] else 'lower_score'
@@ -305,35 +376,43 @@ def apply_filters(evidence, options=None, configs=None):
             reason='global_remove' if tag in global_remove else 'owned_by_other_sources' if tag in owners and tag not in merged[category] else 'manual_rule'
             decisions.append(dict(tag=tag,category=category,source='manual_rule',region_id=None,
                 score=provenance.get('assigned_score',1.0),status='accepted' if tag in merged[category] else 'rejected',reason=reason))
-        for item in decisions:
+        # Literal rules already supplied the reasons above. Only actual regex
+        # rules need the additional diagnostic matching pass, once compiled.
+        regex_checks = {}
+        for source in ('full', 'manual_rule', *detected):
+            regex_checks[source] = [(c.name, field, matchers[c.name][field])
+                for c in settings for field in REGEX_RULE_FIELDS
+                if matchers[c.name][field].compiled and (
+                    field == 'only_from_source'
+                    or (field == 'remove_tags_from_full' and source == 'full' and detected[c.name])
+                    or (field not in ('only_from_source', 'remove_tags_from_full') and source == c.name))]
+        local_records = {('full', None): full}
+        local_records.update({(name, r['region_id']): r for name, rows in detected.items() for r in rows})
+        for item in decisions if global_remove.compiled or any(regex_checks.values()) else ():
             matches = []
-            for config in settings:
-                for field in REGEX_RULE_FIELDS:
-                    applies = (
-                        field == 'only_from_source'
-                        or (field == 'remove_tags_from_full' and item['source'] == 'full' and detected[config.name])
-                        or (field not in ('only_from_source', 'remove_tags_from_full') and item['source'] == config.name)
-                    )
-                    if not applies:
-                        continue
-                    literals = composition_tags(config) if field == 'full_image_only_tags' else None
-                    for match in rule_matcher(config, field, literals).matches(item['tag']):
-                        if match['kind'] == 'regex':
-                            matches.append(dict(match, action=field, source=config.name))
-            for match in global_remove.matches(item['tag']):
-                if match['kind'] == 'regex':
-                    matches.append(dict(match, action='remove_tags', source='global'))
+            for name, field, matcher in regex_checks[item['source']]:
+                for match in matcher.matches(item['tag']):
+                    if match['kind'] == 'regex':
+                        matches.append(dict(match, action=field, source=name))
+            if global_remove.compiled:
+                for match in global_remove.matches(item['tag']):
+                    if match['kind'] == 'regex':
+                        matches.append(dict(match, action='remove_tags', source='global'))
             if matches:
                 item['matched_rules'] = matches
-                local = full if item['source'] == 'full' else next(
-                    (r for r in detected.get(item['source'], []) if r['region_id'] == item['region_id']), None)
+                local = local_records.get((item['source'], item['region_id']))
                 if local is not None and item['tag'] in local['decisions'][item['category']]:
                     local['decisions'][item['category']][item['tag']]['matched_rules'] = deepcopy(matches)
         detail.update(merged_tags=merged, decisions=decisions, settings={'options':options,'sources':[asdict(c) for c in settings],
                       'sam_model':original['geometry'].get('sam_model')},
                       schema_version=1, stage='results', model=data['model'])
+        if data.get('postprocessing'):
+            detail['settings']['postprocessing'] = deepcopy(data['postprocessing'])
         frames.append(detail)
-    return Bundle.pack('results', dict(frames=frames, model=data['model'], evidence=json.loads(evidence.to_json())))
+    payload = dict(frames=frames, model=data['model'], evidence=data['evidence'])
+    if data.get('postprocessing'):
+        payload['postprocessing'] = deepcopy(data['postprocessing'])
+    return Bundle.pack('results', payload)
 
 
 def formatted_text(frame, result=None):
@@ -356,7 +435,7 @@ def outputs(results):
     tags, details = [], []
     for frame in results.data()['frames']:
         text=formatted_text(frame)
-        detail=deepcopy(frame)
+        detail=frame  # results.data() already owns these dictionaries.
         detail.pop('image_png',None)
         for regions in detail['detectors'].values():
             for region in regions:region.pop('mask_png',None)
@@ -367,6 +446,18 @@ def outputs(results):
 def merge_results(left, right):
     if left.kind!='results' or right.kind!='results': raise ValueError('Merge Results needs result bundles')
     a,b=left.data(),right.data()
+    if any(f.get('cascade') for f in a['frames'] + b['frames']):
+        if not all(f.get('cascade') for f in a['frames'] + b['frames']):
+            raise ValueError('Cannot merge hierarchical and flat results')
+        from .comfy_cascade_tags import merge_cascade_results
+        return merge_cascade_results(left, right)
+    from .Scripts.tag_postprocessing import validate_chain, apply_chain
+    def chain(value):
+        fallback = value['frames'][0]['settings'].get('postprocessing', []) if value['frames'] else []
+        return validate_chain(value.get('postprocessing', fallback))
+    operations = chain(a)
+    if operations != chain(b):
+        raise ValueError('Cannot merge different postprocessing chains')
     x,y=a['evidence']['payload'],b['evidence']['payload']
     if x['model']!=y['model'] or len(x['frames'])!=len(y['frames']): raise ValueError('Incompatible evidence models or image counts')
     merged=deepcopy(x)
@@ -385,4 +476,5 @@ def merge_results(left, right):
         p['source_settings']=[sources[n] for n in sorted(sources)]
     evidence=Bundle.pack('evidence',merged)
     # Apply per-frame source snapshots; global options are shared and were checked above.
-    return apply_filters(evidence,a['frames'][0]['settings']['options'] if a['frames'] else {})
+    local = filter_tag_sets(evidence, a['frames'][0]['settings']['options'] if a['frames'] else {})
+    return merge_tag_sets(apply_chain(local, operations))

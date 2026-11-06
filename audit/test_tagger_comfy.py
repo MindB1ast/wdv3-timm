@@ -25,7 +25,8 @@ class ComfyProfileTests(unittest.TestCase):
         labels = LabelData(['a','b','c'], [], [0,1], [2])
         with tempfile.TemporaryDirectory(dir='temp') as directory:
             folder = Path(directory).resolve()
-            with patch.object(resources, 'load_tagger', return_value=(RecordingModel(), labels, transform, folder)) as load:
+            with patch.object(resources, 'load_tagger_metadata', return_value=(labels, transform, folder)) as load, \
+                 patch.object(resources,'load_network',side_effect=AssertionError('Metadata must not load weights')):
                 saved = json.loads(json.dumps({'model': 'vit', 'device': 'cpu', 'download_missing': False,
                                              'local_model_path': str(folder), 'repo_id': transform.profile.repo_id}))
                 runtime, info = nodes.WDModelLoader().load(**saved)
@@ -35,6 +36,7 @@ class ComfyProfileTests(unittest.TestCase):
                 self.assertEqual(metadata['color_order'], 'RGB')
                 self.assertEqual(metadata['source'], 'preprocess.json:test')
                 self.assertEqual(runtime.model_id, transform.profile.repo_id)
+                self.assertIsNone(runtime._network)
                 nodes.WDModelLoader().load('vit', 'cpu', False, str(folder))
                 self.assertEqual(load.call_args.args[0], 'SmilingWolf/wd-vit-tagger-v3')
             with patch.object(nodes, 'model_directory', return_value=folder):

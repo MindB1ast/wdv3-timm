@@ -18,3 +18,15 @@ const config=legacy();config.nodes.push({id:2,type:"WDV3LoadConfig"});config.nod
 config.links=[[1,2,0,1,0,"WDV3_OPTIONS"]];migrateTaggerOptions(config);
 assert.equal(config.nodes.length,2);assert.equal(config.nodes[0].inputs[0].link,1);
 console.log("Tagger settings migration preserves literals, formatting, shared options and connections");
+const collected={nodes:[{id:1,type:'WDV3CollectEvidence',inputs:[],widgets_values:[4]}],links:[]};
+migrateTaggerOptions(collected);
+assert.deepEqual(collected.nodes[0].widgets_values,[]);
+assert.equal(collected.nodes[1].type,'WDV3Options');
+assert.equal(collected.nodes[1].widgets_values[11],4);
+const migrated=JSON.stringify(collected);migrateTaggerOptions(collected);assert.equal(JSON.stringify(collected),migrated);
+const controlled={nodes:[{id:1,type:'WDV3CollectEvidence',inputs:[{name:'options',link:1}],widgets_values:[4]},
+    {id:2,type:'WDV3Options',widgets_values:[.35,.75,2,8,true,true,'','','','',', ',2],outputs:[{links:[1]}]}],
+    links:[[1,2,0,1,0,'WDV3_OPTIONS']]};
+migrateTaggerOptions(controlled);
+assert.equal(controlled.nodes.length,2);assert.deepEqual(controlled.nodes[0].widgets_values,[]);
+assert.equal(controlled.nodes[1].widgets_values[11],2);

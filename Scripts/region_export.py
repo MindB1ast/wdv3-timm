@@ -17,14 +17,15 @@ from .sam_config import RegionViewConfig, SamConfig
 from .types import DetailedResult, MergedResult, PathInput
 
 
-def json_text(data) -> str:
+def json_text(data, *, indent: int | None = 2) -> str:
     def convert(value):
         if isinstance(value, np.generic):
             return value.item()
         if isinstance(value, Path):
             return str(value)
         raise TypeError(f"Not serializable: {type(value).__name__}")
-    return json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False, default=convert)
+    return json.dumps(data, ensure_ascii=False, indent=indent, allow_nan=False, default=convert,
+                      separators=(',', ':') if indent is None else None)
 
 
 def image_identifier(relative_path: str, content_hash: str) -> str:

@@ -16,7 +16,7 @@ const forced = normalizeNodeDefinition({name:'Test', input:{required:{text:['STR
 assert.deepEqual(forced.inputs.map(p=>p.name),['data','tensor']);
 assert.deepEqual(forced.inputs.map(p=>p.index),[0,1]);
 const coverage = catalogCoverage(catalog);
-assert.equal(coverage.length,12);
+assert.equal(coverage.length,22);
 for (const type of coverage) {
     assert.ok(type.producers.length, `No producer for ${type.type}`);
     assert.ok(type.consumers.length, `No consumer for ${type.type}`);

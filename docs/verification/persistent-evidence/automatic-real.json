@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "local_model": "wd-vit-tagger-v3",
+  "existing_node": "WDV3Tagger",
+  "changed_filters": true,
+  "fresh_runtime": true,
+  "second_inference_calls": 0,
+  "raw_unchanged": true,
+  "second_weight_loads": 0,
+  "cold_process_without_weights": true,
+  "model_loading_remains_upstream": false
+}

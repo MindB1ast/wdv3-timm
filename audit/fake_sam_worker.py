@@ -1,5 +1,6 @@
 """Deterministic subprocess fixture for protocol/batch integration acceptance."""
 import json
+import os
 from pathlib import Path
 import sys
 import time
@@ -22,6 +23,9 @@ for line in sys.stdin:
             time.sleep(30)
         if mode == "exit":
             sys.exit(2)
+        if mode == 'native_oom':
+            print('memory allocation of 2097152 bytes failed',file=sys.stderr,flush=True)
+            os._exit(7)
         if mode == "malformed":
             print("not json", flush=True)
             continue

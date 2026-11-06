@@ -105,7 +105,14 @@ class SamWorker:
                 except queue.Empty:
                     continue
             if line is None:
-                raise SamWorkerError("SAM worker exited before replying")
+                if self.process is not None:
+                    try:self.process.wait(timeout=1)
+                    except subprocess.TimeoutExpired:pass
+                    self.stderr_reader.join(timeout=1)
+                detail='\n'.join(self.logs)[-4000:]
+                if 'memory allocation' in detail.lower() or 'out of memory' in detail.lower():
+                    raise SamWorkerError('SAM worker ran out of memory; free system RAM/commit memory and reduce sam_batch_size. '+detail)
+                raise SamWorkerError('SAM worker exited before replying. '+detail)
             response = json.loads(line)
             if (not isinstance(response, dict) or response.get("protocol_version") != PROTOCOL_VERSION
                     or response.get("request_id") != request_id):

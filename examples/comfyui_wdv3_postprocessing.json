@@ -1,0 +1,902 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "LoadImage",
+      "pos": [
+        20,
+        20
+      ],
+      "size": [
+        340,
+        340
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            7
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "tag_managing1.png",
+        "image"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "WDV3ModelLoader",
+      "pos": [
+        20,
+        390
+      ],
+      "size": [
+        340,
+        230
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "wd_model",
+          "type": "WDV3_MODEL",
+          "links": [
+            8
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "model_info",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3ModelLoader"
+      },
+      "widgets_values": [
+        "vit",
+        "auto",
+        true,
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 3,
+      "type": "WDV3Options",
+      "pos": [
+        410,
+        20
+      ],
+      "size": [
+        340,
+        640
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "options",
+          "type": "WDV3_OPTIONS",
+          "links": [
+            9,
+            19
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3Options"
+      },
+      "widgets_values": [
+        0.35,
+        0.75,
+        2,
+        8,
+        true,
+        true,
+        "",
+        "",
+        "",
+        "",
+        ", ",
+        1,
+        "reuse",
+        "",
+        "",
+        true
+      ]
+    },
+    {
+      "id": 6,
+      "type": "WDV3RegionRules",
+      "pos": [
+        410,
+        720
+      ],
+      "size": [
+        340,
+        1000
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "child_detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        },
+        {
+          "name": "child_sam_model",
+          "type": "WDV3_SAM_MODEL",
+          "link": null
+        },
+        {
+          "name": "child_sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        },
+        {
+          "name": "local_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        },
+        {
+          "name": "aggregate_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rules",
+          "type": "WDV3_RULES",
+          "links": [
+            6
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3RegionRules"
+      },
+      "widgets_values": [
+        0.35,
+        0.75,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1boy, 1girl, 1other, 2boys, 2girls, 2others, 3boys, 3girls, 3others, 4boys, 4girls, 4others, 5boys, 5girls, 5others, 6+boys, 6+girls, 6+others, abstract_background, animal_focus, aqua_background, argyle_background, armpit_focus, ass_focus, back_focus, black_background, black_border, blue_background, blue_sky, blurry, blurry_background, blurry_foreground, border, breast_focus, bright_background, brown_background, checkered_background, close-up, colorful_background, cowboy_shot, creature_focus, cross_background, crotch_focus, dark_background, depth_of_field, diagonal-striped_background, dithered_background, dotted_background, drama_layer, ear_focus, eye_focus, feet_out_of_frame, film_grain, flower_focus, food_focus, foot_focus, foot_out_of_frame, footwear_focus, full_body, gradient_background, green_background, grey_background, grid_background, hair_focus, halftone_background, hand_focus, heaven_condition, hip_focus, honeycomb_background, kanji_focus, lace_background, leg_focus, looking_ahead, looking_at_another, looking_at_viewer, looking_away, looking_back, looking_to_the_side, male_focus, marble_background, mecha_focus, meme, monochrome_background, monster_focus, mosaic_background, mouth_focus, multiple_boys, multiple_girls, multiple_others, multiple_views, navel_focus, neck_focus, night, night_sky, object_focus, oekaki, orange_background, other_focus, out_of_frame, parody, patterned_background, pectoral_focus, penis_focus, pink_background, plaid_background, plant_focus, pokemon_focus, polka_dot_background, portrait, pov, pov_hands, purple_background, pussy_focus, rainbow_background, red_background, reflection_focus, simple_background, sky, sky_focus, solo, solo_focus, spiral_background, splatter_background, striped_background, sunburst_background, text_focus, thigh_focus, triangle_background, two-tone_background, upper_body, vehicle_focus, weapon_focus, white_background, white_border",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "separate",
+        true
+      ]
+    },
+    {
+      "id": 7,
+      "type": "WDV3YOLODetector",
+      "pos": [
+        820,
+        530
+      ],
+      "size": [
+        340,
+        294
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "rules",
+          "type": "WDV3_RULES",
+          "link": 6
+        },
+        {
+          "name": "previous_detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "detectors",
+          "type": "WDV3_DETECTORS",
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3YOLODetector"
+      },
+      "widgets_values": [
+        "person_yolov8m-seg.pt",
+        "person",
+        0.35,
+        "0",
+        "",
+        "auto",
+        true
+      ]
+    },
+    {
+      "id": 20,
+      "type": "WDV3CollectEvidence",
+      "pos": [
+        820,
+        20
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 7
+        },
+        {
+          "name": "wd_model",
+          "type": "WDV3_MODEL",
+          "link": 8
+        },
+        {
+          "name": "options",
+          "type": "WDV3_OPTIONS",
+          "link": 9
+        },
+        {
+          "name": "detectors",
+          "type": "WDV3_DETECTORS",
+          "link": 12
+        },
+        {
+          "name": "sam_model",
+          "type": "WDV3_SAM_MODEL",
+          "link": null
+        },
+        {
+          "name": "sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "evidence",
+          "type": "WDV3_EVIDENCE",
+          "links": [
+            18
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "regions",
+          "type": "WDV3_REGIONS",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3CollectEvidence"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 22,
+      "type": "WDV3Inspect",
+      "pos": [
+        2460,
+        20
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "results",
+          "type": "WDV3_RESULTS",
+          "link": 23
+        },
+        {
+          "name": "evidence",
+          "type": "WDV3_EVIDENCE",
+          "link": null
+        },
+        {
+          "name": "regions",
+          "type": "WDV3_REGIONS",
+          "link": null
+        },
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "report",
+          "type": "WDV3_REPORT",
+          "links": [
+            17
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": null,
+          "slot_index": 1
+        },
+        {
+          "name": "tags",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3Inspect"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 23,
+      "type": "WDV3ExportReport",
+      "pos": [
+        2870,
+        20
+      ],
+      "size": [
+        340,
+        230
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "report",
+          "type": "WDV3_REPORT",
+          "link": 17
+        }
+      ],
+      "outputs": [
+        {
+          "name": "json_path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        },
+        {
+          "name": "html_path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 1
+        },
+        {
+          "name": "txt_path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3ExportReport"
+      },
+      "widgets_values": [
+        "output/wdv3",
+        "report",
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "id": 24,
+      "type": "WDV3RegionRules",
+      "pos": [
+        20,
+        720
+      ],
+      "size": [
+        340,
+        1000
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "child_detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        },
+        {
+          "name": "child_sam_model",
+          "type": "WDV3_SAM_MODEL",
+          "link": null
+        },
+        {
+          "name": "child_sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        },
+        {
+          "name": "local_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        },
+        {
+          "name": "aggregate_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rules",
+          "type": "WDV3_RULES",
+          "links": [
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3RegionRules"
+      },
+      "widgets_values": [
+        0.35,
+        0.75,
+        "",
+        "",
+        "face",
+        "portrait, upper_body",
+        "",
+        "",
+        "1boy, 1girl, 1other, 2boys, 2girls, 2others, 3boys, 3girls, 3others, 4boys, 4girls, 4others, 5boys, 5girls, 5others, 6+boys, 6+girls, 6+others, abstract_background, animal_focus, aqua_background, argyle_background, armpit_focus, ass_focus, back_focus, black_background, black_border, blue_background, blue_sky, blurry, blurry_background, blurry_foreground, border, breast_focus, bright_background, brown_background, checkered_background, close-up, colorful_background, cowboy_shot, creature_focus, cross_background, crotch_focus, dark_background, depth_of_field, diagonal-striped_background, dithered_background, dotted_background, drama_layer, ear_focus, eye_focus, feet_out_of_frame, film_grain, flower_focus, food_focus, foot_focus, foot_out_of_frame, footwear_focus, full_body, gradient_background, green_background, grey_background, grid_background, hair_focus, halftone_background, hand_focus, heaven_condition, hip_focus, honeycomb_background, kanji_focus, lace_background, leg_focus, looking_ahead, looking_at_another, looking_at_viewer, looking_away, looking_back, looking_to_the_side, male_focus, marble_background, mecha_focus, meme, monochrome_background, monster_focus, mosaic_background, mouth_focus, multiple_boys, multiple_girls, multiple_others, multiple_views, navel_focus, neck_focus, night, night_sky, object_focus, oekaki, orange_background, other_focus, out_of_frame, parody, patterned_background, pectoral_focus, penis_focus, pink_background, plaid_background, plant_focus, pokemon_focus, polka_dot_background, portrait, pov, pov_hands, purple_background, pussy_focus, rainbow_background, red_background, reflection_focus, simple_background, sky, sky_focus, solo, solo_focus, spiral_background, splatter_background, striped_background, sunburst_background, text_focus, thigh_focus, triangle_background, two-tone_background, upper_body, vehicle_focus, weapon_focus, white_background, white_border",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "separate",
+        true
+      ],
+      "title": "Face / tag rules"
+    },
+    {
+      "id": 25,
+      "type": "WDV3YOLODetector",
+      "pos": [
+        820,
+        1000
+      ],
+      "size": [
+        340,
+        294
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "rules",
+          "type": "WDV3_RULES",
+          "link": 11
+        },
+        {
+          "name": "previous_detectors",
+          "type": "WDV3_DETECTORS",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "detectors",
+          "type": "WDV3_DETECTORS",
+          "links": [
+            12
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3YOLODetector"
+      },
+      "widgets_values": [
+        "face_yolov9c.pt",
+        "face",
+        0.35,
+        "0",
+        "",
+        "auto",
+        true
+      ]
+    },
+    {
+      "id": 21,
+      "type": "WDV3FilterTagSets",
+      "pos": [
+        1230,
+        20
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "evidence",
+          "type": "WDV3_EVIDENCE",
+          "link": 18
+        },
+        {
+          "name": "options",
+          "type": "WDV3_OPTIONS",
+          "link": 19
+        },
+        {
+          "name": "detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        },
+        {
+          "name": "sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        },
+        {
+          "name": "postprocessing",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "links": [
+            20
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3FilterTagSets"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 30,
+      "type": "WDV3RemoveRedundantTags",
+      "pos": [
+        1640,
+        20
+      ],
+      "size": [
+        340,
+        326
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "link": 20
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "links": [
+            21,
+            22
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3RemoveRedundantTags"
+      },
+      "widgets_values": [
+        false,
+        false,
+        "[]",
+        "",
+        "all",
+        "",
+        true,
+        "[{\"id\": \"colors\", \"specific\": \"(?:black|white|red|blue)_(?P<base>.+)\", \"general\": \"\\\\g<base>\"}, {\"id\": \"skirt_lengths\", \"specific\": \"(?:mini|micro)(?P<base>skirt)\", \"general\": \"\\\\g<base>\"}]"
+      ]
+    },
+    {
+      "id": 31,
+      "type": "WDV3MergeTagSets",
+      "pos": [
+        2050,
+        20
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "link": 21
+        }
+      ],
+      "outputs": [
+        {
+          "name": "results",
+          "type": "WDV3_RESULTS",
+          "links": [
+            23
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "tags",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 1
+        },
+        {
+          "name": "results_json",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3MergeTagSets"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 32,
+      "type": "WDV3Inspect",
+      "pos": [
+        2050,
+        500
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "results",
+          "type": "WDV3_RESULTS",
+          "link": null
+        },
+        {
+          "name": "evidence",
+          "type": "WDV3_EVIDENCE",
+          "link": null
+        },
+        {
+          "name": "regions",
+          "type": "WDV3_REGIONS",
+          "link": null
+        },
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "link": 22
+        }
+      ],
+      "outputs": [
+        {
+          "name": "report",
+          "type": "WDV3_REPORT",
+          "links": null,
+          "slot_index": 0
+        },
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": null,
+          "slot_index": 1
+        },
+        {
+          "name": "tags",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3Inspect"
+      },
+      "widgets_values": [],
+      "title": "Local tags / before and after"
+    }
+  ],
+  "links": [
+    [
+      6,
+      6,
+      0,
+      7,
+      0,
+      "WDV3_RULES"
+    ],
+    [
+      7,
+      1,
+      0,
+      20,
+      0,
+      "IMAGE"
+    ],
+    [
+      8,
+      2,
+      0,
+      20,
+      1,
+      "WDV3_MODEL"
+    ],
+    [
+      9,
+      3,
+      0,
+      20,
+      2,
+      "WDV3_OPTIONS"
+    ],
+    [
+      10,
+      7,
+      0,
+      25,
+      1,
+      "WDV3_DETECTORS"
+    ],
+    [
+      11,
+      24,
+      0,
+      25,
+      0,
+      "WDV3_RULES"
+    ],
+    [
+      12,
+      25,
+      0,
+      20,
+      3,
+      "WDV3_DETECTORS"
+    ],
+    [
+      17,
+      22,
+      0,
+      23,
+      0,
+      "WDV3_REPORT"
+    ],
+    [
+      18,
+      20,
+      0,
+      21,
+      0,
+      "WDV3_EVIDENCE"
+    ],
+    [
+      19,
+      3,
+      0,
+      21,
+      1,
+      "WDV3_OPTIONS"
+    ],
+    [
+      20,
+      21,
+      0,
+      30,
+      0,
+      "WDV3_TAG_SETS"
+    ],
+    [
+      21,
+      30,
+      0,
+      31,
+      0,
+      "WDV3_TAG_SETS"
+    ],
+    [
+      22,
+      30,
+      0,
+      32,
+      3,
+      "WDV3_TAG_SETS"
+    ],
+    [
+      23,
+      31,
+      0,
+      22,
+      0,
+      "WDV3_RESULTS"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.65,
+      "offset": [
+        40,
+        40
+      ]
+    }
+  },
+  "version": 0.4,
+  "last_node_id": 32,
+  "last_link_id": 23
+}

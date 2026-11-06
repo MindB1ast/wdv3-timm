@@ -2,6 +2,7 @@
   "WDV3ModelLoader": {
     "name": "WDV3ModelLoader",
     "display_name": "WDV3 Load Tagger Model",
+    "description": "Подготавливает настройки, словарь и preprocessing WD. Веса загружаются только при реальной необходимости inference; готовый постоянный кэш не требует выделения модели. Подключите wd_model к прежним нодам тегирования.",
     "input": {
       "required": {
         "model": [
@@ -38,7 +39,10 @@
             "convnext",
             "vit"
           ],
-          {}
+          {
+            "default": "vit",
+            "tooltip": "Выберите WD-модель для распознавания тегов. Список отсортирован по Macro F1@0.40: сначала модели с рейтингом, затем остальные по дате публикации. repo_id или local_model_path позволяют использовать другую модель."
+          }
         ],
         "device": [
           [
@@ -46,21 +50,32 @@
             "cpu",
             "cuda"
           ],
-          {}
+          {
+            "tooltip": "Где выполнять вычисления: auto — устройство, выбранное окружением; cpu — процессор; cuda — видеокарта NVIDIA с доступной CUDA. При нехватке видеопамяти выберите cpu или уменьшите батч."
+          }
         ]
       },
       "optional": {
         "download_missing": [
           "BOOLEAN",
-          {}
+          {
+            "default": true,
+            "tooltip": "Разрешить скачивание недостающих файлов модели. Выключите для работы только с локальными файлами: если их нет или комплект неполон, выполнение завершится ошибкой."
+          }
         ],
         "local_model_path": [
           "STRING",
-          {}
+          {
+            "default": "",
+            "tooltip": "Путь к локальной папке WD-модели или файлу model.safetensors / pytorch_model.bin в ней. Нужны также конфигурация и файл меток. Пусто — искать выбранную модель в стандартных папках models/wdv3/taggers или models/taggers проекта.\nПример ввода: C:/models/my_model"
+          }
         ],
         "repo_id": [
           "STRING",
-          {}
+          {
+            "default": "",
+            "tooltip": "Необязательно: репозиторий Hugging Face в формате owner/model. Если заполнен, заменяет model; оставьте пустым для выбора из списка.\nПример ввода: SmilingWolf/wd-eva02-large-tagger-v3"
+          }
         ]
       }
     },
@@ -76,12 +91,15 @@
   "WDV3DetectorLoader": {
     "name": "WDV3DetectorLoader",
     "display_name": "WDV3 Load YOLO Detectors",
+    "description": "Описывает YOLO-детекторы из JSON-массива настроек. Веса загружаются при необходимом поиске регионов; готовый кэш не загружает детекторы. Для отдельных полей используйте YOLO Detector и Region Tag Rules.",
     "input": {
       "required": {
         "detectors_json": [
           "STRING",
           {
-            "multiline": true
+            "default": "[\n  {\n    \"name\": \"person\",\n    \"model_path\": \"person_yolov8m-seg.pt\",\n    \"confidence\": 0.35,\n    \"classes\": [\n      0\n    ],\n    \"region_gen_threshold\": 0.35,\n    \"region_char_threshold\": 0.75\n  }\n]",
+            "multiline": true,
+            "tooltip": "JSON-массив источников YOLO. Для каждого укажите уникальный name, model_path, confidence и classes; можно добавить правила тегов. Пример уже заполнен. Для настройки без JSON используйте YOLO Detector и Region Tag Rules.\nПример ввода: [{\"name\": \"person_detector\", \"model_path\": \"person_yolov8s-seg.pt\", \"confidence\": 0.4, \"classes\": [0], \"region_gen_threshold\": 0.3, \"region_char_threshold\": 0.8}]"
           }
         ]
       }
@@ -96,37 +114,53 @@
   "WDV3Tagger": {
     "name": "WDV3Tagger",
     "display_name": "WDV3 Tag Image / Regions",
+    "description": "Распознаёт теги полного изображения и найденных YOLO/SAM-регионов, затем собирает общий caption. Глобальные параметры берутся из options. Выдаёт tags, подробный results_json и SAM-регионы. Для отдельных операций до объединения используйте Collect Evidence → Filter Tag Sets → операции → Merge Tag Sets.",
     "input": {
       "required": {
         "images": [
           "IMAGE",
-          {}
+          {
+            "tooltip": "Исходное изображение или батч IMAGE, например из Load Image. Для SAM Segment и тегирования подключайте одни и те же изображения в одинаковом порядке, чтобы маски соответствовали картинкам."
+          }
         ],
         "wd_model": [
           "WDV3_MODEL",
-          {}
+          {
+            "tooltip": "Модель WD из Load Tagger Model. Она распознаёт теги на полном изображении и вырезанных регионах; YOLO/SAM только находят эти регионы."
+          }
         ]
       },
       "optional": {
         "detectors": [
           "WDV3_DETECTORS",
-          {}
+          {
+            "tooltip": "Источники YOLO из YOLO Detector / Combine YOLO Detectors / Load Pipeline Config. Их прямоугольные вырезки тегируются WD вместе с полным изображением; фон внутри вырезок сохраняется."
+          }
         ],
         "sam_regions": [
           "WDV3_SAM_REGIONS",
-          {}
+          {
+            "tooltip": "Готовые маски и регионы из SAM Segment Images для этих же изображений и в том же порядке. В Tag Image / Regions используйте либо этот вход, либо пару sam_model + запросы SAM. Для просмотра масок подключите также к Results Viewer."
+          }
         ],
         "options": [
           "WDV3_OPTIONS",
-          {}
+          {
+            "tooltip": "Настройки из Tagging Settings или Load Pipeline Config. Задают глобальные пороги WD, формат текста и батчи. В Tag Image / Regions эти настройки задаются только через options; без подключения используются стандартные значения."
+          }
         ],
         "sam_model": [
           "WDV3_SAM_MODEL",
-          {}
+          {
+            "tooltip": "Настройки SAM из Load SAM 3.1 или Load Pipeline Config. Подключайте вместе с запросами SAM. SAM ищет объекты по тексту; для получения тегов также нужна модель WD."
+          }
         ],
         "sources": [
           "WDV3_SAM_SOURCES",
-          {}
+          {
+            "display_name": "sam_queries",
+            "tooltip": "Текстовые запросы SAM и настройки регионов из SAM Text / Region Settings, Combine SAM Queries или Load Pipeline Config. Подключайте вместе с sam_model. Каждый источник сохраняет собственные пороги, режим вырезки и правила."
+          }
         ]
       }
     },
@@ -144,65 +178,151 @@
   "WDV3Options": {
     "name": "WDV3Options",
     "display_name": "WDV3 Tagging Settings",
+    "description": "Задаёт общие параметры тегирования: пороги WD, удаляемые теги, prefix/suffix, формат текста и размеры батчей. Подключите options к нодам обработки и фильтрации. Настройки можно сохранить через Save Pipeline Config.",
     "input": {
       "required": {
         "general_threshold": [
           "FLOAT",
-          {}
+          {
+            "tooltip": "Порог уверенности WD для обычных тегов: проходят оценки строго выше этого значения. Ниже — больше тегов и ошибок; выше — меньше, но увереннее. Для регионов можно задать отдельный порог в Region Tag Rules.",
+            "default": 0.35,
+            "min": 0,
+            "max": 1,
+            "step": 0.01
+          }
         ],
         "character_threshold": [
           "FLOAT",
-          {}
+          {
+            "tooltip": "Порог WD для имён персонажей, а не для обнаружения людей. Ниже — больше предполагаемых персонажей; выше — меньше ложных имён. Для регионов используйте Region Tag Rules.",
+            "default": 0.75,
+            "min": 0,
+            "max": 1,
+            "step": 0.01
+          }
         ],
         "image_batch_size": [
           "INT",
-          {}
+          {
+            "tooltip": "Сколько полных изображений WD обрабатывает одновременно. Больше — обычно быстрее, но требует больше памяти; при нехватке памяти уменьшите до 1. Размеры батчей SAM и регионов задаются отдельно.",
+            "default": 2,
+            "min": 1,
+            "max": 64
+          }
         ],
         "region_batch_size": [
           "INT",
-          {}
+          {
+            "tooltip": "Сколько вырезанных областей YOLO/SAM WD тегирует одновременно. При нехватке памяти уменьшите. Не ограничивает число найденных объектов и не задаёт размер батча SAM.",
+            "default": 8,
+            "min": 1,
+            "max": 128
+          }
         ],
         "replace_underscores": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Заменять подчёркивания пробелами в итоговом тексте: blue_eyes → blue eyes. Имена тегов в подробных данных остаются каноническими.",
+            "default": true
+          }
         ],
         "escape_parentheses": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Экранировать скобки в итоговом тексте для использования в промпте: hero_(series) → hero_\\(series\\). Отключите, если текст нужен без экранирования.",
+            "default": true
+          }
         ],
         "remove_tags": [
           "STRING",
           {
+            "tooltip": "Теги, которые нужно удалить из итогового результата независимо от источника. Разделяйте запятыми или переносами строк, например blurry, watermark. Удаление имеет приоритет над ручным добавлением. Буквальные имена: blue eyes = blue_eyes. Список через запятые или переводы строк; пробел внутри имени не разделяет теги. Regex-метасимволы здесь буквальные.\nПример ввода: watermark, blurry",
+            "default": "",
             "multiline": true
           }
         ],
         "prefix_tags": [
           "STRING",
           {
+            "tooltip": "Вручную добавить теги в начало итогового текста, через запятую. Они не требуют распознавания моделью; глобальное удаление и ограничения источников продолжают действовать. Буквальные имена: blue eyes = blue_eyes. Список через запятые или переводы строк; пробел внутри имени не разделяет теги. Regex-метасимволы здесь буквальные.\nПример ввода: highres",
+            "default": "",
             "multiline": false
           }
         ],
         "suffix_tags": [
           "STRING",
           {
+            "tooltip": "Вручную добавить теги в конец итогового текста, через запятую. Они не требуют распознавания моделью; глобальное удаление и ограничения источников продолжают действовать. Буквальные имена: blue eyes = blue_eyes. Список через запятые или переводы строк; пробел внутри имени не разделяет теги. Regex-метасимволы здесь буквальные.\nПример ввода: dataset_sample",
+            "default": "",
             "multiline": false
           }
         ],
         "remove_tags_regex": [
           "STRING",
           {
+            "tooltip": "remove_tags: Regex: один Python-шаблон на строку, полное совпадение с именем с _, с учётом регистра. Например .*_eyes. Пробелы и запятые сохраняются. Обычные теги вводите в отдельное буквальное поле.\nПример ввода (два отдельных шаблона, по одному на строку):\n(?:blue|green)_eyes\n.*_skirt",
+            "default": "",
             "multiline": true
           }
         ],
         "tag_separator": [
           "STRING",
           {
+            "tooltip": "Точная строка между тегами: , или пробел или |. Пробелы сохраняются. Пусто — без разделителя. На ввод правил не влияет.\nПримеры ввода без кавычек: \", \" — запятая и пробел; \" | \" — символ | с пробелами. Для вывода можно указать \" \" — один пробел или пустую строку.",
+            "default": ", ",
             "multiline": false
           }
         ],
         "sam_batch_size": [
           "INT",
-          {}
+          {
+            "tooltip": "Сколько исходных изображений SAM сегментирует одновременно. Это не число областей или источников. Сохраняется в options pipeline-конфига.",
+            "default": 1,
+            "min": 1,
+            "max": 16
+          }
+        ]
+      },
+      "optional": {
+        "cache_mode": [
+          "COMBO",
+          {
+            "display_name": "calculation_mode",
+            "tooltip": "reuse = automatic: reuse saved calculations, compute only missing stages. reuse_only = saved calculations only, never run inference. refresh = recalculate. off = do not use persistent calculations. Saving TXT/JSON is controlled separately in Tag Folder.",
+            "default": "reuse",
+            "multiselect": false,
+            "options": [
+              "reuse",
+              "reuse_only",
+              "refresh",
+              "off"
+            ]
+          }
+        ],
+        "cache_dataset_root": [
+          "STRING",
+          {
+            "display_name": "dataset_folder_override",
+            "tooltip": "Tag Folder: leave empty; calculations are stored automatically beside images in Image Folder/.wdv3. Override only to reuse another dataset folder. Accepts the dataset folder or its .wdv3 folder. This is independent of the TXT/JSON output directory. For IMAGE input, choose a dataset folder once.\nПример ввода: C:/dataset",
+            "default": "",
+            "multiline": false
+          }
+        ],
+        "cache_refresh": [
+          "STRING",
+          {
+            "display_name": "refresh_selection",
+            "tooltip": "Только для refresh: имена детекторов или стадии через запятую. Пусто — всё. Для изменения фильтров используйте reuse.\nПример ввода: person_detector, wd_full",
+            "default": "",
+            "multiline": false
+          }
+        ],
+        "low_memory_mode": [
+          "BOOLEAN",
+          {
+            "tooltip": "On: release WD weights from RAM before SAM; reload WD only when inference is needed. Uses less peak RAM but can be slower. Off: keep WD weights resident to avoid reloading; requires enough RAM for WD and SAM together. SAM remains isolated in a worker in both modes. Cached results are unchanged.",
+            "default": true
+          }
         ]
       }
     },
@@ -216,93 +336,180 @@
   "WDV3RegionRules": {
     "name": "WDV3RegionRules",
     "display_name": "WDV3 Region Tag Rules",
+    "description": "Задаёт правила тегов YOLO/SAM-источника и необязательный дочерний стек детекторов. Подключите детей к child_detectors либо child_sam_model + child_sources, затем rules — к родительскому YOLO Detector или SAM Text / Region Settings. Дети ищут внутри исходного bbox родителя. Буквальные теги и regex задаются раздельно.",
     "input": {
       "required": {
         "general_threshold": [
           "FLOAT",
-          {}
+          {
+            "tooltip": "Порог WD для обычных тегов только в регионах этого источника. Проходят оценки строго выше порога; меньшее значение добавляет больше тегов и ошибок. Порог полного изображения задаётся в Tagging Settings.",
+            "default": 0.35,
+            "min": 0,
+            "max": 1,
+            "step": 0.01
+          }
         ],
         "character_threshold": [
           "FLOAT",
-          {}
+          {
+            "tooltip": "Порог WD для имён персонажей только в регионах этого источника. Это не уверенность детектора и не класс person. Выше — меньше ложных имён.",
+            "default": 0.75,
+            "min": 0,
+            "max": 1,
+            "step": 0.01
+          }
         ],
         "remove_from_full": [
           "STRING",
           {
+            "tooltip": "Убрать эти теги из вклада полного изображения, если этот источник нашёл хотя бы один регион. Например, перенести определение 1girl на регионы. Другие источники всё ещё могут добавить эти теги. Буквальные имена: blue eyes = blue_eyes. Список через запятые или переводы строк; пробел внутри имени не разделяет теги. Regex-метасимволы здесь буквальные.\nПример ввода: blue_eyes, green_eyes",
+            "default": "",
             "multiline": true
           }
         ],
         "remove_from_regions": [
           "STRING",
           {
+            "tooltip": "Не принимать эти теги из регионов данного источника. Запятые или переносы строк. Полное изображение и другие источники сохраняют свои теги; удаление побеждает add_to_regions. Буквальные имена: blue eyes = blue_eyes. Список через запятые или переводы строк; пробел внутри имени не разделяет теги. Regex-метасимволы здесь буквальные.\nПример ввода: watermark, blurry",
+            "default": "",
             "multiline": true
           }
         ],
         "add_to_regions": [
           "STRING",
           {
+            "tooltip": "Добавить теги в каждый найденный регион этого источника. Формат: person или person:0.9, через запятую/перенос строки. Без оценки назначается 1.0; это ручная оценка, не уверенность WD. Если регионов нет, ничего не добавится. Ограничения и удаление продолжают действовать. Буквальные имена: blue eyes = blue_eyes. Список через запятые или переводы строк; пробел внутри имени не разделяет теги. Regex-метасимволы здесь буквальные.\nПример ввода: person, red_hair:0.9",
+            "default": "",
             "multiline": true
           }
         ],
         "require_full_confirmation": [
           "STRING",
           {
+            "tooltip": "Принимать перечисленные теги из регионов только если они также прошли порог на полном изображении. Например, full_body не попадёт в итог лишь из-за маленького кропа. Запятые или переносы строк. Буквальные имена: blue eyes = blue_eyes. Список через запятые или переводы строк; пробел внутри имени не разделяет теги. Regex-метасимволы здесь буквальные.\nПример ввода: full_body, cowboy_shot",
+            "default": "",
             "multiline": true
           }
         ],
         "only_from_source": [
           "STRING",
           {
+            "tooltip": "Закрепить эти теги за данным источником: полное изображение и источники, не объявившие этот тег своим, не смогут добавить его в итог. Если источник не нашёл/не подтвердил тег, запасного варианта с полного изображения нет. Буквальные имена: blue eyes = blue_eyes. Список через запятые или переводы строк; пробел внутри имени не разделяет теги. Regex-метасимволы здесь буквальные.\nПример ввода: blue_eyes, smile",
+            "default": "",
             "multiline": true
           }
         ],
         "allowed_tags": [
           "STRING",
           {
+            "tooltip": "Разрешить из этого источника только перечисленные теги, включая ручные добавления. Пусто — без такого ограничения. Например, для лица оставьте blue_eyes, smile. Запятые или переносы строк. Буквальные имена: blue eyes = blue_eyes. Список через запятые или переводы строк; пробел внутри имени не разделяет теги. Regex-метасимволы здесь буквальные.\nПример ввода: blue_eyes, green_eyes, smile",
+            "default": "",
             "multiline": true
           }
         ],
         "full_image_only_tags": [
           "STRING",
           {
+            "tooltip": "Эти теги нельзя добавлять из регионов данного источника: они описывают фон и композицию всей картинки. Они могут прийти с полного изображения. Очистите поле, чтобы разрешить их из этого источника. Буквальные имена: blue eyes = blue_eyes. Список через запятые или переводы строк; пробел внутри имени не разделяет теги. Regex-метасимволы здесь буквальные.\nПример ввода: solo, scenery",
+            "default": "1boy, 1girl, 1other, 2boys, 2girls, 2others, 3boys, 3girls, 3others, 4boys, 4girls, 4others, 5boys, 5girls, 5others, 6+boys, 6+girls, 6+others, abstract_background, animal_focus, aqua_background, argyle_background, armpit_focus, ass_focus, back_focus, black_background, black_border, blue_background, blue_sky, blurry, blurry_background, blurry_foreground, border, breast_focus, bright_background, brown_background, checkered_background, close-up, colorful_background, cowboy_shot, creature_focus, cross_background, crotch_focus, dark_background, depth_of_field, diagonal-striped_background, dithered_background, dotted_background, drama_layer, ear_focus, eye_focus, feet_out_of_frame, film_grain, flower_focus, food_focus, foot_focus, foot_out_of_frame, footwear_focus, full_body, gradient_background, green_background, grey_background, grid_background, hair_focus, halftone_background, hand_focus, heaven_condition, hip_focus, honeycomb_background, kanji_focus, lace_background, leg_focus, looking_ahead, looking_at_another, looking_at_viewer, looking_away, looking_back, looking_to_the_side, male_focus, marble_background, mecha_focus, meme, monochrome_background, monster_focus, mosaic_background, mouth_focus, multiple_boys, multiple_girls, multiple_others, multiple_views, navel_focus, neck_focus, night, night_sky, object_focus, oekaki, orange_background, other_focus, out_of_frame, parody, patterned_background, pectoral_focus, penis_focus, pink_background, plaid_background, plant_focus, pokemon_focus, polka_dot_background, portrait, pov, pov_hands, purple_background, pussy_focus, rainbow_background, red_background, reflection_focus, simple_background, sky, sky_focus, solo, solo_focus, spiral_background, splatter_background, striped_background, sunburst_background, text_focus, thigh_focus, triangle_background, two-tone_background, upper_body, vehicle_focus, weapon_focus, white_background, white_border",
             "multiline": true
           }
         ],
         "remove_tags_from_full_regex": [
           "STRING",
           {
+            "tooltip": "remove_tags_from_full: Regex: один Python-шаблон на строку, полное совпадение с именем с _, с учётом регистра. Например .*_eyes. Пробелы и запятые сохраняются. Обычные теги вводите в отдельное буквальное поле.\nПример ввода (два отдельных шаблона, по одному на строку):\n(?:blue|green)_eyes\n.*_skirt",
+            "default": "",
             "multiline": true
           }
         ],
         "remove_tags_from_region_regex": [
           "STRING",
           {
+            "tooltip": "remove_tags_from_region: Regex: один Python-шаблон на строку, полное совпадение с именем с _, с учётом регистра. Например .*_eyes. Пробелы и запятые сохраняются. Обычные теги вводите в отдельное буквальное поле.\nПример ввода (два отдельных шаблона, по одному на строку):\n(?:blue|green)_eyes\n.*_skirt",
+            "default": "",
             "multiline": true
           }
         ],
         "exclude_from_region_regex": [
           "STRING",
           {
+            "tooltip": "exclude_from_region: Regex: один Python-шаблон на строку, полное совпадение с именем с _, с учётом регистра. Например .*_eyes. Пробелы и запятые сохраняются. Обычные теги вводите в отдельное буквальное поле.\nПример ввода (два отдельных шаблона, по одному на строку):\n(?:blue|green)_eyes\n.*_skirt",
+            "default": "",
             "multiline": true
           }
         ],
         "only_from_source_regex": [
           "STRING",
           {
+            "tooltip": "only_from_source: Regex: один Python-шаблон на строку, полное совпадение с именем с _, с учётом регистра. Например .*_eyes. Пробелы и запятые сохраняются. Обычные теги вводите в отдельное буквальное поле.\nПример ввода (два отдельных шаблона, по одному на строку):\n(?:blue|green)_eyes\n.*_skirt",
+            "default": "",
             "multiline": true
           }
         ],
         "allowed_tags_regex": [
           "STRING",
           {
+            "tooltip": "allowed_tags: Regex: один Python-шаблон на строку, полное совпадение с именем с _, с учётом регистра. Например .*_eyes. Пробелы и запятые сохраняются. Обычные теги вводите в отдельное буквальное поле.\nПример ввода (два отдельных шаблона, по одному на строку):\n(?:blue|green)_eyes\n.*_skirt",
+            "default": "",
             "multiline": true
           }
         ],
         "full_image_only_tags_regex": [
           "STRING",
           {
+            "tooltip": "full_image_only_tags: Regex: один Python-шаблон на строку, полное совпадение с именем с _, с учётом регистра. Например .*_eyes. Пробелы и запятые сохраняются. Обычные теги вводите в отдельное буквальное поле.\nПример ввода (два отдельных шаблона, по одному на строку):\n(?:blue|green)_eyes\n.*_skirt",
+            "default": "",
             "multiline": true
           }
+        ]
+      },
+      "optional": {
+        "child_detectors": [
+          "WDV3_DETECTORS",
+          {
+            "tooltip": "Дочерний стек обычных YOLO Detector / Combine YOLO Detectors. Ищет внутри каждого исходного bbox этого источника, без маски или заливки родителя."
+          }
+        ],
+        "child_sam_model": [
+          "WDV3_SAM_MODEL",
+          {
+            "tooltip": "Модель дочернего SAM из Load SAM 3.1; подключите вместе с child_sources."
+          }
+        ],
+        "child_sources": [
+          "WDV3_SAM_SOURCES",
+          {
+            "display_name": "child_sam_queries",
+            "tooltip": "Дочерние запросы SAM с собственными обычными настройками и rules. Для следующих уровней подключите детей в их Region Tag Rules."
+          }
+        ],
+        "child_tag_route": [
+          "COMBO",
+          {
+            "tooltip": "Оставить дочерние области отдельными либо добавить их теги непосредственному родителю.",
+            "default": "separate",
+            "multiselect": false,
+            "options": [
+              "separate",
+              "merge_to_parent"
+            ]
+          }
+        ],
+        "tag_enabled": [
+          "BOOLEAN",
+          {
+            "tooltip": "Тегировать этот источник через WD. Выключите для промежуточного детектора, который только находит области для детей.",
+            "default": true
+          }
+        ],
+        "local_operations": [
+          "WDV3_POSTPROCESSING",
+          {}
+        ],
+        "aggregate_operations": [
+          "WDV3_POSTPROCESSING",
+          {}
         ]
       }
     },
@@ -316,11 +523,13 @@
   "WDV3YOLODetector": {
     "name": "WDV3YOLODetector",
     "display_name": "WDV3 YOLO Detector",
+    "description": "Настраивает один именованный YOLO-источник: модель, классы, confidence и правила тегов регионов. Поиск областей выполняется при тегировании или Collect Evidence; сами теги распознаёт WD. Несколько источников можно связать через previous_detectors или Combine YOLO Detectors.",
     "input": {
       "required": {
         "model": [
           "COMBO",
           {
+            "tooltip": "Веса YOLO для поиска объектов. person/face/hand — специализированные модели; yolov8n — общие классы COCO. Используются прямоугольные вырезки bbox, даже для весов с суффиксом -seg. custom_model_path заменяет выбор.",
             "multiselect": false,
             "options": [
               "person_yolov8m-seg.pt",
@@ -334,22 +543,35 @@
         "source_name": [
           "STRING",
           {
+            "display_name": "detector_name",
+            "tooltip": "Уникальное имя источника регионов в общей схеме, например person_detail или face. По нему показываются регионы и происхождение тегов в отчётах. Имена YOLO и SAM не должны совпадать.\nПример ввода: person_detector",
+            "default": "person",
             "multiline": false
           }
         ],
         "confidence": [
           "FLOAT",
-          {}
+          {
+            "tooltip": "Порог уверенности обнаружения объекта (0–1). Выше — меньше сомнительных объектов, ниже — больше находок и ложных срабатываний. Это не порог уверенности тегов WD.",
+            "default": 0.35,
+            "min": 0,
+            "max": 1,
+            "step": 0.01
+          }
         ],
         "classes": [
           "STRING",
           {
+            "tooltip": "Числовые ID классов YOLO через запятую; пусто — все классы. Для COCO-модели 0 = person; у специализированных моделей значения могут отличаться. Это не текстовый запрос SAM.\nПример ввода: 0",
+            "default": "0",
             "multiline": false
           }
         ],
         "custom_model_path": [
           "STRING",
           {
+            "tooltip": "Полный путь к весам YOLO (.pt). Если заполнен, используется вместо model. Оставьте пустым для выбора из списка.\nПример ввода: C:/models/yolo/person_yolov8s-seg.pt",
+            "default": "",
             "multiline": false
           }
         ]
@@ -357,15 +579,21 @@
       "optional": {
         "rules": [
           "WDV3_RULES",
-          {}
+          {
+            "tooltip": "Подключите rules из Region Tag Rules: пороги WD, удаление и добавление тегов применятся к регионам этого источника. Без подключения используются стандартные правила."
+          }
         ],
         "previous_detectors": [
           "WDV3_DETECTORS",
-          {}
+          {
+            "tooltip": "Необязательно: detectors от другой ноды YOLO. Текущий источник будет добавлен к списку. Для отдельных веток используйте Combine YOLO Detectors; имена источников должны быть уникальны."
+          }
         ],
         "device": [
           "COMBO",
           {
+            "tooltip": "Где выполнять вычисления: auto — устройство, выбранное окружением; cpu — процессор; cuda — видеокарта NVIDIA с доступной CUDA. При нехватке видеопамяти выберите cpu или уменьшите батч.",
+            "default": "auto",
             "multiselect": false,
             "options": [
               "auto",
@@ -376,7 +604,10 @@
         ],
         "download_missing": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Разрешить скачивание недостающих файлов модели. Выключите для работы только с локальными файлами: если их нет или комплект неполон, выполнение завершится ошибкой.",
+            "default": true
+          }
         ]
       }
     },
@@ -390,11 +621,13 @@
   "WDV3SAMLoader": {
     "name": "WDV3SAMLoader",
     "display_name": "WDV3 Load SAM 3.1",
+    "description": "Задаёт модель SAM 3.1, устройство, локальный путь и разрешение скачивания. Подключите sam_model вместе с текстовыми запросы SAM к сегментации или тегированию. Веса загружаются при выполнении сегментации; эту конфигурацию можно сохранить в пресете.",
     "input": {
       "required": {
         "model": [
           "COMBO",
           {
+            "tooltip": "Модель сегментации SAM 3.1 (unsloth/sam3.1). Находит объекты по тексту из запросы SAM; теги распознаёт отдельная модель WD. Недостающие файлы загружаются при запуске сегментации, если это разрешено.",
             "multiselect": false,
             "options": [
               "unsloth/sam3.1"
@@ -404,6 +637,7 @@
         "device": [
           "COMBO",
           {
+            "tooltip": "Где выполнять вычисления: auto — устройство, выбранное окружением; cpu — процессор; cuda — видеокарта NVIDIA с доступной CUDA. При нехватке видеопамяти выберите cpu или уменьшите батч.",
             "multiselect": false,
             "options": [
               "auto",
@@ -414,11 +648,16 @@
         ],
         "download_missing": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Разрешить скачивание недостающих файлов модели. Выключите для работы только с локальными файлами: если их нет или комплект неполон, выполнение завершится ошибкой.",
+            "default": true
+          }
         ],
         "local_model_path": [
           "STRING",
           {
+            "tooltip": "Папка SAM 3.1 с весами и сопутствующими JSON/токенизатором либо путь к model.safetensors в ней. Пусто — стандартная папка models/sam3/unsloth-sam3.1 ComfyUI или локальный models/sam3 проекта, если там есть веса.\nПример ввода: C:/models/my_model",
+            "default": "",
             "multiline": false
           }
         ]
@@ -434,39 +673,68 @@
   "WDV3SAMSource": {
     "name": "WDV3SAMSource",
     "display_name": "WDV3 SAM Text / Region Settings",
+    "description": "Описывает один именованный текстовый запрос SAM и настройки его регионов: отбор масок, вид вырезки, padding и правила тегов. Подключите запросы SAM вместе с sam_model. Текст prompt используется для поиска объектов; для распознавания тегов регионов служит WD.",
     "input": {
       "required": {
         "source_name": [
           "STRING",
           {
+            "display_name": "sam_query_name",
+            "tooltip": "Уникальное имя источника регионов в общей схеме, например person_detail или face. По нему показываются регионы и происхождение тегов в отчётах. Имена YOLO и SAM не должны совпадать.\nПример ввода: person_detector",
+            "default": "sam_person",
             "multiline": false
           }
         ],
         "prompt": [
           "STRING",
           {
+            "tooltip": "Какой объект должен найти SAM: короткое описание, например person, face или cup. Лучше начать с английского названия. Для нескольких независимых запросов создайте отдельные SAM Sources и объедините их; это не список итоговых тегов.\nПример ввода: person wearing a red shirt",
+            "default": "person",
             "multiline": false
           }
         ],
         "confidence": [
           "FLOAT",
-          {}
+          {
+            "tooltip": "Минимальная уверенность SAM, что найденная область соответствует текстовому prompt. Проходят оценки строго выше порога. Выше — меньше сомнительных объектов. Форму маски задаёт mask_threshold, а отбор тегов WD — Region Tag Rules.",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "step": 0.01
+          }
         ],
         "mask_threshold": [
           "FLOAT",
-          {}
+          {
+            "tooltip": "Порог включения пикселя в маску SAM: остаются вероятности строго выше значения. Выше — маска обычно меньше и строже, ниже — захватывает больше краёв и фона. Меняет форму маски и её bbox, а не уверенность тегов WD.",
+            "default": 0.5,
+            "min": 0,
+            "max": 1,
+            "step": 0.01
+          }
         ],
         "min_mask_area_px": [
           "INT",
-          {}
+          {
+            "tooltip": "Минимальная площадь маски в пикселях исходного изображения. Более мелкие маски отбрасываются. Уменьшите для небольших лиц/предметов; увеличьте для удаления мелкого шума. Это площадь маски, а не прямоугольника bbox.",
+            "default": 32,
+            "min": 1,
+            "max": 100000000
+          }
         ],
         "max_regions": [
           "INT",
-          {}
+          {
+            "tooltip": "Максимум регионов этого SAM-источника на одно изображение. После фильтрации и удаления одинаковых масок остаются самые уверенные. Это не размер батча.",
+            "default": 32,
+            "min": 1,
+            "max": 256
+          }
         ],
         "view_mode": [
           "COMBO",
           {
+            "tooltip": "Какой фрагмент получит WD для тегирования региона. mask — вырезка объекта по маске SAM: внутри минимального прямоугольника вокруг маски пиксели вне объекта заливаются белым, поэтому исходный фон меньше влияет на теги. bbox — минимальный прямоугольник вокруг той же маски целиком: исходный фон и соседние объекты внутри сохраняются и могут влиять на теги. padding_px добавляет контекст; в mask он также расширяет видимую область вокруг маски. Сама найденная SAM-маска от выбора режима не меняется.",
             "multiselect": false,
             "options": [
               "bbox",
@@ -476,17 +744,27 @@
         ],
         "padding_px": [
           "INT",
-          {}
+          {
+            "tooltip": "Отступ в пикселях исходного изображения вокруг bbox маски, с обрезкой по краям картинки. 0 — плотная вырезка. В bbox добавляет исходный фон; в mask также расширяет видимую маску на этот отступ, сохраняя немного окружения объекта. Остальное в mask заливается белым.",
+            "default": 0,
+            "min": 0,
+            "max": 4096
+          }
         ]
       },
       "optional": {
         "rules": [
           "WDV3_RULES",
-          {}
+          {
+            "tooltip": "Подключите rules из Region Tag Rules: пороги WD, удаление и добавление тегов применятся к регионам этого источника. Без подключения используются стандартные правила."
+          }
         ],
         "previous_sources": [
           "WDV3_SAM_SOURCES",
-          {}
+          {
+            "display_name": "previous_sam_queries",
+            "tooltip": "Необязательно: запросы SAM от другой SAM Text / Region Settings. Текущий запрос добавится к списку. Для отдельных веток используйте Combine SAM Queries; имена источников должны быть уникальны."
+          }
         ]
       }
     },
@@ -500,23 +778,36 @@
   "WDV3SAMSegment": {
     "name": "WDV3SAMSegment",
     "display_name": "WDV3 SAM Segment Images",
+    "description": "Находит области SAM на входных изображениях по заданным текстовым источникам. Выдаёт sam_regions с отдельными объектами и combined_mask для каждого изображения. Готовые области можно передать в Tag Image / Regions вместе с теми же исходными изображениями.",
     "input": {
       "required": {
         "images": [
           "IMAGE",
-          {}
+          {
+            "tooltip": "Исходное изображение или батч IMAGE, например из Load Image. Для SAM Segment и тегирования подключайте одни и те же изображения в одинаковом порядке, чтобы маски соответствовали картинкам."
+          }
         ],
         "sam_model": [
           "WDV3_SAM_MODEL",
-          {}
+          {
+            "tooltip": "Настройки SAM из Load SAM 3.1 или Load Pipeline Config. Подключайте вместе с запросами SAM. SAM ищет объекты по тексту; для получения тегов также нужна модель WD."
+          }
         ],
         "sources": [
           "WDV3_SAM_SOURCES",
-          {}
+          {
+            "display_name": "sam_queries",
+            "tooltip": "Текстовые запросы SAM и настройки регионов из SAM Text / Region Settings, Combine SAM Queries или Load Pipeline Config. Подключайте вместе с sam_model. Каждый источник сохраняет собственные пороги, режим вырезки и правила."
+          }
         ],
         "sam_batch_size": [
           "INT",
-          {}
+          {
+            "tooltip": "Сколько исходных изображений SAM сегментирует одновременно. Начните с 1; увеличение требует больше памяти. Это не число объектов на изображении и не батч WD.",
+            "default": 1,
+            "min": 1,
+            "max": 16
+          }
         ]
       }
     },
@@ -532,25 +823,41 @@
   "WDV3LoadFolder": {
     "name": "WDV3LoadFolder",
     "display_name": "WDV3 Image Folder",
+    "description": "Собирает пути изображений выбранной папки с учётом вложенных каталогов, начального индекса и лимита. Выдаёт files и число изображений. Подключите files к Tag Folder для пакетного тегирования.",
     "input": {
       "required": {
         "directory": [
           "STRING",
           {
+            "tooltip": "Папка с исходными изображениями на машине, где работает ComfyUI. Нода собирает пути; для обработки подключите files к Tag Folder. Оригиналы не изменяются.\nПример ввода: C:/dataset/images",
+            "default": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\connection-comfy\\input",
             "multiline": false
           }
         ],
         "recursive": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Искать изображения также во всех подпапках. Если выключено, берутся только файлы непосредственно в directory.",
+            "default": false
+          }
         ],
         "start_index": [
           "INT",
-          {}
+          {
+            "tooltip": "С какого изображения в отсортированном списке начинать: 0 — первое. Удобно для обработки папки по частям; применяется до limit.",
+            "default": 0,
+            "min": 0,
+            "max": 10000000
+          }
         ],
         "limit": [
           "INT",
-          {}
+          {
+            "tooltip": "Сколько изображений взять после start_index. 0 — все оставшиеся подходящие изображения.",
+            "default": 0,
+            "min": 0,
+            "max": 10000000
+          }
         ]
       }
     },
@@ -566,55 +873,85 @@
   "WDV3TagFolder": {
     "name": "WDV3TagFolder",
     "display_name": "WDV3 Tag Folder",
+    "description": "Тегирует изображения из files полным WD и подключёнными YOLO/SAM-источниками. Для каждого изображения формирует общий caption и подробный JSON; при включении сохранения записывает TXT/JSON в выбранную папку. Общие параметры берутся из options.",
     "input": {
       "required": {
         "files": [
           "WDV3_FILES",
-          {}
+          {
+            "tooltip": "Список файлов из Image Folder. Изображения читаются группами, поэтому папка может содержать картинки разных размеров."
+          }
         ],
         "wd_model": [
           "WDV3_MODEL",
-          {}
+          {
+            "tooltip": "Модель WD из Load Tagger Model. Она распознаёт теги на полном изображении и вырезанных регионах; YOLO/SAM только находят эти регионы."
+          }
         ],
         "options": [
           "WDV3_OPTIONS",
-          {}
+          {
+            "tooltip": "Настройки из Tagging Settings или Load Pipeline Config. Задают глобальные пороги WD, формат текста и батчи. В Tag Image / Regions эти настройки задаются только через options; без подключения используются стандартные значения."
+          }
         ],
         "save_txt": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Сохранить итоговые теги в текстовый файл TXT. Для Export Report нужен отчёт по results из Apply Filters или Merge Results; сырые evidence и геометрия regions не содержат итоговых тегов.",
+            "default": true
+          }
         ],
         "save_json": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Сохранить подробные данные в JSON: оценки, регионы и сведения о результате. Формат результата и формат отчёта Inspect различаются.",
+            "default": true
+          }
         ],
         "output_directory": [
           "STRING",
           {
+            "tooltip": "Папка сохранения на машине, где работает ComfyUI; при необходимости создаётся автоматически. Это папка, а не имя файла.\nПример ввода: C:/dataset/tagging_output",
+            "default": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\connection-comfy\\output\\wdv3",
             "multiline": false
           }
         ],
         "overwrite": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Разрешить заменять существующие файлы с теми же именами. Если выключено, при совпадении имён будет ошибка: выберите другое имя или папку.",
+            "default": false
+          }
         ],
         "sam_batch_size": [
           "INT",
-          {}
+          {
+            "tooltip": "Сколько исходных изображений SAM сегментирует одновременно. Начните с 1; увеличение требует больше памяти. Это не число объектов на изображении и не батч WD.",
+            "default": 1,
+            "min": 1,
+            "max": 16
+          }
         ]
       },
       "optional": {
         "detectors": [
           "WDV3_DETECTORS",
-          {}
+          {
+            "tooltip": "Источники YOLO из YOLO Detector / Combine YOLO Detectors / Load Pipeline Config. Их прямоугольные вырезки тегируются WD вместе с полным изображением; фон внутри вырезок сохраняется."
+          }
         ],
         "sam_model": [
           "WDV3_SAM_MODEL",
-          {}
+          {
+            "tooltip": "Настройки SAM из Load SAM 3.1 или Load Pipeline Config. Подключайте вместе с запросами SAM. SAM ищет объекты по тексту; для получения тегов также нужна модель WD."
+          }
         ],
         "sources": [
           "WDV3_SAM_SOURCES",
-          {}
+          {
+            "display_name": "sam_queries",
+            "tooltip": "Текстовые запросы SAM и настройки регионов из SAM Text / Region Settings, Combine SAM Queries или Load Pipeline Config. Подключайте вместе с sam_model. Каждый источник сохраняет собственные пороги, режим вырезки и правила."
+          }
         ]
       },
       "hidden": {
@@ -638,28 +975,39 @@
   "WDV3Preview": {
     "name": "WDV3Preview",
     "display_name": "WDV3 Results Viewer",
+    "description": "Displays results_json from Tag Folder, Tag Image / Regions, Merge Tag Sets, Apply Filters or Merge Results: captions, image and region tags, scores and provenance. For Tag Folder, original images are read from result paths automatically. For Tag Image / Regions, connect the original images for previews. No inference or file saving is performed by this viewer.",
     "input": {
       "required": {
         "results_json": [
           "STRING",
           {
+            "tooltip": "Connect results_json from Tag Folder, Tag Image / Regions, Merge Tag Sets, Apply Filters or Merge Results. Tag Folder results include original image paths, so images is optional. Use results_json, not tags or a file path.\nПример ввода: {\"image_path\": \"C:/dataset/image_001.png\", \"detectors\": {}, \"full_image\": {\"general\": {\"1girl\": 0.95}, \"character\": {}, \"ratings\": {\"general\": 0.9}}, \"merged_tags\": {\"general\": {\"1girl\": 0.95}, \"character\": {}, \"ratings\": {\"general\": 0.9}, \"caption\": \"1girl\", \"taglist\": \"1girl\"}}",
             "forceInput": true,
             "multiline": false
           }
         ],
         "preview_limit": [
           "INT",
-          {}
+          {
+            "tooltip": "0 = show all results. A positive value shows only the first N results. Affects viewing only, not inference or saving. Showing all images in a large dataset can use more memory.",
+            "default": 16,
+            "min": 0,
+            "max": 256
+          }
         ]
       },
       "optional": {
         "images": [
           "IMAGE",
-          {}
+          {
+            "tooltip": "Для результатов Tag Image / Regions подключите тот же исходный батч IMAGE: появится предпросмотр картинки и рамок. Для Tag Folder просмотрщик читает оригиналы по путям из results_json."
+          }
         ],
         "sam_regions": [
           "WDV3_SAM_REGIONS",
-          {}
+          {
+            "tooltip": "Готовые маски и регионы из SAM Segment Images для этих же изображений и в том же порядке. В Tag Image / Regions используйте либо этот вход, либо пару sam_model + запросы SAM. Для просмотра масок подключите также к Results Viewer."
+          }
         ]
       },
       "hidden": {
@@ -677,6 +1025,7 @@
   "WDV3CombineDetectors": {
     "name": "WDV3CombineDetectors",
     "display_name": "WDV3 Combine YOLO Detectors",
+    "description": "Собирает несколько независимо настроенных YOLO-источников в один detectors для тегирования или Collect Evidence. Имена источников должны быть уникальны. Новые входы появляются по мере подключения.",
     "input": {
       "required": {
         "detectors": [
@@ -687,11 +1036,15 @@
                 "required": {
                   "detector": [
                     "WDV3_DETECTORS",
-                    {}
+                    {
+                      "tooltip": "Подключите detectors от отдельно настроенной YOLO-ноды. При подключении появляется следующий вход. Все источники объединяются; их имена должны быть уникальны."
+                    }
                   ]
                 }
               },
-              "prefix": "detector"
+              "prefix": "detector",
+              "min": 1,
+              "max": 64
             }
           }
         ]
@@ -706,22 +1059,28 @@
   },
   "WDV3CombineSAMSources": {
     "name": "WDV3CombineSAMSources",
-    "display_name": "WDV3 Combine SAM Sources",
+    "display_name": "WDV3 Combine SAM Queries",
+    "description": "Собирает несколько SAM-промптов и настроек регионов в общий запросы SAM для одной SAM-модели. Каждый источник сохраняет своё имя, параметры вырезки и правила тегов. Подключите результат вместе с sam_model.",
     "input": {
       "required": {
         "sources": [
           "COMFY_AUTOGROW_V3",
           {
+            "display_name": "sam_queries",
             "template": {
               "input": {
                 "required": {
                   "source": [
                     "WDV3_SAM_SOURCES",
-                    {}
+                    {
+                      "tooltip": "Подключите запросы SAM от отдельно настроенного SAM-запроса. При подключении появляется следующий вход. Все запросы используют общую модель SAM, сохраняя свои настройки и уникальные имена."
+                    }
                   ]
                 }
               },
-              "prefix": "source"
+              "prefix": "source",
+              "min": 1,
+              "max": 64
             }
           }
         ]
@@ -737,34 +1096,75 @@
   "WDV3SaveConfig": {
     "name": "WDV3SaveConfig",
     "display_name": "WDV3 Save Pipeline Config",
+    "description": "Сохраняет подключённые настройки тегирования, YOLO/SAM-источники, конфигурацию SAM и цепочку постобработки в переносимый JSON-пресет. Настройки берутся из конфигурационных нод. Сохранённый файл открывается через Load Pipeline Config.",
     "input": {
       "required": {
         "preset_name": [
           "STRING",
           {
+            "tooltip": "Имя JSON-пресета настроек, например my_pipeline. Сохраняется в пользовательской папке ComfyUI default/wdv3/configs. Затем выберите его в Load Pipeline Config.\nПример ввода: my_tagging_pipeline",
+            "default": "my_pipeline",
             "multiline": false
           }
         ],
         "overwrite": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Разрешить заменять существующие файлы с теми же именами. Если выключено, при совпадении имён будет ошибка: выберите другое имя или папку.",
+            "default": false
+          }
         ]
       },
       "optional": {
         "options": [
           "WDV3_OPTIONS",
-          {}
+          {
+            "tooltip": "Настройки из Tagging Settings или Load Pipeline Config. Задают глобальные пороги WD, формат текста и батчи. В Tag Image / Regions эти настройки задаются только через options; без подключения используются стандартные значения."
+          }
         ],
         "detectors": [
           "WDV3_DETECTORS",
-          {}
+          {
+            "tooltip": "Источники YOLO из YOLO Detector / Combine YOLO Detectors / Load Pipeline Config. Их прямоугольные вырезки тегируются WD вместе с полным изображением; фон внутри вырезок сохраняется."
+          }
         ],
         "sources": [
           "WDV3_SAM_SOURCES",
-          {}
+          {
+            "display_name": "sam_queries",
+            "tooltip": "Текстовые запросы SAM и настройки регионов из SAM Text / Region Settings, Combine SAM Queries или Load Pipeline Config. Подключайте вместе с sam_model. Каждый источник сохраняет собственные пороги, режим вырезки и правила."
+          }
         ],
         "sam_model": [
           "WDV3_SAM_MODEL",
+          {
+            "tooltip": "Настройки SAM из Load SAM 3.1 или Load Pipeline Config. Подключайте вместе с запросами SAM. SAM ищет объекты по тексту; для получения тегов также нужна модель WD."
+          }
+        ],
+        "postprocessing": [
+          "WDV3_POSTPROCESSING",
+          {
+            "tooltip": "Цепочка из Postprocessing Config или Load Pipeline Config. Настройки без изображений и инференса."
+          }
+        ],
+        "calculation_store": [
+          "WDV3_CALCULATION_STORE",
+          {}
+        ],
+        "inference": [
+          "WDV3_INFERENCE",
+          {}
+        ],
+        "caption_read": [
+          "WDV3_CAPTION_READ",
+          {}
+        ],
+        "caption_edit": [
+          "WDV3_CAPTION_EDIT",
+          {}
+        ],
+        "caption_export": [
+          "WDV3_CAPTION_EXPORT",
           {}
         ]
       },
@@ -787,13 +1187,16 @@
   "WDV3LoadConfig": {
     "name": "WDV3LoadConfig",
     "display_name": "WDV3 Load Pipeline Config",
+    "description": "Открывает JSON-пресет и выдаёт options, detectors, запросы SAM, sam_model и postprocessing. Подключите нужные выходы к соответствующим этапам обработки. Пресет содержит настройки, а WD-модель выбирается отдельно в Load Tagger Model.",
     "input": {
       "required": {
         "preset": [
           "COMBO",
           {
+            "tooltip": "Сохранённый или примерный JSON-пресет. Подключите его выходы к ноде тегирования. Модели и изображения не хранятся в пресете; если новый файл не появился в списке, обновите ComfyUI.",
             "multiselect": false,
             "options": [
+              "Example: benchmark_cached_copy1",
               "Example: multi_all",
               "Example: multi_sam",
               "Example: multi_yolo"
@@ -806,23 +1209,37 @@
       "WDV3_OPTIONS",
       "WDV3_DETECTORS",
       "WDV3_SAM_SOURCES",
-      "WDV3_SAM_MODEL"
+      "WDV3_SAM_MODEL",
+      "WDV3_POSTPROCESSING",
+      "WDV3_CALCULATION_STORE",
+      "WDV3_INFERENCE",
+      "WDV3_CAPTION_READ",
+      "WDV3_CAPTION_EDIT",
+      "WDV3_CAPTION_EXPORT"
     ],
     "output_name": [
       "options",
       "detectors",
       "sources",
-      "sam_model"
+      "sam_model",
+      "postprocessing",
+      "calculation_store",
+      "inference",
+      "caption_read",
+      "caption_edit",
+      "caption_export"
     ]
   },
   "WDV3SaveResult": {
     "name": "WDV3SaveResult",
     "display_name": "WDV3 Save Result",
+    "description": "Сохраняет один выбранный результат из results_json в TXT и/или JSON. result_index выбирает изображение в батче. Необязательный вход tags позволяет записать точный текст того же результата с его форматированием.",
     "input": {
       "required": {
         "results_json": [
           "STRING",
           {
+            "tooltip": "Подробные результаты из выхода results_json ноды тегирования, Apply Filters или Merge Results: один JSON на изображение. Подключайте напрямую; это не путь к файлу и не простой список тегов.\nПример ввода: {\"image_path\": \"C:/dataset/image_001.png\", \"detectors\": {}, \"full_image\": {\"general\": {\"1girl\": 0.95}, \"character\": {}, \"ratings\": {\"general\": 0.9}}, \"merged_tags\": {\"general\": {\"1girl\": 0.95}, \"character\": {}, \"ratings\": {\"general\": 0.9}, \"caption\": \"1girl\", \"taglist\": \"1girl\"}}",
             "forceInput": true,
             "multiline": false
           }
@@ -830,36 +1247,55 @@
         "output_directory": [
           "STRING",
           {
+            "tooltip": "Папка сохранения на машине, где работает ComfyUI; при необходимости создаётся автоматически. Это папка, а не имя файла.\nПример ввода: C:/dataset/tagging_output",
+            "default": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\connection-comfy\\output\\wdv3",
             "multiline": false
           }
         ],
         "filename": [
           "STRING",
           {
+            "tooltip": "Имя сохраняемого результата без папки и расширения, например result_01. Допустимы буквы, цифры, пробелы, _ и -; первый символ — буква или цифра. Расширения .txt и .json добавляются автоматически.\nПример ввода: image_001",
+            "default": "result",
             "multiline": false
           }
         ],
         "result_index": [
           "INT",
-          {}
+          {
+            "tooltip": "Какое изображение из батча сохранить: 0 — первое, 1 — второе и т. д. За один запуск сохраняется один выбранный результат; для всей папки используйте Tag Folder.",
+            "default": 0,
+            "min": 0,
+            "max": 10000000
+          }
         ],
         "save_txt": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Сохранить итоговые теги в текстовый файл TXT. Для Export Report нужен отчёт по results из Apply Filters или Merge Results; сырые evidence и геометрия regions не содержат итоговых тегов.",
+            "default": true
+          }
         ],
         "save_json": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Сохранить подробные данные в JSON: оценки, регионы и сведения о результате. Формат результата и формат отчёта Inspect различаются.",
+            "default": true
+          }
         ],
         "overwrite": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Разрешить заменять существующие файлы с теми же именами. Если выключено, при совпадении имён будет ошибка: выберите другое имя или папку.",
+            "default": false
+          }
         ]
       },
       "optional": {
         "tags": [
           "STRING",
           {
+            "tooltip": "Необязательно: tags из той же ноды и ветки, что и results_json. Сохраняет точное форматирование текста, включая пробелы и экранирование скобок. Без подключения текст берётся из JSON.\nПример ввода: 1girl, blue_eyes, long_hair",
             "forceInput": true,
             "multiline": false
           }
@@ -886,37 +1322,47 @@
   "WDV3CollectEvidence": {
     "name": "WDV3CollectEvidence",
     "display_name": "WDV3 Collect Evidence",
+    "description": "Распознаёт и сохраняет исходные оценки WD до пользовательских порогов отдельно для полного кадра и YOLO/SAM-регионов. Evidence позволяет менять фильтры и постобработку без нового инференса при прежней геометрии и моделях. Выход regions содержит геометрию для Inspect.",
     "input": {
       "required": {
         "images": [
           "IMAGE",
-          {}
+          {
+            "tooltip": "Исходное изображение или батч IMAGE, например из Load Image. Для SAM Segment и тегирования подключайте одни и те же изображения в одинаковом порядке, чтобы маски соответствовали картинкам."
+          }
         ],
         "wd_model": [
           "WDV3_MODEL",
-          {}
-        ],
-        "sam_batch_size": [
-          "INT",
-          {}
+          {
+            "tooltip": "Модель WD из Load Tagger Model. Она распознаёт теги на полном изображении и вырезанных регионах; YOLO/SAM только находят эти регионы."
+          }
         ]
       },
       "optional": {
         "options": [
           "WDV3_OPTIONS",
-          {}
+          {
+            "tooltip": "Настройки из Tagging Settings или Load Pipeline Config. Задают глобальные пороги WD, формат текста и батчи. В Tag Image / Regions эти настройки задаются только через options; без подключения используются стандартные значения."
+          }
         ],
         "detectors": [
           "WDV3_DETECTORS",
-          {}
+          {
+            "tooltip": "Источники YOLO из YOLO Detector / Combine YOLO Detectors / Load Pipeline Config. Их прямоугольные вырезки тегируются WD вместе с полным изображением; фон внутри вырезок сохраняется."
+          }
         ],
         "sam_model": [
           "WDV3_SAM_MODEL",
-          {}
+          {
+            "tooltip": "Настройки SAM из Load SAM 3.1 или Load Pipeline Config. Подключайте вместе с запросами SAM. SAM ищет объекты по тексту; для получения тегов также нужна модель WD."
+          }
         ],
         "sources": [
           "WDV3_SAM_SOURCES",
-          {}
+          {
+            "display_name": "sam_queries",
+            "tooltip": "Текстовые запросы SAM и настройки регионов из SAM Text / Region Settings, Combine SAM Queries или Load Pipeline Config. Подключайте вместе с sam_model. Каждый источник сохраняет собственные пороги, режим вырезки и правила."
+          }
         ]
       }
     },
@@ -932,25 +1378,35 @@
   "WDV3ApplyFilters": {
     "name": "WDV3ApplyFilters",
     "display_name": "WDV3 Apply Filters",
+    "description": "Применяет к evidence пороги и правила источников, затем сразу объединяет теги в общий caption. Выдаёт results, tags и results_json. Для вставки отдельных операций перед объединением используйте Filter Tag Sets и Merge Tag Sets.",
     "input": {
       "required": {
         "evidence": [
           "WDV3_EVIDENCE",
-          {}
+          {
+            "tooltip": "Сырые оценки WD до порогов из Collect Evidence. В Apply Filters можно менять правила без повторного распознавания. В Inspect этот вход показывает исходные оценки; подключите только один вход стадии."
+          }
         ]
       },
       "optional": {
         "options": [
           "WDV3_OPTIONS",
-          {}
+          {
+            "tooltip": "Настройки из Tagging Settings или Load Pipeline Config. Задают глобальные пороги WD, формат текста и батчи. В Tag Image / Regions эти настройки задаются только через options; без подключения используются стандартные значения."
+          }
         ],
         "detectors": [
           "WDV3_DETECTORS",
-          {}
+          {
+            "tooltip": "Новые правила YOLO для уже собранных evidence. При подключении detectors или запросы SAM передайте полный набор источников, совпадающий с Collect Evidence по именам. Параметры детекции менять нельзя — для этого заново соберите evidence."
+          }
         ],
         "sources": [
           "WDV3_SAM_SOURCES",
-          {}
+          {
+            "display_name": "sam_queries",
+            "tooltip": "Новые правила SAM для уже найденных регионов. При подключении запросы SAM или detectors передайте полный набор исходных источников с теми же именами. Изменение prompt, масок или вырезок требует повторного Collect Evidence."
+          }
         ]
       }
     },
@@ -968,15 +1424,20 @@
   "WDV3MergeResults": {
     "name": "WDV3MergeResults",
     "display_name": "WDV3 Merge Results",
+    "description": "Объединяет результаты нескольких ветвей одного набора изображений, сохраняя исходные оценки, регионы и происхождение тегов. Общие настройки и цепочки постобработки должны быть совместимы. Одинаковые теги общего caption получают максимальную допустимую оценку.",
     "input": {
       "required": {
         "left": [
           "WDV3_RESULTS",
-          {}
+          {
+            "tooltip": "Первая ветка результатов из Apply Filters или Merge Results. Обе ветки должны относиться к тем же изображениям и совместимым настройкам текста. Теги объединяются с сохранением происхождения."
+          }
         ],
         "right": [
           "WDV3_RESULTS",
-          {}
+          {
+            "tooltip": "Вторая ветка результатов для тех же изображений. При совпадении тегов выбирается наибольшая оценка; данные регионов и происхождение сохраняются."
+          }
         ]
       }
     },
@@ -994,20 +1455,33 @@
   "WDV3Inspect": {
     "name": "WDV3Inspect",
     "display_name": "WDV3 Inspect",
+    "description": "Показывает одну выбранную стадию: regions, исходные evidence, локальные tag_sets или итоговые results. Доступны изображения, области, оценки, причины решений и история before/after. Подключите ровно один вход стадии; report можно сохранить через Export Report.",
     "input": {
       "required": {},
       "optional": {
         "results": [
           "WDV3_RESULTS",
-          {}
+          {
+            "tooltip": "Отфильтрованные результаты из Apply Filters или Merge Results. В Inspect показывает принятые/отклонённые теги и их источники; подключите только один вход стадии."
+          }
         ],
         "evidence": [
           "WDV3_EVIDENCE",
-          {}
+          {
+            "tooltip": "Сырые оценки WD до порогов из Collect Evidence. В Apply Filters можно менять правила без повторного распознавания. В Inspect этот вход показывает исходные оценки; подключите только один вход стадии."
+          }
         ],
         "regions": [
           "WDV3_REGIONS",
-          {}
+          {
+            "tooltip": "Геометрия найденных областей из Collect Evidence, без оценок тегов. В Inspect подключите только этот вход, чтобы изучить расположение регионов."
+          }
+        ],
+        "tag_sets": [
+          "WDV3_TAG_SETS",
+          {
+            "tooltip": "Локальные принятые теги до merge: before/after и причины удаления избыточности. Подключите только один вход стадии."
+          }
         ]
       },
       "hidden": {
@@ -1033,35 +1507,51 @@
   "WDV3ExportReport": {
     "name": "WDV3ExportReport",
     "display_name": "WDV3 Export Report",
+    "description": "Сохраняет report из Inspect как автономный HTML с изображениями, подробный JSON и/или TXT. TXT общего caption доступен для итоговой стадии results; для локальных tag_sets, evidence и regions выбирайте HTML/JSON. Каждый экспорт получает отдельную папку.",
     "input": {
       "required": {
         "report": [
           "WDV3_REPORT",
-          {}
+          {
+            "tooltip": "Отчёт из Inspect с изображениями и данными выбранной стадии. Для сохранения итогового TXT создавайте его из results; evidence подходит для анализа исходных оценок."
+          }
         ],
         "output_directory": [
           "STRING",
           {
+            "tooltip": "Папка сохранения на машине, где работает ComfyUI; при необходимости создаётся автоматически. Это папка, а не имя файла.\nПример ввода: C:/dataset/tagging_output",
+            "default": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\connection-comfy\\output\\wdv3",
             "multiline": false
           }
         ],
         "prefix": [
           "STRING",
           {
+            "tooltip": "Имя отчёта: буквы, цифры, пробелы, _ и -. Для каждого экспорта создаётся отдельная папка wdv3-<имя>-<уникальный ID> внутри output_directory.\nПример ввода: dataset_check",
+            "default": "report",
             "multiline": false
           }
         ],
         "save_json": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Сохранить подробные данные в JSON: оценки, регионы и сведения о результате. Формат результата и формат отчёта Inspect различаются.",
+            "default": true
+          }
         ],
         "save_html": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Сохранить интерактивный HTML-отчёт с картинками, регионами, поиском и оценками. Открывайте report.html в браузере; при переносе сохраняйте рядом папку assets.",
+            "default": true
+          }
         ],
         "save_txt": [
           "BOOLEAN",
-          {}
+          {
+            "tooltip": "Сохранить итоговые теги в текстовый файл TXT. Для Export Report нужен отчёт по results из Apply Filters или Merge Results; сырые evidence и геометрия regions не содержат итоговых тегов.",
+            "default": true
+          }
         ]
       },
       "hidden": {
@@ -1082,6 +1572,862 @@
       "json_path",
       "html_path",
       "txt_path"
+    ]
+  },
+  "WDV3FilterTagSets": {
+    "name": "WDV3FilterTagSets",
+    "display_name": "WDV3 Filter Tag Sets",
+    "description": "Применяет локальные пороги и правила к evidence и сохраняет отдельный набор тегов полного кадра и каждого региона. Это вход в цепочку постобработки перед глобальным объединением. После операций подключите tag_sets к Merge Tag Sets; для просмотра локальных наборов — к Inspect.",
+    "input": {
+      "required": {
+        "evidence": [
+          "WDV3_EVIDENCE",
+          {
+            "tooltip": "Сырые оценки WD до порогов из Collect Evidence. В Apply Filters можно менять правила без повторного распознавания. В Inspect этот вход показывает исходные оценки; подключите только один вход стадии."
+          }
+        ]
+      },
+      "optional": {
+        "options": [
+          "WDV3_OPTIONS",
+          {
+            "tooltip": "Настройки из Tagging Settings или Load Pipeline Config. Задают глобальные пороги WD, формат текста и батчи. В Tag Image / Regions эти настройки задаются только через options; без подключения используются стандартные значения."
+          }
+        ],
+        "detectors": [
+          "WDV3_DETECTORS",
+          {
+            "tooltip": "Новые правила YOLO для уже собранных evidence. При подключении detectors или запросы SAM передайте полный набор источников, совпадающий с Collect Evidence по именам. Параметры детекции менять нельзя — для этого заново соберите evidence."
+          }
+        ],
+        "sources": [
+          "WDV3_SAM_SOURCES",
+          {
+            "display_name": "sam_queries",
+            "tooltip": "Новые правила SAM для уже найденных регионов. При подключении запросы SAM или detectors передайте полный набор исходных источников с теми же именами. Изменение prompt, масок или вырезок требует повторного Collect Evidence."
+          }
+        ],
+        "postprocessing": [
+          "WDV3_POSTPROCESSING",
+          {
+            "tooltip": "Необязательная сохранённая цепочка из Postprocessing Config / Load Pipeline Config. Применяется к локальным наборам без инференса."
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_TAG_SETS"
+    ],
+    "output_name": [
+      "tag_sets"
+    ]
+  },
+  "WDV3RemoveRedundantTags": {
+    "name": "WDV3RemoveRedundantTags",
+    "display_name": "WDV3 Remove Redundant Tags",
+    "description": "Удаляет избыточные general-теги внутри каждого выбранного локального набора. Доступны точные пары, отдельные regex-семейства и текстовая эвристика; protected_tags защищает нужные теги. Исходные оценки и области сохраняются, а Inspect показывает причины и before/after. Все методы выключены по умолчанию.",
+    "input": {
+      "required": {
+        "tag_sets": [
+          "WDV3_TAG_SETS",
+          {
+            "tooltip": "Принятые локальные теги из Filter Tag Sets / предыдущей операции. Raw-оценки сохраняются."
+          }
+        ],
+        "explicit_enabled": [
+          "BOOLEAN",
+          {
+            "tooltip": "Включить точные пары specific → general. Оба тега должны быть приняты в одном наборе.",
+            "default": false
+          }
+        ],
+        "textual_enabled": [
+          "BOOLEAN",
+          {
+            "tooltip": "Необязательная эвристика: black_skirt вытесняет skirt по целым компонентам; skirted — нет. Может удалить полезный общий тег.",
+            "default": false
+          }
+        ],
+        "relations_json": [
+          "STRING",
+          {
+            "tooltip": "JSON-массив, например [{\"specific\":\"miniskirt\",\"general\":\"skirt\"}]. Полные буквальные имена, пробелы = _. Без regex/подстрок; циклы запрещены.\nПример ввода: [{\"specific\": \"miniskirt\", \"general\": \"skirt\"}]",
+            "default": "[]",
+            "multiline": true
+          }
+        ],
+        "protected_tags": [
+          "STRING",
+          {
+            "tooltip": "Сохранить эти теги при обоих методах. Список через запятые/переносы; пробел внутри имени = _.\nПример ввода: skirt, dress",
+            "default": "",
+            "multiline": true
+          }
+        ],
+        "scope": [
+          "COMBO",
+          {
+            "tooltip": "Full, отдельные regions или оба. Разные наборы не сравниваются.",
+            "default": "all",
+            "multiselect": false,
+            "options": [
+              "all",
+              "full",
+              "regions"
+            ]
+          }
+        ],
+        "sources": [
+          "STRING",
+          {
+            "display_name": "detector_names",
+            "tooltip": "Имена региональных источников через запятую/перенос; пусто — все. Не ограничивает full. Неизвестное имя — ошибка.\nПример ввода: person_detector, face_detector",
+            "default": "",
+            "multiline": false
+          }
+        ]
+      },
+      "optional": {
+        "regex_enabled": [
+          "BOOLEAN",
+          {
+            "tooltip": "Включить отдельные regex-отношения. Шаблон specific сопоставляется с полным каноническим именем; general — шаблон замены с захваченными группами.",
+            "default": false
+          }
+        ],
+        "regex_relations_json": [
+          "STRING",
+          {
+            "tooltip": "JSON-массив правил с id, specific (regex) и general (шаблон замены). Например specific=(?:black|white)_(?P<base>.+), general=\\g<base>. В JSON обратный слеш удваивается. Удаляется только уже принятый общий тег в том же наборе.\nПример ввода: [{\"id\": \"colors\", \"specific\": \"(?:black|white)_(?P<base>.+)\", \"general\": \"\\\\g<base>\"}]",
+            "default": "[]",
+            "multiline": true
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_TAG_SETS"
+    ],
+    "output_name": [
+      "tag_sets"
+    ]
+  },
+  "WDV3MergeTagSets": {
+    "name": "WDV3MergeTagSets",
+    "display_name": "WDV3 Merge Tag Sets",
+    "description": "Собирает локальные наборы полного кадра и регионов после постобработки в общий caption. Применяет правила переноса, владения, композиции и финальное форматирование. Повторы объединяются только в общем описании; отдельные региональные записи сохраняются в results и results_json.",
+    "input": {
+      "required": {
+        "tag_sets": [
+          "WDV3_TAG_SETS",
+          {
+            "tooltip": "Локальные наборы после операций. Здесь применяются глобальное отсечение, композиция и формат вывода."
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_RESULTS",
+      "STRING",
+      "STRING"
+    ],
+    "output_name": [
+      "results",
+      "tags",
+      "results_json"
+    ]
+  },
+  "WDV3PostprocessingConfig": {
+    "name": "WDV3PostprocessingConfig",
+    "display_name": "WDV3 Postprocessing Config",
+    "description": "Создаёт переносимую упорядоченную цепочку операций из JSON-описания. Подключите postprocessing к Save Pipeline Config для сохранения или к Filter Tag Sets для применения к готовым evidence. Подходит для хранения и повторного использования правил без загрузки изображений и моделей.",
+    "input": {
+      "required": {
+        "postprocessing_json": [
+          "STRING",
+          {
+            "tooltip": "JSON-массив операций schema_version=1, operation=remove_redundant. Сохраните через Save Pipeline Config или примените через Filter Tag Sets. Без пикселей/оценок.\nПример ввода: [{\"schema_version\": 1, \"operation\": \"remove_redundant\", \"textual_enabled\": true, \"scope\": \"all\"}]",
+            "default": "[]",
+            "multiline": true
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_POSTPROCESSING"
+    ],
+    "output_name": [
+      "postprocessing"
+    ]
+  },
+  "WDV3CalculationStore": {
+    "name": "WDV3CalculationStore",
+    "display_name": "WDV3 Calculation Store Settings",
+    "description": "Необязательная настройка расширенного маршрута: папка постоянного evidence (.wdv3), режим и выбор пересчёта. Изображения не выбирает: это делает Dataset Files. В обычном графе кэш задаётся прямо в Tagging Settings.",
+    "input": {
+      "required": {
+        "dataset_root": [
+          "STRING",
+          {
+            "display_name": "dataset_root",
+            "tooltip": "Папка датасета с изображениями.\nПример ввода: C:/dataset",
+            "default": "",
+            "multiline": false
+          }
+        ],
+        "store_path": [
+          "STRING",
+          {
+            "tooltip": "Пусто — папка .wdv3 внутри dataset_root.\nПример ввода: C:/dataset/.wdv3",
+            "default": "",
+            "multiline": false
+          }
+        ],
+        "mode": [
+          "COMBO",
+          {
+            "default": "reuse",
+            "multiselect": false,
+            "options": [
+              "reuse",
+              "reuse_only",
+              "refresh"
+            ]
+          }
+        ],
+        "refresh": [
+          "STRING",
+          {
+            "display_name": "refresh_selection",
+            "tooltip": "Имена источников или стадий, через запятую. Пусто при refresh — пересчитать всё.\nПример ввода: person_detector, wd_full",
+            "default": "",
+            "multiline": false
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_CALCULATION_STORE"
+    ],
+    "output_name": [
+      "calculation_store"
+    ]
+  },
+  "WDV3InferenceSettings": {
+    "name": "WDV3InferenceSettings",
+    "display_name": "WDV3 Inference Settings",
+    "description": "Необязательный расширенный интерфейс описания моделей без загрузки, для Plan/Compute и агентного API. Для обычного Tag Image / Regions, Collect Evidence, Tag Folder и изменения фильтров не требуется: используйте прежние модели и Tagging Settings.",
+    "input": {
+      "required": {
+        "wd_local_path": [
+          "STRING",
+          {
+            "tooltip": "Локальная папка с весами WD, конфигурацией и словарём тегов.\nПример ввода: C:/models/taggers/wd-eva02-large-tagger-v3",
+            "default": "",
+            "multiline": false
+          }
+        ],
+        "model_id": [
+          "STRING",
+          {
+            "tooltip": "Идентификатор WD-модели или поддерживаемый псевдоним, например vit.\nПример ввода: SmilingWolf/wd-eva02-large-tagger-v3",
+            "default": "vit",
+            "multiline": false
+          }
+        ],
+        "device": [
+          "COMBO",
+          {
+            "default": "cpu",
+            "multiselect": false,
+            "options": [
+              "cpu",
+              "cuda"
+            ]
+          }
+        ],
+        "sources_json": [
+          "STRING",
+          {
+            "display_name": "region_detectors_json",
+            "tooltip": "Массив источников: name, kind (yolo/sam), model с files/identity и локальными настройками, confidence/classes или SAM prompt, view_mode/padding_px, rules.\nПример ввода: [{\"name\": \"person_detector\", \"kind\": \"yolo\", \"model\": {\"files\": {\"weights\": \"C:/models/yolo/person_yolov8s-seg.pt\"}}, \"confidence\": 0.4, \"classes\": [0], \"rules\": {\"region_gen_threshold\": 0.3}}]",
+            "default": "[]",
+            "multiline": true
+          }
+        ],
+        "pinned_identity_json": [
+          "STRING",
+          {
+            "tooltip": "Явная сохранённая идентичность WD для планирования без локальных весов. Пустой объект — хешировать локальные файлы.\nЭто пример структуры. Подставьте настоящую identity сохранённой WD-модели; {} отключает явную привязку.\nПример ввода: {\"weights_sha256\": \"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"}",
+            "default": "{}",
+            "multiline": true
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_INFERENCE"
+    ],
+    "output_name": [
+      "inference"
+    ]
+  },
+  "WDV3DatasetFiles": {
+    "name": "WDV3DatasetFiles",
+    "display_name": "WDV3 Dataset Files",
+    "description": "Собирает изображения dataset_root для нового постоянного пайплайна. Исключает .wdv3 и выбранный store до обхода, поэтому сохранённые PNG/маски не попадут в датасет. Подключите files к Plan Calculations.",
+    "input": {
+      "required": {
+        "calculation_store": [
+          "WDV3_CALCULATION_STORE",
+          {}
+        ],
+        "recursive": [
+          "BOOLEAN",
+          {
+            "default": true
+          }
+        ],
+        "start": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0
+          }
+        ],
+        "limit": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_FILES",
+      "INT"
+    ],
+    "output_name": [
+      "files",
+      "image_count"
+    ]
+  },
+  "WDV3PlanCalculations": {
+    "name": "WDV3PlanCalculations",
+    "display_name": "WDV3 Plan Calculations",
+    "description": "Проверяет evidence для IMAGE либо FILES до загрузки моделей. Выдаёт готовые/недостающие/повреждённые стадии и причины. Если геометрия ещё не рассчитана, WD регионов помечается как ожидающий геометрии.",
+    "input": {
+      "required": {
+        "calculation_store": [
+          "WDV3_CALCULATION_STORE",
+          {}
+        ],
+        "inference": [
+          "WDV3_INFERENCE",
+          {}
+        ],
+        "image_mapping_json": [
+          "STRING",
+          {
+            "tooltip": "Для IMAGE: явные относительные имена изображений, по одному на кадр, JSON-массив.\nОтносительные пути внутри датасета; число имён должно совпадать с числом кадров IMAGE.\nПример ввода: [\"image_001.png\", \"subfolder/image_002.jpg\"]",
+            "default": "[]",
+            "multiline": true
+          }
+        ]
+      },
+      "optional": {
+        "images": [
+          "IMAGE",
+          {}
+        ],
+        "files": [
+          "WDV3_FILES",
+          {}
+        ],
+        "options": [
+          "WDV3_OPTIONS",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_CALCULATION_PLAN",
+      "STRING"
+    ],
+    "output_name": [
+      "plan",
+      "plan_json"
+    ]
+  },
+  "WDV3ComputeMissingEvidence": {
+    "name": "WDV3ComputeMissingEvidence",
+    "display_name": "WDV3 Compute Missing Evidence",
+    "description": "Исполняет план: загружает модели только для отсутствующих стадий, сохраняет raw/PNG/маски в .wdv3 и возвращает evidence для фильтров. При reuse_only модельные вызовы запрещены. Не записывает конечные TXT.",
+    "input": {
+      "required": {
+        "plan": [
+          "WDV3_CALCULATION_PLAN",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_EVIDENCE",
+      "STRING",
+      "STRING"
+    ],
+    "output_name": [
+      "evidence",
+      "run_report",
+      "evidence_refs"
+    ]
+  },
+  "WDV3SaveEvidence": {
+    "name": "WDV3SaveEvidence",
+    "display_name": "WDV3 Save Evidence",
+    "description": "Сохраняет готовое полное evidence в dataset-local store. Это raw-артефакт для последующей фильтрации, а не итоговая TXT-подпись. Возвращает переносимый artifact_id.",
+    "input": {
+      "required": {
+        "calculation_store": [
+          "WDV3_CALCULATION_STORE",
+          {}
+        ],
+        "evidence": [
+          "WDV3_EVIDENCE",
+          {}
+        ]
+      },
+      "hidden": {
+        "prompt": [
+          "PROMPT"
+        ],
+        "extra_pnginfo": [
+          "EXTRA_PNGINFO"
+        ]
+      }
+    },
+    "output": [
+      "STRING"
+    ],
+    "output_name": [
+      "artifact_id"
+    ]
+  },
+  "WDV3LoadEvidence": {
+    "name": "WDV3LoadEvidence",
+    "display_name": "WDV3 Load Evidence",
+    "description": "Загружает evidence по artifact_id/JSON-массиву refs либо manifest run_id. Проверяет целостность без весов и моделей. Подключите к Filter Tag Sets/Apply Filters/Inspect; dataset mapping сохраняется.",
+    "input": {
+      "required": {
+        "calculation_store": [
+          "WDV3_CALCULATION_STORE",
+          {}
+        ],
+        "artifact_ids": [
+          "STRING",
+          {
+            "tooltip": "Это пример формата. Используйте ID существующих расчётов из Save Evidence или отчёта Compute Missing.\nПример ввода: [\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"]",
+            "default": "",
+            "multiline": true
+          }
+        ],
+        "run_id": [
+          "STRING",
+          {
+            "tooltip": "Это пример формата. Возьмите run_id существующего сохранённого запуска, не создавайте произвольный.\nПример ввода: 0123456789abcdef0123456789abcdef",
+            "default": "",
+            "multiline": false
+          }
+        ],
+        "start": [
+          "INT",
+          {
+            "default": 0,
+            "min": 0
+          }
+        ],
+        "limit": [
+          "INT",
+          {
+            "default": 64,
+            "min": 1
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_EVIDENCE"
+    ],
+    "output_name": [
+      "evidence"
+    ]
+  },
+  "WDV3ImportCalculations": {
+    "name": "WDV3ImportCalculations",
+    "display_name": "WDV3 Import Calculations",
+    "description": "Импортирует Bundle evidence либо results_json с полными raw_scores. TXT/merged-only JSON отклоняются. Отчёт capabilities указывает, доступны ли пиксели, маски и пересборка; старый JSON может быть refilter-only.",
+    "input": {
+      "required": {
+        "calculation_store": [
+          "WDV3_CALCULATION_STORE",
+          {}
+        ],
+        "calculations_json": [
+          "STRING",
+          {
+            "tooltip": "Пример маленького refilter-only расчёта. Для своих изображений вставьте полный JSON с raw_scores из экспорта.\nПример ввода: [{\"image_id\": \"image_001\", \"image_size\": [512, 512], \"image_path\": \"C:/dataset/image_001.png\", \"model\": {\"model_id\": \"example\", \"labels_count\": 2, \"categories\": {\"general\": [\"1girl\"], \"character\": [], \"ratings\": [\"general\"]}, \"labels_sha256\": \"2199d73ff2463a864fd302e236a0eef41bc7b8e576d1b15fc8b3f7ca0f7bdc5f\"}, \"full_image\": {\"raw_scores\": {\"general\": {\"1girl\": 0.95}, \"character\": {}, \"ratings\": {\"general\": 0.9}}}, \"detectors\": {}, \"source_settings\": [], \"geometry\": {}}]",
+            "default": "",
+            "multiline": true
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_EVIDENCE",
+      "STRING"
+    ],
+    "output_name": [
+      "evidence",
+      "import_report"
+    ]
+  },
+  "WDV3LoadCaptions": {
+    "name": "WDV3LoadCaptions",
+    "display_name": "WDV3 Load Captions",
+    "description": "Читает готовые UTF-8 TXT датасета без моделей. Сохраняет bytes/digest, порядок и ручные теги без вероятности. .wdv3 исключена из обхода. Входной разделитель независим от формата итогового текста.",
+    "input": {
+      "required": {
+        "calculation_store": [
+          "WDV3_CALCULATION_STORE",
+          {}
+        ],
+        "input_format": [
+          "COMBO",
+          {
+            "default": "comma_newline",
+            "multiselect": false,
+            "options": [
+              "comma_newline",
+              "literal_separator"
+            ]
+          }
+        ],
+        "input_separator": [
+          "STRING",
+          {
+            "tooltip": "Примеры ввода без кавычек: \", \" — запятая и пробел; \" | \" — символ | с пробелами. Поле используется при input_format=literal_separator; разделитель не может состоять только из пробелов.",
+            "default": ", ",
+            "multiline": false
+          }
+        ],
+        "escaped_parentheses": [
+          "BOOLEAN",
+          {
+            "default": false
+          }
+        ],
+        "recursive": [
+          "BOOLEAN",
+          {
+            "default": true
+          }
+        ]
+      },
+      "optional": {
+        "caption_read": [
+          "WDV3_CAPTION_READ",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_CAPTIONS",
+      "STRING"
+    ],
+    "output_name": [
+      "captions",
+      "preview_json"
+    ]
+  },
+  "WDV3EditCaptions": {
+    "name": "WDV3EditCaptions",
+    "display_name": "WDV3 Edit Captions",
+    "description": "Применяет упорядоченные add_before/add_after/remove/remove_regex/replace/sort к подписям в памяти. Remove сильнее add в одной операции. Без записи TXT и без моделей; provenance и история сохраняются.",
+    "input": {
+      "required": {
+        "captions": [
+          "WDV3_CAPTIONS",
+          {}
+        ],
+        "operations_json": [
+          "STRING",
+          {
+            "tooltip": "Упорядоченный JSON-массив операций редактирования подписей.\nПример ввода: [{\"add_before\": [\"highres\"], \"remove\": [\"watermark\"], \"sort\": \"preserve\"}]",
+            "default": "[]",
+            "multiline": true
+          }
+        ]
+      },
+      "optional": {
+        "caption_edit": [
+          "WDV3_CAPTION_EDIT",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_CAPTIONS",
+      "STRING"
+    ],
+    "output_name": [
+      "captions",
+      "preview_json"
+    ]
+  },
+  "WDV3CombineCaptions": {
+    "name": "WDV3CombineCaptions",
+    "display_name": "WDV3 Combine Captions",
+    "description": "Преобразует готовые results в подписи либо дополняет существующие captions. Старые пользовательские теги сохраняются, новые дедуплицируются; фильтры модели не удаляют старые теги. Нужен dataset-relative mapping результатов.",
+    "input": {
+      "required": {
+        "results": [
+          "WDV3_RESULTS",
+          {}
+        ]
+      },
+      "optional": {
+        "captions": [
+          "WDV3_CAPTIONS",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_CAPTIONS"
+    ],
+    "output_name": [
+      "captions"
+    ]
+  },
+  "WDV3CaptionExportSettings": {
+    "name": "WDV3CaptionExportSettings",
+    "display_name": "WDV3 Caption Export Settings",
+    "description": "Задаёт запись подписей: error/skip/append/overwrite, соседний image.txt (default), image.png.txt либо explicit mapping. Формат вывода берётся из options; чтение старого назначения задаётся отдельно. Настройка не пишет файлы.",
+    "input": {
+      "required": {
+        "write_mode": [
+          "COMBO",
+          {
+            "default": "error",
+            "multiselect": false,
+            "options": [
+              "error",
+              "skip",
+              "append",
+              "overwrite"
+            ]
+          }
+        ],
+        "naming": [
+          "COMBO",
+          {
+            "default": "stem_txt",
+            "multiselect": false,
+            "options": [
+              "stem_txt",
+              "image_extension_txt",
+              "explicit"
+            ]
+          }
+        ],
+        "in_place": [
+          "BOOLEAN",
+          {
+            "default": true
+          }
+        ],
+        "target_root": [
+          "STRING",
+          {
+            "tooltip": "Пример ввода: C:/dataset/captions",
+            "default": "",
+            "multiline": false
+          }
+        ],
+        "mapping_json": [
+          "STRING",
+          {
+            "tooltip": "JSON-объект: относительный путь изображения → относительный путь TXT.\nПример ввода: {\"image_001.png\": \"captions/image_001.txt\"}",
+            "default": "{}",
+            "multiline": true
+          }
+        ],
+        "input_format": [
+          "COMBO",
+          {
+            "default": "comma_newline",
+            "multiselect": false,
+            "options": [
+              "comma_newline",
+              "literal_separator"
+            ]
+          }
+        ],
+        "input_separator": [
+          "STRING",
+          {
+            "tooltip": "Примеры ввода без кавычек: \", \" — запятая и пробел; \" | \" — символ | с пробелами. Поле используется при input_format=literal_separator; разделитель не может состоять только из пробелов.",
+            "default": ", ",
+            "multiline": false
+          }
+        ],
+        "escaped_parentheses": [
+          "BOOLEAN",
+          {
+            "default": false
+          }
+        ]
+      },
+      "optional": {
+        "options": [
+          "WDV3_OPTIONS",
+          {}
+        ]
+      }
+    },
+    "output": [
+      "WDV3_CAPTION_EXPORT"
+    ],
+    "output_name": [
+      "caption_export"
+    ]
+  },
+  "WDV3PlanCaptionExport": {
+    "name": "WDV3PlanCaptionExport",
+    "display_name": "WDV3 Plan Caption Export",
+    "description": "Строит preview diff и проверяет коллизии, границы путей, режим записи и текущие digest TXT. Файлы не меняются. Сохранение — отдельный финальный Save Captions.",
+    "input": {
+      "required": {
+        "calculation_store": [
+          "WDV3_CALCULATION_STORE",
+          {}
+        ],
+        "captions": [
+          "WDV3_CAPTIONS",
+          {}
+        ],
+        "caption_export": [
+          "WDV3_CAPTION_EXPORT",
+          {}
+        ],
+        "operation_id": [
+          "STRING",
+          {
+            "tooltip": "Пусто — автоматический ID конкретного плана. Явный ID для агента/повторения: другое содержимое с тем же ID отклоняется.\nПример ввода: caption-export-001",
+            "default": "",
+            "multiline": false
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_CAPTION_PLAN",
+      "STRING"
+    ],
+    "output_name": [
+      "caption_plan",
+      "preview_json"
+    ]
+  },
+  "WDV3SaveCaptions": {
+    "name": "WDV3SaveCaptions",
+    "display_name": "WDV3 Save Captions",
+    "description": "Последний этап: безопасно записывает подготовленные TXT по плану. Проверяет внешние правки, использует атомарную запись и журнал operation_id. Повтор возобновляет запись, не inference. Отчёт: written/skipped/unchanged/conflict/failed.",
+    "input": {
+      "required": {
+        "caption_plan": [
+          "WDV3_CAPTION_PLAN",
+          {}
+        ]
+      },
+      "hidden": {
+        "prompt": [
+          "PROMPT"
+        ],
+        "extra_pnginfo": [
+          "EXTRA_PNGINFO"
+        ]
+      }
+    },
+    "output": [
+      "STRING"
+    ],
+    "output_name": [
+      "export_report"
+    ]
+  },
+  "WDV3CaptionReadSettings": {
+    "name": "WDV3CaptionReadSettings",
+    "display_name": "WDV3 Caption Read Settings",
+    "description": "Переносимые правила чтения TXT для Load Captions и pipeline-пресета. Запятые/переводы строк либо явный непробельный literal separator; скобки декодируются только по переключателю.",
+    "input": {
+      "required": {
+        "input_format": [
+          "COMBO",
+          {
+            "default": "comma_newline",
+            "multiselect": false,
+            "options": [
+              "comma_newline",
+              "literal_separator"
+            ]
+          }
+        ],
+        "input_separator": [
+          "STRING",
+          {
+            "tooltip": "Примеры ввода без кавычек: \", \" — запятая и пробел; \" | \" — символ | с пробелами. Поле используется при input_format=literal_separator; разделитель не может состоять только из пробелов.",
+            "default": ", ",
+            "multiline": false
+          }
+        ],
+        "escaped_parentheses": [
+          "BOOLEAN",
+          {
+            "default": false
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_CAPTION_READ"
+    ],
+    "output_name": [
+      "caption_read"
+    ]
+  },
+  "WDV3CaptionEditSettings": {
+    "name": "WDV3CaptionEditSettings",
+    "display_name": "WDV3 Caption Edit Settings",
+    "description": "Переносимая упорядоченная цепочка редактирования TXT. Подключите к Edit Captions либо Save Pipeline Config. Проверяет операции без чтения файлов и моделей.",
+    "input": {
+      "required": {
+        "operations_json": [
+          "STRING",
+          {
+            "tooltip": "Упорядоченный JSON-массив операций редактирования подписей.\nПример ввода: [{\"add_before\": [\"highres\"], \"remove\": [\"watermark\"], \"sort\": \"preserve\"}]",
+            "default": "[]",
+            "multiline": true
+          }
+        ]
+      }
+    },
+    "output": [
+      "WDV3_CAPTION_EDIT"
+    ],
+    "output_name": [
+      "caption_edit"
     ]
   }
 }

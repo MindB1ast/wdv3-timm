@@ -1,5 +1,6 @@
 """Batch identity, SAM masks, exports and opt-in model download without large weights."""
 from importlib import import_module
+from dataclasses import asdict
 import json
 from pathlib import Path
 import tempfile
@@ -25,6 +26,8 @@ class FakeSAM:
     def __init__(self):
         self.batches = []
         self.offloaded = False
+        self.torch = torch
+        self.device = 'cpu'
 
     def load(self):
         pass
@@ -43,6 +46,19 @@ class FakeSAM:
         mask = np.zeros((size[1], size[0]))
         mask[:, :max(1, size[0] // 2)] = 1
         yield mask, .9, [0, 0, size[0] / 2, size[1]]
+
+
+def fake_worker(backend):
+    """Keep existing mask/batch assertions at the new worker boundary."""
+    class Worker:
+        def __init__(self,python,config,**kwargs):self.config=config
+        def __enter__(self):return self
+        def __exit__(self,*args):backend.offload()
+        def segment(self,images,directory):
+            method=import_module('wdv3_comfy_test.Scripts.sam3_backend').OfficialSam3Backend.segment
+            sources=[{k:v for k,v in asdict(s).items() if k not in ('view','rules')} for s in self.config.sources]
+            return method(backend,images,sources,directory)
+    return Worker
 
 
 class ProcessingTests(unittest.TestCase):
@@ -66,7 +82,7 @@ class ProcessingTests(unittest.TestCase):
     def test_tag_image_runs_sam_internally_and_exposes_masks_for_viewer(self):
         wd = runtime()
         backend = FakeSAM()
-        with patch("wdv3_comfy_test.Scripts.sam_runtime.create_backend", return_value=backend) as factory:
+        with patch("wdv3_comfy_test.Scripts.sam3_adapter.SamWorker", side_effect=fake_worker(backend)) as factory:
             result = nodes.WDTagger().tag(torch.ones(2, 4, 4, 3), wd,
                 sam_model={"backend": "test"}, sources=[source()], sam_batch_size=1)
         tags, details, regions = result["result"]
@@ -105,7 +121,7 @@ class ProcessingTests(unittest.TestCase):
 
     def test_sam_regions_are_bound_to_pixels_and_merged_with_rules(self):
         backend = FakeSAM()
-        with patch("wdv3_comfy_test.Scripts.sam_runtime.create_backend", return_value=backend):
+        with patch("wdv3_comfy_test.Scripts.sam3_adapter.SamWorker", side_effect=fake_worker(backend)):
             records = processing.segment_frames(self.frames, {}, [source()], 2)
         self.assertEqual(backend.batches, [2, 1])
         self.assertTrue(backend.offloaded)
@@ -118,7 +134,7 @@ class ProcessingTests(unittest.TestCase):
 
     def test_sam_offloads_on_prediction_error(self):
         backend = FakeSAM()
-        with patch("wdv3_comfy_test.Scripts.sam_runtime.create_backend", return_value=backend), \
+        with patch("wdv3_comfy_test.Scripts.sam3_adapter.SamWorker", side_effect=fake_worker(backend)), \
              patch.object(backend, "_predict_source", side_effect=RuntimeError("prediction failed")):
             with self.assertRaisesRegex(RuntimeError, "prediction failed"):
                 processing.segment_frames(self.frames, {}, [source()])
@@ -131,7 +147,7 @@ class ProcessingTests(unittest.TestCase):
             frame.save(images / f"{index}.png")
         files = processing.scan_folder(str(images), False, 0, 0)
         backend = FakeSAM()
-        with patch("wdv3_comfy_test.Scripts.sam_runtime.create_backend", return_value=backend):
+        with patch("wdv3_comfy_test.Scripts.sam3_adapter.SamWorker", side_effect=fake_worker(backend)):
             tags, details = processing.tag_folder(files, runtime(), {"image_batch_size": 2},
                 sam_settings={"backend": "test"}, sources=[source()])
         self.assertEqual(backend.batches, [1, 1, 1])

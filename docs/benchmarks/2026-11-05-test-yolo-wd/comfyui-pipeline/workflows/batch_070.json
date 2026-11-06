@@ -1,0 +1,114 @@
+{
+  "1": {
+    "class_type": "WDV3CalculationStore",
+    "inputs": {
+      "dataset_root": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\readme-benchmark\\dataset",
+      "store_path": "",
+      "mode": "reuse_only",
+      "refresh": ""
+    }
+  },
+  "2": {
+    "class_type": "WDV3LoadEvidence",
+    "inputs": {
+      "calculation_store": [
+        "1",
+        0
+      ],
+      "artifact_ids": "",
+      "run_id": "a03fd4303a1b47cb948da22937676756",
+      "start": 70,
+      "limit": 2
+    }
+  },
+  "3": {
+    "class_type": "WDV3Options",
+    "inputs": {
+      "general_threshold": 0.35,
+      "character_threshold": 0.75,
+      "image_batch_size": 2,
+      "region_batch_size": 8,
+      "replace_underscores": false,
+      "escape_parentheses": false,
+      "remove_tags": "",
+      "prefix_tags": "",
+      "suffix_tags": "",
+      "remove_tags_regex": "",
+      "tag_separator": ", ",
+      "sam_batch_size": 1,
+      "cache_mode": "reuse_only",
+      "cache_dataset_root": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\readme-benchmark\\dataset",
+      "cache_refresh": ""
+    }
+  },
+  "4": {
+    "class_type": "WDV3DetectorLoader",
+    "inputs": {
+      "detectors_json": "[{\"name\": \"person_detector\", \"model_path\": \"C:\\\\Users\\\\annak\\\\Downloads\\\\full_tagger_project\\\\wdv3-timm\\\\models\\\\yolo\\\\person_yolov8s-seg.pt\", \"confidence\": 0.4, \"classes\": [0], \"remove_tags_from_full\": [], \"remove_tags_from_region\": [], \"add_tags_to_region\": {}, \"exclude_from_region\": [], \"region_gen_threshold\": 0.3, \"region_char_threshold\": 0.8}, {\"name\": \"face_detector\", \"model_path\": \"C:\\\\Users\\\\annak\\\\Downloads\\\\full_tagger_project\\\\wdv3-timm\\\\models\\\\yolo\\\\face_yolov9c.pt\", \"confidence\": 0.4, \"classes\": [0], \"remove_tags_from_full\": [\"fang\", \"fangs\", \"skin fang\", \"skin fangs\", \"fang out\", \"tongue\", \"tongue out\", \"licking lips\", \"aqua eyes\", \"black eyes\", \"blue eyes\", \"brown eyes\", \"green eyes\", \"grey eyes\", \"orange eyes\", \"purple eyes\", \"pink eyes\", \"red eyes\", \"white eyes\", \"yellow eyes\", \"heterochromia\", \"multicolored eyes\", \"gradient eyes\", \"two-tone eyes\", \"rainbow eyes\", \"@ @\", \"mismatched irises\", \"dashed eyes\", \"Pac-man eyes\", \"ringed eyes\", \"squiggle eyes\", \"aqua pupils\", \"blue pupils\", \"brown pupils\", \"green pupils\", \"grey pupils\", \"orange pupils\", \"pink pupils\", \"purple pupils\", \"red pupils\", \"white pupils\", \"yellow pupils\", \"constricted pupils\", \"extra pupils\", \"horizontal pupils\", \"no pupils\", \"slit pupils\", \"symbol-shaped pupils\", \"diamond-shaped pupils\", \"flower-shaped pupils\", \"heart-shaped pupils\", \"star-shaped pupils\", \"solid circle pupils\", \"cross-shaped pupils\", \"x-shaped pupils\", \"mismatched pupils\", \"blue sclera\", \"black sclera\", \"blank eyes\", \"bloodshot eyes\", \"green sclera\", \"mismatched sclera\", \"no sclera\", \"orange sclera\", \"red sclera\", \"yellow sclera\", \"bags under eyes\", \"aegyo sal\", \"bruised eye\", \"flaming eyes\", \"button eyes\", \"cephalopod eyes\", \"compound eyes\", \"horizontal pupils\", \"lens eye\", \"pixel eyes\", \"crazy eyes\", \"empty eyes\", \"heart-shaped eyes\", \"nonowa\", \"solid circle eyes\", \"o o\", \"0 0\", \"spiral-only eyes\", \"jitome\", \"tareme\", \"tsurime\", \"sanpaku\", \"sparkling eyes\", \"geass\", \"sharingan\", \"mangekyou sharingan\", \"rinnegan\", \"byakugan\", \"missing eye\", \"third eye\", \"extra eyes\", \"no eyes\", \"> <\", \"X3\", \"XD\", \"DX\", \"O o\", \"3 3\", \"6 9\", \"^ ^\", \"^o^\", \"|_|\", \"= =\", \"+ +\", \". .\", \"<o> <o>\", \"<|>_<|>\", \"closed eyes\", \"wince\", \"one eye closed\", \";<\", \";>\", \";p\", \"covering own eyes\", \"hair over eyes\", \"hair over one eye\", \"eyelashes\", \"colored eyelashes\", \"fake eyelashes\", \"eyes visible through hair\", \"makeup\", \"eyeliner\", \"eyeshadow\", \"mascara\", \"akanbe\", \"artificial eye\", \"mechanical eye\", \"asymmetrical eyes\", \"blind\", \"partially blind\", \"cross-eyed\", \"rolling eyes\", \"sideways glance\", \"squinting\", \"uneven eyes\", \"unusually open eyes\", \"upturned eyes\", \"wall-eyed\", \"wide-eyed\", \"parted lips\", \"crazy smile\", \"evil smile\", \"fingersmile\", \"forced smile\", \"glasgow smile\", \"grin\", \"evil grin\", \"light smile\", \"sad smile\", \"seductive smile\", \"smile\", \"smirk\", \"smug\", \"troll face\", \"wavy mouth\", \"sobbing\", \"dot nose\", \"no nose\", \"chestnut mouth\", \"dot mouth\", \"mouth drool\", \"no mouth\", \"rectangular mouth\", \"sideways mouth\", \"split mouth\", \"Yurie mouth\", \"nose blush\", \"pout\"], \"remove_tags_from_region\": [], \"add_tags_to_region\": {}, \"exclude_from_region\": [], \"region_gen_threshold\": 0.3, \"region_char_threshold\": 0.85}]"
+    }
+  },
+  "5": {
+    "class_type": "WDV3FilterTagSets",
+    "inputs": {
+      "evidence": [
+        "2",
+        0
+      ],
+      "options": [
+        "3",
+        0
+      ],
+      "detectors": [
+        "4",
+        0
+      ]
+    }
+  },
+  "6": {
+    "class_type": "WDV3MergeTagSets",
+    "inputs": {
+      "tag_sets": [
+        "5",
+        0
+      ]
+    }
+  },
+  "7": {
+    "class_type": "WDV3SaveResult",
+    "inputs": {
+      "results_json": [
+        "6",
+        2
+      ],
+      "tags": [
+        "6",
+        1
+      ],
+      "output_directory": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\docs\\benchmarks\\2026-11-05-test-yolo-wd\\comfyui-pipeline\\tags",
+      "filename": "image_070",
+      "result_index": 0,
+      "save_txt": true,
+      "save_json": false,
+      "overwrite": false
+    }
+  },
+  "8": {
+    "class_type": "WDV3SaveResult",
+    "inputs": {
+      "results_json": [
+        "6",
+        2
+      ],
+      "tags": [
+        "6",
+        1
+      ],
+      "output_directory": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\docs\\benchmarks\\2026-11-05-test-yolo-wd\\comfyui-pipeline\\tags",
+      "filename": "image_071",
+      "result_index": 1,
+      "save_txt": true,
+      "save_json": false,
+      "overwrite": false
+    }
+  }
+}

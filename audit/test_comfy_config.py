@@ -8,13 +8,20 @@ import unittest
 from unittest.mock import patch
 
 from audit.test_comfy_nodes import runtime
-from audit.test_comfy_processing import processing, FakeSAM, source
+from audit.test_comfy_processing import processing, FakeSAM, source, fake_worker
 
 config = import_module("wdv3_comfy_test.comfy_config")
 nodes = import_module("wdv3_comfy_test.comfy_nodes")
 
 
 class ConfigTests(unittest.TestCase):
+    def test_low_memory_setting_round_trips_and_rejects_non_boolean(self):
+        for enabled in (False,True):
+            data={'schema_version':1,'options':{'low_memory_mode':enabled}}
+            self.assertIs(config.validate_config(data)['options']['low_memory_mode'],enabled)
+        with self.assertRaisesRegex(ValueError,'boolean'):
+            config.validate_config({'schema_version':1,'options':{'low_memory_mode':'false'}})
+
     def test_multi_sam_uses_one_backend_and_one_encoding_per_image_batch(self):
         preset = json.loads(Path("configs/multi_sam.json").read_text())
         sources = preset["sam_sources"]
@@ -28,7 +35,7 @@ class ConfigTests(unittest.TestCase):
                 calls.append((row["name"], row["prompt"], row["confidence"]))
                 return original(state, row, count)
             backend._predict_source = predict
-            with patch("wdv3_comfy_test.Scripts.sam_runtime.create_backend", return_value=backend) as factory:
+            with patch("wdv3_comfy_test.Scripts.sam3_adapter.SamWorker", side_effect=fake_worker(backend)) as factory:
                 regions = processing.segment_frames([image], {}, sources)
             self.assertEqual(factory.call_count, 1)
             self.assertEqual(backend.batches, [1])
@@ -37,7 +44,7 @@ class ConfigTests(unittest.TestCase):
             # Fixture masks are 16 pixels, so lower the area threshold for this tiny frame.
             for row in sources:
                 row["min_mask_area_px"] = 1
-            with patch("wdv3_comfy_test.Scripts.sam_runtime.create_backend", return_value=FakeSAM()):
+            with patch("wdv3_comfy_test.Scripts.sam3_adapter.SamWorker", side_effect=fake_worker(FakeSAM())):
                 regions = processing.segment_frames([image], {}, sources)
             _, details = processing.tag_frames([image], runtime(), sam_regions=regions)
         views = details[0]["detectors"]

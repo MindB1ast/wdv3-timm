@@ -6,12 +6,14 @@ export function migrateTaggerOptions(graph) {
     let nodeId=Math.max(Number(graph.last_node_id)||0,...graph.nodes.map(n=>Number(n.id)||0));
     let linkId=Math.max(Number(graph.last_link_id)||0,...graph.links.map(l=>Number(l[0])||0));
     for(const tagger of [...graph.nodes]) {
-        if(tagger.type!=="WDV3Tagger"||!Array.isArray(tagger.widgets_values)||tagger.widgets_values.length<8)continue;
+        const collecting=tagger.type==="WDV3CollectEvidence";
+        if((!collecting&&tagger.type!=="WDV3Tagger")||!Array.isArray(tagger.widgets_values)||tagger.widgets_values.length<(collecting?1:8))continue;
         const old=tagger.widgets_values;
         const input=(tagger.inputs??=[]).find(i=>i.name==="options");
         const edge=graph.links.find(l=>l[0]===input?.link);
         const source=edge&&graph.nodes.find(n=>n.id===edge[1]);
-        const samBatch=typeof old[8]==="number"?old[8]:1;
+        const batchIndex=collecting?0:8;
+        const samBatch=typeof old[batchIndex]==="number"?old[batchIndex]:1;
         // Existing options already controlled tagging. Preserve that connection;
         // clone a Settings node only to carry a formerly local SAM batch size.
         if(edge&&(source?.type!=="WDV3Options"||source.widgets_values?.length>=12||samBatch===1)) {
@@ -21,7 +23,7 @@ export function migrateTaggerOptions(graph) {
         const values=[...defaults];
         if(source?.type==="WDV3Options") {
             source.widgets_values?.forEach((value,index)=>{if(index<values.length)values[index]=value;});
-        } else {
+        } else if(!collecting) {
             const positions=[0,1,3,4,5,6,7,8];
             old.slice(0,8).forEach((value,index)=>{values[positions[index]]=value;});
             if(typeof old[9]==="string")values[10]=old[9];

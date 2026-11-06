@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {labelPorts,portLabel} from '../web/port_labels.mjs';
+assert.equal(portLabel('WDV3CollectEvidence','sources','WDV3_SAM_SOURCES'),'sam_queries');
+assert.equal(portLabel('WDV3RemoveRedundantTags','sources','STRING'),'detector_names');
+assert.equal(portLabel('WDV3InferenceSettings','sources_json','STRING'),'region_detectors_json');
+const node={type:'WDV3CombineSAMSources',inputs:[{name:'sources.source0',type:'WDV3_SAM_SOURCES',link:3}],outputs:[{name:'sources',type:'WDV3_SAM_SOURCES',links:[4]}]};
+labelPorts(node);assert.equal(node.inputs[0].label,'sam_queries');
+assert.equal(node.inputs[0].name,'sources.source0');assert.equal(node.inputs[0].link,3);
+assert.equal(node.outputs[0].name,'sources');assert.deepEqual(node.outputs[0].links,[4]);
+const once=JSON.stringify(node);labelPorts(node);assert.equal(JSON.stringify(node),once);

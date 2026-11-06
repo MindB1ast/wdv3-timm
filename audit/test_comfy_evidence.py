@@ -20,6 +20,19 @@ class EvidenceTests(unittest.TestCase):
     def setUp(self):
         self.image=Image.new('RGB',(8,6),'white');self.addCleanup(self.image.close)
         self.wd=runtime()
+    def test_low_memory_setting_releases_only_on_sam_cache_miss(self):
+        from unittest.mock import Mock
+        for enabled in (False,True):
+            with self.subTest(enabled=enabled):
+                wd=runtime();wd.release_weights=Mock()
+                records=[{'sources':[]}]
+                with patch('wdv3_comfy_test.comfy_processing.segment_frames',return_value=records) as segment:
+                    pipeline.cached_segment([self.image],wd,{},[],low_memory_mode=enabled)
+                    self.assertEqual(wd.release_weights.call_count,int(enabled))
+                    pipeline.cached_segment([self.image],wd,{},[],low_memory_mode=not enabled)
+                    self.assertEqual(wd.release_weights.call_count,int(enabled))
+                    self.assertEqual(segment.call_count,1)
+
     def collect(self,configs=None):
         return pipeline.collect([self.image],self.wd,detectors=(configs or [],{}))
     def test_raw_scores_and_filtering_do_not_run_models_again(self):

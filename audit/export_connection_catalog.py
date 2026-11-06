@@ -25,8 +25,11 @@ def main():
     sys.modules[spec.name] = package
     spec.loader.exec_module(package)
     definitions = {name: dict(name=name, display_name=package.NODE_DISPLAY_NAME_MAPPINGS[name],
+                              description=cls.DESCRIPTION,
                               input=cls.INPUT_TYPES(), output=cls.RETURN_TYPES, output_name=cls.RETURN_NAMES)
                    for name, cls in package.NODE_CLASS_MAPPINGS.items()}
+    assert all(isinstance(node['description'], str) and node['description'].strip()
+               for node in definitions.values()), 'Every WDV3 node needs a readable description'
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(definitions, ensure_ascii=False, indent=2), encoding='utf-8')
     print(f'Exported {len(definitions)} real node definitions to {args.output}')

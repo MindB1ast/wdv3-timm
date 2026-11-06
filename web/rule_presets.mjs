@@ -46,6 +46,8 @@ export function taggingWidgetValues(options={}){
         if(name.endsWith("batch_size")&&(!Number.isInteger(value)||value<1))throw new Error(`${name}: expected a positive integer`);
         if(["replace_underscores","escape_parentheses"].includes(name)&&typeof value!=="boolean")throw new Error(`${name}: expected boolean`);
         if(["remove_tags","prefix_tags","suffix_tags","tag_separator"].includes(name)&&typeof value!=="string")throw new Error(`${name}: expected text`);
+        if(name==='cache_mode'&&!['reuse','reuse_only','refresh','off'].includes(value))throw new Error('cache_mode: unknown mode');
+        if(['cache_dataset_root','cache_refresh'].includes(name)&&typeof value!=='string')throw new Error(`${name}: expected text`);
     }
     return values;
 }

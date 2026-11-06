@@ -1,5 +1,7 @@
 """One local/Hub resource bundle for notebook and ComfyUI taggers."""
 import json
+import inspect
+import sys
 from dataclasses import replace
 from pathlib import Path
 
@@ -67,18 +69,31 @@ def ensure_resources(repo_id: str, root: Path, *, allow_download=True, local_pat
     return target
 
 
+def load_weight_state(path: Path):
+    """Avoid the Windows torch storage-slicing crash in the mmap backend.
+
+    A native access violation cannot be caught with try/except. Select a
+    non-mmap reader before opening the checkpoint, retaining older APIs.
+    """
+    if sys.platform != 'win32':
+        return safetensors.torch.load_file(path)
+    if 'backend' in inspect.signature(safetensors.torch.load_file).parameters:
+        return safetensors.torch.load_file(path, device='cpu', backend='pread')
+    return safetensors.torch.load(path.read_bytes())
+
+
 def load_network(target: Path):
     """Build from local timm config; no implicit pretrained download."""
     network = timm.create_model(f'local-dir:{target}', pretrained=False).eval()
     if (target / 'model.safetensors').is_file():
-        state = safetensors.torch.load_file(target / 'model.safetensors')
+        state = load_weight_state(target / 'model.safetensors')
     else:
         state = torch.load(target / 'pytorch_model.bin', map_location='cpu', weights_only=True)
     network.load_state_dict(state)
     return network
 
 
-def load_tagger(repo_id: str, root: Path, *, allow_download=True, local_path=None):
+def load_tagger_metadata(repo_id: str, root: Path, *, allow_download=True, local_path=None):
     repo_id = resolve_model_id(repo_id)
     target = ensure_resources(repo_id, root, allow_download=allow_download, local_path=local_path)
     # Validate metadata and dictionary before allocating a large network.
@@ -103,5 +118,9 @@ def load_tagger(repo_id: str, root: Path, *, allow_download=True, local_path=Non
     if not revision and cached_metadata.is_file():
         revision = cached_metadata.read_text(encoding='utf-8').splitlines()[0]
     transform.profile = replace(transform.profile, revision=revision)
-    network = load_network(target)
-    return network, labels, transform, target
+    return labels, transform, target
+
+
+def load_tagger(repo_id: str, root: Path, *, allow_download=True, local_path=None):
+    labels,transform,target=load_tagger_metadata(repo_id,root,allow_download=allow_download,local_path=local_path)
+    return load_network(target),labels,transform,target

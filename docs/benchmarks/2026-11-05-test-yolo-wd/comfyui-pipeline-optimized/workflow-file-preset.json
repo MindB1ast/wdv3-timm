@@ -1,0 +1,435 @@
+{
+  "last_node_id": 8,
+  "last_link_id": 9,
+  "nodes": [
+    {
+      "id": 2,
+      "type": "WDV3LoadEvidence",
+      "pos": [
+        440,
+        20
+      ],
+      "size": [
+        350,
+        236
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "calculation_store",
+          "type": "WDV3_CALCULATION_STORE",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "evidence",
+          "type": "WDV3_EVIDENCE",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3LoadEvidence"
+      },
+      "widgets_values": [
+        "",
+        "a03fd4303a1b47cb948da22937676756",
+        0,
+        2
+      ]
+    },
+    {
+      "id": 3,
+      "type": "WDV3LoadConfig",
+      "pos": [
+        20,
+        20
+      ],
+      "size": [
+        350,
+        170
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "options",
+          "type": "WDV3_OPTIONS",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "detectors",
+          "type": "WDV3_DETECTORS",
+          "links": [
+            4
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "sources",
+          "type": "WDV3_SAM_SOURCES",
+          "links": null,
+          "slot_index": 2
+        },
+        {
+          "name": "sam_model",
+          "type": "WDV3_SAM_MODEL",
+          "links": null,
+          "slot_index": 3
+        },
+        {
+          "name": "postprocessing",
+          "type": "WDV3_POSTPROCESSING",
+          "links": null,
+          "slot_index": 4
+        },
+        {
+          "name": "calculation_store",
+          "type": "WDV3_CALCULATION_STORE",
+          "links": [
+            1
+          ],
+          "slot_index": 5
+        },
+        {
+          "name": "inference",
+          "type": "WDV3_INFERENCE",
+          "links": null,
+          "slot_index": 6
+        },
+        {
+          "name": "caption_read",
+          "type": "WDV3_CAPTION_READ",
+          "links": null,
+          "slot_index": 7
+        },
+        {
+          "name": "caption_edit",
+          "type": "WDV3_CAPTION_EDIT",
+          "links": null,
+          "slot_index": 8
+        },
+        {
+          "name": "caption_export",
+          "type": "WDV3_CAPTION_EXPORT",
+          "links": null,
+          "slot_index": 9
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3LoadConfig"
+      },
+      "widgets_values": [
+        "Example: benchmark_cached_copy1"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "WDV3FilterTagSets",
+      "pos": [
+        860,
+        20
+      ],
+      "size": [
+        350,
+        170
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "evidence",
+          "type": "WDV3_EVIDENCE",
+          "link": 2
+        },
+        {
+          "name": "options",
+          "type": "WDV3_OPTIONS",
+          "link": 3
+        },
+        {
+          "name": "detectors",
+          "type": "WDV3_DETECTORS",
+          "link": 4
+        },
+        {
+          "name": "sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        },
+        {
+          "name": "postprocessing",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "links": [
+            5
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3FilterTagSets"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 6,
+      "type": "WDV3MergeTagSets",
+      "pos": [
+        1280,
+        20
+      ],
+      "size": [
+        350,
+        170
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "results",
+          "type": "WDV3_RESULTS",
+          "links": null,
+          "slot_index": 0
+        },
+        {
+          "name": "tags",
+          "type": "STRING",
+          "links": [
+            7,
+            9
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "results_json",
+          "type": "STRING",
+          "links": [
+            6,
+            8
+          ],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3MergeTagSets"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 7,
+      "type": "WDV3SaveResult",
+      "pos": [
+        1700,
+        20
+      ],
+      "size": [
+        350,
+        304
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "results_json",
+          "type": "STRING",
+          "link": 6
+        },
+        {
+          "name": "tags",
+          "type": "STRING",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "txt_path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        },
+        {
+          "name": "json_path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3SaveResult"
+      },
+      "widgets_values": [
+        "C:/Users/annak/Downloads/full_tagger_project/wdv3-timm/docs/benchmarks/2026-11-05-test-yolo-wd/comfyui-pipeline-optimized/preset-preview",
+        "preview_image_000",
+        0,
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "id": 8,
+      "type": "WDV3SaveResult",
+      "pos": [
+        1700,
+        450
+      ],
+      "size": [
+        350,
+        304
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "results_json",
+          "type": "STRING",
+          "link": 8
+        },
+        {
+          "name": "tags",
+          "type": "STRING",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "txt_path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        },
+        {
+          "name": "json_path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3SaveResult"
+      },
+      "widgets_values": [
+        "C:/Users/annak/Downloads/full_tagger_project/wdv3-timm/docs/benchmarks/2026-11-05-test-yolo-wd/comfyui-pipeline-optimized/preset-preview",
+        "preview_image_001",
+        1,
+        true,
+        false,
+        true
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      3,
+      5,
+      2,
+      0,
+      "WDV3_CALCULATION_STORE"
+    ],
+    [
+      2,
+      2,
+      0,
+      5,
+      0,
+      "WDV3_EVIDENCE"
+    ],
+    [
+      3,
+      3,
+      0,
+      5,
+      1,
+      "WDV3_OPTIONS"
+    ],
+    [
+      4,
+      3,
+      1,
+      5,
+      2,
+      "WDV3_DETECTORS"
+    ],
+    [
+      5,
+      5,
+      0,
+      6,
+      0,
+      "WDV3_TAG_SETS"
+    ],
+    [
+      6,
+      6,
+      2,
+      7,
+      0,
+      "STRING"
+    ],
+    [
+      7,
+      6,
+      1,
+      7,
+      1,
+      "STRING"
+    ],
+    [
+      8,
+      6,
+      2,
+      8,
+      0,
+      "STRING"
+    ],
+    [
+      9,
+      6,
+      1,
+      8,
+      1,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.55,
+      "offset": [
+        35,
+        30
+      ]
+    }
+  },
+  "version": 0.4
+}

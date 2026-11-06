@@ -58,6 +58,13 @@ class WorkerTests(unittest.TestCase):
             with self.assertRaisesRegex(SamWorkerError, "reduce sam_batch_size"):
                 worker.segment(self.images, self.directory)
 
+    def test_native_allocation_abort_is_reported_to_parent(self):
+        with self.worker('native_oom') as worker:
+            process=worker.process
+            with self.assertRaisesRegex(SamWorkerError,'ran out of memory'):
+                worker.segment(self.images,self.directory)
+            self.assertIsNotNone(process.poll())
+
     def test_timeout_and_cancel_terminate_process(self):
         with self.worker("timeout") as worker:
             process = worker.process

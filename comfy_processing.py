@@ -2,7 +2,10 @@
 from contextlib import ExitStack
 import hashlib
 import json
+import os
 from pathlib import Path
+import sys
+import tempfile
 
 import numpy as np
 from PIL import Image, ImageOps
@@ -13,7 +16,6 @@ from .Scripts.preprocess import merge_tags_from_regions, NumpyEncoder
 from .Scripts.region_tagging import RegionTagger
 from .Scripts.regions import prepare_region_view
 from .Scripts.sam_config import RegionViewConfig
-from .Scripts.sam_masks import select_masks
 from .Scripts.tag_utils import apply_tag_rules, enforce_owners
 from .Scripts.wdv3_timm import pil_ensure_rgb
 
@@ -68,11 +70,13 @@ def sam_folder(checkpoint, default_folder, allow_download):
     return folder.resolve()
 
 
-def segment_frames(frames, settings, sources, batch_size=1, progress=None):
-    """Reuse the project's SAM backend and mask selection; release weights after the stage."""
+def segment_frames(frames, settings, sources, batch_size=1, progress=None, *, worker_factory=None):
+    """Use the existing isolated SAM worker; release all CPU/GPU weights on exit."""
     if batch_size < 1 or not sources:
         raise ValueError("SAM needs positive batch_size and at least one source")
-    from .Scripts.sam_runtime import create_backend
+    from .Scripts.sam3_adapter import SamWorker
+    from .Scripts.sam_config import SamConfig, SamSourceConfig
+    from .Scripts.regions import read_mask, resolve_asset
     from .comfy_evidence import interrupt
     from .comfy_config import validate_config
     sources=validate_config({'schema_version':1,'sam_sources':sources})['sam_sources']
@@ -81,36 +85,48 @@ def segment_frames(frames, settings, sources, batch_size=1, progress=None):
         settings = dict(settings)
         folder = sam_folder(settings["checkpoint"], settings["checkpoint"], settings.get("allow_download", False))
         settings.update(checkpoint=str(folder), allow_download=False)
-    backend = create_backend(settings)
+    config=SamConfig(checkpoint=settings.get('checkpoint',''),device=settings.get('device','auto'),
+        allow_download=settings.get('allow_download',False),backend=settings.get('backend','auto'),
+        model_id=settings.get('model_id'),revision=settings.get('revision'),
+        sources=tuple(SamSourceConfig(source_id=s['name'],name=s['name'],prompt=s['prompt'],
+            confidence=s['confidence'],mask_threshold=s['mask_threshold'],min_mask_area_px=s['min_mask_area_px'],
+            max_regions=s['max_regions']) for s in sources))
+    def cancelled():
+        interrupt()
+        return False
     output = []
     try:
-        backend.load()
-        with torch.inference_mode():
-            for start in range(0, len(frames), batch_size):
-                interrupt()
-                if progress:
-                    progress(start, len(frames))
-                chunk = frames[start:start + batch_size]
-                state = backend._encode_images(chunk)
-                records = [{"digest": frame_digest(image), "size": list(image.size), "model_settings": dict(settings),
-                            "sources": sources, "regions": {}} for image in chunk]
-                for source in sources:
-                    interrupt()
-                    predictions = backend._predict_source(state, source, len(chunk))
-                    interrupt()
-                    for index, image in enumerate(chunk):
-                        candidates = backend._candidates(predictions, index, image.size, source["confidence"])
-                        try:
-                            rows, _ = select_masks(candidates, source, image.size)
-                        finally:
-                            candidates.close()
-                        records[index]["regions"][source["name"]] = rows
-                    del predictions
-                del state
-                output.extend(records)
-        return output
-    finally:
-        backend.offload()
+        import folder_paths
+        temporary_root=Path(folder_paths.get_temp_directory())
+    except ImportError:
+        temporary_root=Path(__file__).resolve().parent/'temp'
+    temporary_root.mkdir(parents=True,exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='wdv3-sam-',dir=temporary_root) as temporary, \
+         (worker_factory or SamWorker)(sys.executable,config,timeout=3600,cancelled=cancelled) as worker:
+        directory=Path(temporary)
+        for start in range(0,len(frames),batch_size):
+            interrupt()
+            if progress:progress(start,len(frames))
+            chunk=frames[start:start+batch_size]
+            images=[]
+            for offset,image in enumerate(chunk):
+                image_id=f'frame_{start+offset}'
+                path=directory/(image_id+'.png');image.save(path)
+                images.append(dict(image_id=image_id,path=str(path),size=list(image.size)))
+            segmented=worker.segment(images,directory)
+            by_image={row['image_id']:{'digest':frame_digest(image),'size':list(image.size),
+                'model_settings':dict(settings),'sources':sources,'regions':{}} for row,image in zip(images,chunk)}
+            for record in segmented:
+                rows=[]
+                for geometry in record['regions']:
+                    mask_path=resolve_asset(directory,geometry['mask_path'])
+                    mask=read_mask(mask_path,tuple(by_image[record['image_id']]['size']))
+                    rows.append(dict(bbox=geometry['bbox'],segmentation_score=geometry['segmentation_score'],mask=mask))
+                    mask_path.unlink()
+                by_image[record['image_id']]['regions'][record['source_id']]=rows
+            output.extend(by_image[row['image_id']] for row in images)
+            for row in images:Path(row['path']).unlink()
+    return output
 
 
 def sam_tag_regions(image, record, tagger, batch_size):
@@ -157,7 +173,12 @@ def scan_folder(directory, recursive, start, limit):
     root = Path(directory).expanduser().resolve()
     if not root.is_dir():
         raise FileNotFoundError(f"Image folder not found: {root}")
-    files = sorted((p for p in (root.rglob("*") if recursive else root.iterdir())
+    def candidates():
+        for directory,folders,names in os.walk(root,followlinks=False):
+            folders[:]=[name for name in folders if name!='.wdv3']
+            yield from (Path(directory)/name for name in names)
+            if not recursive:folders.clear()
+    files = sorted((p for p in candidates()
                     if p.is_file() and p.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp", ".bmp")),
                    key=lambda p: p.relative_to(root).as_posix().casefold())
     files = files[start:start + limit] if limit else files[start:]
@@ -182,8 +203,12 @@ def tag_folder(files, runtime, options, *, detectors=None, sam_settings=None, so
                 if enabled:
                     # Keep original extension: a.jpg and a.png cannot collide.
                     target = out / (str(path.relative_to(root)) + suffix)
-                    if target in used or (target.exists() and not overwrite):
-                        raise FileExistsError(f"Output exists or collides: {target}")
+                    if target in used:
+                        raise FileExistsError(f"Output paths collide: {target}")
+                    if target.exists() and not overwrite:
+                        raise FileExistsError(f"Result file already exists: {target}. In Tag Folder enable overwrite "
+                                              "to update saved TXT/JSON, or disable save_txt and save_json to view results only. "
+                                              "This controls file saving, not inference; cache_mode=reuse_only still prevents inference.")
                     if target.resolve() == path.resolve():
                         raise ValueError("Output must not overwrite an input image")
                     targets[suffix] = target
@@ -199,10 +224,17 @@ def tag_folder(files, runtime, options, *, detectors=None, sam_settings=None, so
         chunk = paths[start:start + batch_size]
         with ExitStack() as stack:
             frames = [stack.enter_context(file_frame(path)) for path in chunk]
-            from .comfy_evidence import cached_segment
-            regions = cached_segment(frames, runtime, sam_settings, sources, sam_batch_size, progress) if sam_settings else None
-            texts, records = tag_frames(frames, runtime, detectors=detectors, sam_regions=regions,
-                                       options=options, image_paths=chunk, progress=progress)
+            from .comfy_evidence import cached_segment,apply_filters,outputs
+            from .comfy_automatic_cache import cached_evidence
+            raw=cached_evidence(frames,runtime,options=options,detectors=detectors,sam_model=sam_settings,sources=sources,
+                                image_paths=chunk,dataset_root=root,progress=progress)
+            if raw is not None:
+                texts,encoded=outputs(apply_filters(raw,options))
+                records=[json.loads(row) for row in encoded]
+            else:
+                regions = cached_segment(frames, runtime, sam_settings, sources, sam_batch_size, progress, low_memory_mode=options.get('low_memory_mode',True)) if sam_settings else None
+                texts, records = tag_frames(frames, runtime, detectors=detectors, sam_regions=regions,
+                                           options=options, image_paths=chunk, progress=progress)
         for offset, (path, text, record) in enumerate(zip(chunk, texts, records)):
             record["image_index"] = start + offset
             encoded = json_result(record)

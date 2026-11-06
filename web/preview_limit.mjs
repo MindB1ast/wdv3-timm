@@ -2,7 +2,7 @@
 export function previewLimit(value) {
     if (value == null || (typeof value === "string" && !value.trim())) return 16;
     const number = Number(value);
-    return Number.isFinite(number) ? Math.min(256, Math.max(1, Math.trunc(number))) : 16;
+    return Number.isFinite(number) ? Math.min(256, Math.max(0, Math.trunc(number))) : 16;
 }
 
 export function repairPreviewLimit(node) {

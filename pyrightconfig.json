@@ -1,7 +1,17 @@
 {
   "include": [
     "Scripts/types.py",
+    "Scripts/cascade.py",
+    "Scripts/cascade_geometry.py",
     "Scripts/tag_utils.py",
+    "Scripts/tag_names.py",
+    "Scripts/tag_postprocessing.py",
+    "Scripts/artifact_store.py",
+    "Scripts/inference_plan.py",
+    "Scripts/persistent_evidence.py",
+    "Scripts/caption_files.py",
+    "Scripts/workflow_api.py",
+    "Scripts/workflow_cli.py",
     "Scripts/preprocess.py",
     "Scripts/configs.py",
     "Scripts/wdv3_timm.py",

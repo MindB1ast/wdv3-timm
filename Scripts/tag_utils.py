@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from typing import TypeVar
 
 from .types import CATEGORIES, Score, Scores, TagInput, WDTagResult
+from .tag_names import canonical_tag, parse_tags
 
 _Result = TypeVar("_Result", bound=WDTagResult)
 
@@ -47,7 +48,8 @@ class TagMatcher:
         return bool(self.literals or self.patterns)
 
     def __contains__(self, tag):
-        return bool(self.matches(tag))
+        tag = canonical_tag(tag)
+        return tag in self.literals or any(pattern.fullmatch(tag) for pattern in self.compiled)
 
     def matches(self, tag):
         tag = canonical_tag(tag)
@@ -61,17 +63,6 @@ def rule_matcher(rules, field, literals=None):
     return TagMatcher(getattr(rules, field, ()) if literals is None else literals,
                       getattr(rules, field + '_regex', ()), field + '_regex',
                       getattr(rules, 'name', None))
-
-
-def canonical_tag(tag: str) -> str:
-    """Preserve punctuation/case, replacing spaces with underscores."""
-    return str(tag).strip().replace(" ", "_")
-
-
-def parse_tags(value: TagInput) -> list[str]:
-    """Parse comma/newline separated input, deduplicating in order."""
-    values = re.split(r"[,\r\n]+", value) if isinstance(value, str) else (value or [])
-    return list(dict.fromkeys(tag for item in values if (tag := canonical_tag(item))))
 
 
 def parse_additions(value):

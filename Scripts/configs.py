@@ -1,7 +1,8 @@
 """Serializable detector settings and public notebook options."""
 
 # Файл для классов конфигов
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar, asdict
+from copy import deepcopy
 from typing import List, Optional
 
 from simple_parsing import field as sp_field
@@ -40,8 +41,10 @@ class DetectorConfig:  # pylint: disable=R0902  # Public configuration fields.
     only_from_source_regex: Optional[List[str]] = None
     allowed_tags_regex: Optional[List[str]] = None
     full_image_only_tags_regex: Optional[List[str]] = None
+    children: InitVar[dict | None] = None
 
-    def __post_init__(self):
+    def __post_init__(self, children=None):
+        self._children = deepcopy(children)
         if self.classes is None:
             self.classes = [0]
         if self.remove_tags_from_full is None:
@@ -61,6 +64,12 @@ class DetectorConfig:  # pylint: disable=R0902  # Public configuration fields.
         for field in REGEX_RULE_FIELDS:
             setattr(self, field + '_regex', parse_regex(getattr(self, field + '_regex')))
             rule_matcher(self, field)
+
+    def to_dict(self):
+        value = asdict(self)
+        if self._children is not None:
+            value['children'] = deepcopy(self._children)
+        return value
 
     @classmethod
     def from_dict(cls, values):

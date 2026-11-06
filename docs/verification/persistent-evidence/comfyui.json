@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "nodes": 42,
+  "real_comfy_schemas": true,
+  "valid_prompt": true,
+  "txt_only": true,
+  "image_mapping": true,
+  "preset_roundtrip": true,
+  "evidence_roundtrip": true,
+  "api_ui_bytes": true,
+  "browser_tested": false,
+  "caption_modes": {
+    "error": "conflict",
+    "skip": "skipped",
+    "append": "written",
+    "overwrite": "written"
+  },
+  "custom_separator": true,
+  "append_resume": true,
+  "external_edit_conflict": true,
+  "existing_collect_automatic_cache": true,
+  "visible_sam_port_labels": true
+}

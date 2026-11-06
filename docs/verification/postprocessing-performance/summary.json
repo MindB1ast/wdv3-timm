@@ -1,0 +1,27 @@
+{
+  "before": {
+    "graph_seconds": 1358.086,
+    "wall_seconds": 1432.295
+  },
+  "after": {
+    "graph_seconds": 131.227,
+    "wall_seconds": 135.072
+  },
+  "speedup": 10.3491354675486,
+  "images": 108,
+  "matching_images": 108,
+  "inference_calls": 0,
+  "tests": {
+    "tests_run": 248,
+    "passed": 248,
+    "failures": 0,
+    "errors": 0
+  },
+  "typecheck": {
+    "filesAnalyzed": 38,
+    "errorCount": 0,
+    "warningCount": 0,
+    "informationCount": 0,
+    "timeInSec": 11.068
+  }
+}

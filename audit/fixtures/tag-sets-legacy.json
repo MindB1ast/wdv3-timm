@@ -1,0 +1,1788 @@
+{
+  "{}": [
+    {
+      "image_id": "first",
+      "image_size": [
+        8,
+        6
+      ],
+      "image_png": "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAGCAIAAABxZ0isAAAAFElEQVR4nGP8//8/AzbAhFWUThIAvm0DCRxYCEQAAAAASUVORK5CYII=",
+      "full_image": {
+        "general": {
+          "skirt": 0.95,
+          "solo": 0.99
+        },
+        "character": {
+          "hero_(series)": 0.91
+        },
+        "ratings": {
+          "general": 0.8
+        },
+        "caption": "hero_(series), skirt, solo",
+        "taglist": "hero (series), skirt, solo",
+        "raw_scores": {
+          "general": {
+            "skirt": 0.95,
+            "solo": 0.99,
+            "below": 0.1
+          },
+          "character": {
+            "hero_(series)": 0.91
+          },
+          "ratings": {
+            "general": 0.8
+          }
+        },
+        "provenance": {},
+        "decisions": {
+          "general": {
+            "skirt": {
+              "score": 0.95,
+              "status": "accepted",
+              "reason": "threshold_pass"
+            },
+            "solo": {
+              "score": 0.99,
+              "status": "accepted",
+              "reason": "threshold_pass"
+            },
+            "below": {
+              "score": 0.1,
+              "status": "rejected",
+              "reason": "below_threshold"
+            }
+          },
+          "character": {
+            "hero_(series)": {
+              "score": 0.91,
+              "status": "accepted",
+              "reason": "threshold_pass"
+            }
+          }
+        }
+      },
+      "detectors": {
+        "clothes": [
+          {
+            "general": {
+              "skirt": 0.8,
+              "black_skirt": 0.9,
+              "1girl": 0.9
+            },
+            "character": {
+              "hero_(series)": 0.91
+            },
+            "ratings": {
+              "general": 0.8
+            },
+            "caption": "1girl, black_skirt, hero_(series), skirt",
+            "taglist": "1girl, black skirt, hero (series), skirt",
+            "region_id": 0,
+            "bbox": [
+              0,
+              0,
+              4,
+              4
+            ],
+            "raw_scores": {
+              "general": {
+                "skirt": 0.8,
+                "black_skirt": 0.9,
+                "1girl": 0.9
+              },
+              "character": {
+                "hero_(series)": 0.91
+              },
+              "ratings": {
+                "general": 0.8
+              }
+            },
+            "provenance": {},
+            "decisions": {
+              "general": {
+                "skirt": {
+                  "score": 0.8,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                },
+                "black_skirt": {
+                  "score": 0.9,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                },
+                "1girl": {
+                  "score": 0.9,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                }
+              },
+              "character": {
+                "hero_(series)": {
+                  "score": 0.91,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                }
+              }
+            }
+          },
+          {
+            "general": {
+              "skirt": 0.7,
+              "1girl": 0.9
+            },
+            "character": {
+              "hero_(series)": 0.91
+            },
+            "ratings": {
+              "general": 0.8
+            },
+            "caption": "1girl, hero_(series), skirt",
+            "taglist": "1girl, hero (series), skirt",
+            "region_id": 1,
+            "bbox": [
+              0,
+              0,
+              4,
+              4
+            ],
+            "raw_scores": {
+              "general": {
+                "skirt": 0.7,
+                "miniskirt": 0.3,
+                "1girl": 0.9
+              },
+              "character": {
+                "hero_(series)": 0.91
+              },
+              "ratings": {
+                "general": 0.8
+              }
+            },
+            "provenance": {},
+            "decisions": {
+              "general": {
+                "skirt": {
+                  "score": 0.7,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                },
+                "miniskirt": {
+                  "score": 0.3,
+                  "status": "rejected",
+                  "reason": "below_threshold"
+                },
+                "1girl": {
+                  "score": 0.9,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                }
+              },
+              "character": {
+                "hero_(series)": {
+                  "score": 0.91,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                }
+              }
+            }
+          }
+        ],
+        "face": [
+          {
+            "general": {
+              "skirt": 0.7,
+              "miniskirt": 0.9,
+              "blue_eyes": 0.8
+            },
+            "character": {},
+            "ratings": {
+              "general": 0.8
+            },
+            "caption": "blue_eyes, miniskirt, skirt",
+            "taglist": "blue eyes, miniskirt, skirt",
+            "region_id": 0,
+            "bbox": [
+              0,
+              0,
+              4,
+              4
+            ],
+            "mask_png": "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAGCAAAAADbboAnAAAAEUlEQVR4nGP8zwABTFCaKAYANkUBC0ocmd0AAAAASUVORK5CYII=",
+            "raw_scores": {
+              "general": {
+                "skirt": 0.7,
+                "miniskirt": 0.9,
+                "blue_eyes": 0.8
+              },
+              "character": {
+                "hero_(series)": 0.91
+              },
+              "ratings": {
+                "general": 0.8
+              }
+            },
+            "provenance": {},
+            "decisions": {
+              "general": {
+                "skirt": {
+                  "score": 0.7,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                },
+                "miniskirt": {
+                  "score": 0.9,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                },
+                "blue_eyes": {
+                  "score": 0.8,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                },
+                "manual": {
+                  "score": 0.8,
+                  "status": "rejected",
+                  "reason": "not_in_allowed_tags"
+                }
+              },
+              "character": {
+                "hero_(series)": {
+                  "score": 0.91,
+                  "status": "rejected",
+                  "reason": "not_in_allowed_tags"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "source_settings": [
+        {
+          "name": "clothes",
+          "model_path": "fake",
+          "confidence": 0.25,
+          "classes": [
+            0
+          ],
+          "remove_tags_from_full": [],
+          "remove_tags_from_region": [],
+          "add_tags_to_region": {},
+          "exclude_from_region": [],
+          "region_gen_threshold": null,
+          "region_char_threshold": null,
+          "only_from_source": [],
+          "allowed_tags": [],
+          "device": "auto",
+          "download_missing": true,
+          "full_image_only_tags": [],
+          "remove_tags_from_full_regex": [],
+          "remove_tags_from_region_regex": [],
+          "exclude_from_region_regex": [],
+          "only_from_source_regex": [],
+          "allowed_tags_regex": [],
+          "full_image_only_tags_regex": []
+        },
+        {
+          "name": "face",
+          "model_path": "sam3",
+          "confidence": 0.25,
+          "classes": [
+            0
+          ],
+          "remove_tags_from_full": [],
+          "remove_tags_from_region": [],
+          "add_tags_to_region": {
+            "manual": 0.8
+          },
+          "exclude_from_region": [],
+          "region_gen_threshold": null,
+          "region_char_threshold": null,
+          "only_from_source": [],
+          "allowed_tags": [
+            "1girl",
+            "skirt",
+            "miniskirt",
+            "blue_eyes"
+          ],
+          "device": "auto",
+          "download_missing": true,
+          "full_image_only_tags": [],
+          "remove_tags_from_full_regex": [],
+          "remove_tags_from_region_regex": [],
+          "exclude_from_region_regex": [],
+          "only_from_source_regex": [],
+          "allowed_tags_regex": [],
+          "full_image_only_tags_regex": []
+        }
+      ],
+      "geometry": {
+        "sam_model": {
+          "model_id": "fake-sam"
+        }
+      },
+      "merged_tags": {
+        "general": {
+          "skirt": 0.95,
+          "solo": 0.99,
+          "black_skirt": 0.9,
+          "1girl": 0.9,
+          "miniskirt": 0.9,
+          "blue_eyes": 0.8
+        },
+        "character": {
+          "hero_(series)": 0.91
+        },
+        "ratings": {
+          "general": 0.8
+        },
+        "provenance": {
+          "skirt": {
+            "source": "full",
+            "model_score": 0.95
+          },
+          "solo": {
+            "source": "full",
+            "model_score": 0.99
+          },
+          "hero_(series)": {
+            "source": "full",
+            "model_score": 0.91
+          },
+          "black_skirt": {
+            "source": "clothes:0",
+            "model_score": 0.9
+          },
+          "1girl": {
+            "source": "clothes:0",
+            "model_score": 0.9
+          },
+          "miniskirt": {
+            "source": "face:0",
+            "model_score": 0.9
+          },
+          "blue_eyes": {
+            "source": "face:0",
+            "model_score": 0.8
+          }
+        },
+        "caption": "1girl, black_skirt, blue_eyes, hero_(series), miniskirt, skirt, solo",
+        "taglist": "1girl, black skirt, blue eyes, hero (series), miniskirt, skirt, solo"
+      },
+      "decisions": [
+        {
+          "score": 0.95,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "skirt",
+          "category": "general",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "score": 0.99,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "solo",
+          "category": "general",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "score": 0.1,
+          "status": "rejected",
+          "reason": "below_threshold",
+          "tag": "below",
+          "category": "general",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "score": 0.91,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "hero_(series)",
+          "category": "character",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "score": 0.8,
+          "status": "accepted",
+          "reason": "lower_score",
+          "tag": "skirt",
+          "category": "general",
+          "source": "clothes",
+          "region_id": 0
+        },
+        {
+          "score": 0.9,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "black_skirt",
+          "category": "general",
+          "source": "clothes",
+          "region_id": 0
+        },
+        {
+          "score": 0.9,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "1girl",
+          "category": "general",
+          "source": "clothes",
+          "region_id": 0
+        },
+        {
+          "score": 0.91,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "hero_(series)",
+          "category": "character",
+          "source": "clothes",
+          "region_id": 0
+        },
+        {
+          "score": 0.7,
+          "status": "accepted",
+          "reason": "lower_score",
+          "tag": "skirt",
+          "category": "general",
+          "source": "clothes",
+          "region_id": 1
+        },
+        {
+          "score": 0.3,
+          "status": "rejected",
+          "reason": "below_threshold",
+          "tag": "miniskirt",
+          "category": "general",
+          "source": "clothes",
+          "region_id": 1
+        },
+        {
+          "score": 0.9,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "1girl",
+          "category": "general",
+          "source": "clothes",
+          "region_id": 1
+        },
+        {
+          "score": 0.91,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "hero_(series)",
+          "category": "character",
+          "source": "clothes",
+          "region_id": 1
+        },
+        {
+          "score": 0.7,
+          "status": "accepted",
+          "reason": "lower_score",
+          "tag": "skirt",
+          "category": "general",
+          "source": "face",
+          "region_id": 0
+        },
+        {
+          "score": 0.9,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "miniskirt",
+          "category": "general",
+          "source": "face",
+          "region_id": 0
+        },
+        {
+          "score": 0.8,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "blue_eyes",
+          "category": "general",
+          "source": "face",
+          "region_id": 0
+        },
+        {
+          "score": 0.8,
+          "status": "rejected",
+          "reason": "not_in_allowed_tags",
+          "tag": "manual",
+          "category": "general",
+          "source": "face",
+          "region_id": 0
+        },
+        {
+          "score": 0.91,
+          "status": "rejected",
+          "reason": "not_in_allowed_tags",
+          "tag": "hero_(series)",
+          "category": "character",
+          "source": "face",
+          "region_id": 0
+        }
+      ],
+      "settings": {
+        "options": {},
+        "sources": [
+          {
+            "name": "clothes",
+            "model_path": "fake",
+            "confidence": 0.25,
+            "classes": [
+              0
+            ],
+            "remove_tags_from_full": [],
+            "remove_tags_from_region": [],
+            "add_tags_to_region": {},
+            "exclude_from_region": [],
+            "region_gen_threshold": null,
+            "region_char_threshold": null,
+            "only_from_source": [],
+            "allowed_tags": [],
+            "device": "auto",
+            "download_missing": true,
+            "full_image_only_tags": [],
+            "remove_tags_from_full_regex": [],
+            "remove_tags_from_region_regex": [],
+            "exclude_from_region_regex": [],
+            "only_from_source_regex": [],
+            "allowed_tags_regex": [],
+            "full_image_only_tags_regex": []
+          },
+          {
+            "name": "face",
+            "model_path": "sam3",
+            "confidence": 0.25,
+            "classes": [
+              0
+            ],
+            "remove_tags_from_full": [],
+            "remove_tags_from_region": [],
+            "add_tags_to_region": {
+              "manual": 0.8
+            },
+            "exclude_from_region": [],
+            "region_gen_threshold": null,
+            "region_char_threshold": null,
+            "only_from_source": [],
+            "allowed_tags": [
+              "1girl",
+              "skirt",
+              "miniskirt",
+              "blue_eyes"
+            ],
+            "device": "auto",
+            "download_missing": true,
+            "full_image_only_tags": [],
+            "remove_tags_from_full_regex": [],
+            "remove_tags_from_region_regex": [],
+            "exclude_from_region_regex": [],
+            "only_from_source_regex": [],
+            "allowed_tags_regex": [],
+            "full_image_only_tags_regex": []
+          }
+        ],
+        "sam_model": {
+          "model_id": "fake-sam"
+        }
+      },
+      "schema_version": 1,
+      "stage": "results",
+      "model": {
+        "model_id": "test"
+      }
+    },
+    {
+      "image_id": "second",
+      "image_size": [
+        8,
+        6
+      ],
+      "image_png": "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAGCAIAAABxZ0isAAAAFElEQVR4nGP8//8/AzbAhFWUThIAvm0DCRxYCEQAAAAASUVORK5CYII=",
+      "full_image": {
+        "general": {
+          "skirt": 0.95,
+          "solo": 0.99
+        },
+        "character": {
+          "hero_(series)": 0.91
+        },
+        "ratings": {
+          "general": 0.8
+        },
+        "caption": "hero_(series), skirt, solo",
+        "taglist": "hero (series), skirt, solo",
+        "raw_scores": {
+          "general": {
+            "skirt": 0.95,
+            "solo": 0.99,
+            "below": 0.1
+          },
+          "character": {
+            "hero_(series)": 0.91
+          },
+          "ratings": {
+            "general": 0.8
+          }
+        },
+        "provenance": {},
+        "decisions": {
+          "general": {
+            "skirt": {
+              "score": 0.95,
+              "status": "accepted",
+              "reason": "threshold_pass"
+            },
+            "solo": {
+              "score": 0.99,
+              "status": "accepted",
+              "reason": "threshold_pass"
+            },
+            "below": {
+              "score": 0.1,
+              "status": "rejected",
+              "reason": "below_threshold"
+            }
+          },
+          "character": {
+            "hero_(series)": {
+              "score": 0.91,
+              "status": "accepted",
+              "reason": "threshold_pass"
+            }
+          }
+        }
+      },
+      "detectors": {
+        "clothes": [],
+        "face": []
+      },
+      "source_settings": [
+        {
+          "name": "clothes",
+          "model_path": "fake",
+          "confidence": 0.25,
+          "classes": [
+            0
+          ],
+          "remove_tags_from_full": [],
+          "remove_tags_from_region": [],
+          "add_tags_to_region": {},
+          "exclude_from_region": [],
+          "region_gen_threshold": null,
+          "region_char_threshold": null,
+          "only_from_source": [],
+          "allowed_tags": [],
+          "device": "auto",
+          "download_missing": true,
+          "full_image_only_tags": [],
+          "remove_tags_from_full_regex": [],
+          "remove_tags_from_region_regex": [],
+          "exclude_from_region_regex": [],
+          "only_from_source_regex": [],
+          "allowed_tags_regex": [],
+          "full_image_only_tags_regex": []
+        },
+        {
+          "name": "face",
+          "model_path": "sam3",
+          "confidence": 0.25,
+          "classes": [
+            0
+          ],
+          "remove_tags_from_full": [],
+          "remove_tags_from_region": [],
+          "add_tags_to_region": {
+            "manual": 0.8
+          },
+          "exclude_from_region": [],
+          "region_gen_threshold": null,
+          "region_char_threshold": null,
+          "only_from_source": [],
+          "allowed_tags": [
+            "1girl",
+            "skirt",
+            "miniskirt",
+            "blue_eyes"
+          ],
+          "device": "auto",
+          "download_missing": true,
+          "full_image_only_tags": [],
+          "remove_tags_from_full_regex": [],
+          "remove_tags_from_region_regex": [],
+          "exclude_from_region_regex": [],
+          "only_from_source_regex": [],
+          "allowed_tags_regex": [],
+          "full_image_only_tags_regex": []
+        }
+      ],
+      "geometry": {
+        "sam_model": {
+          "model_id": "fake-sam"
+        }
+      },
+      "merged_tags": {
+        "general": {
+          "skirt": 0.95,
+          "solo": 0.99
+        },
+        "character": {
+          "hero_(series)": 0.91
+        },
+        "ratings": {
+          "general": 0.8
+        },
+        "provenance": {
+          "skirt": {
+            "source": "full",
+            "model_score": 0.95
+          },
+          "solo": {
+            "source": "full",
+            "model_score": 0.99
+          },
+          "hero_(series)": {
+            "source": "full",
+            "model_score": 0.91
+          }
+        },
+        "caption": "hero_(series), skirt, solo",
+        "taglist": "hero (series), skirt, solo"
+      },
+      "decisions": [
+        {
+          "score": 0.95,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "skirt",
+          "category": "general",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "score": 0.99,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "solo",
+          "category": "general",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "score": 0.1,
+          "status": "rejected",
+          "reason": "below_threshold",
+          "tag": "below",
+          "category": "general",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "score": 0.91,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "hero_(series)",
+          "category": "character",
+          "source": "full",
+          "region_id": null
+        }
+      ],
+      "settings": {
+        "options": {},
+        "sources": [
+          {
+            "name": "clothes",
+            "model_path": "fake",
+            "confidence": 0.25,
+            "classes": [
+              0
+            ],
+            "remove_tags_from_full": [],
+            "remove_tags_from_region": [],
+            "add_tags_to_region": {},
+            "exclude_from_region": [],
+            "region_gen_threshold": null,
+            "region_char_threshold": null,
+            "only_from_source": [],
+            "allowed_tags": [],
+            "device": "auto",
+            "download_missing": true,
+            "full_image_only_tags": [],
+            "remove_tags_from_full_regex": [],
+            "remove_tags_from_region_regex": [],
+            "exclude_from_region_regex": [],
+            "only_from_source_regex": [],
+            "allowed_tags_regex": [],
+            "full_image_only_tags_regex": []
+          },
+          {
+            "name": "face",
+            "model_path": "sam3",
+            "confidence": 0.25,
+            "classes": [
+              0
+            ],
+            "remove_tags_from_full": [],
+            "remove_tags_from_region": [],
+            "add_tags_to_region": {
+              "manual": 0.8
+            },
+            "exclude_from_region": [],
+            "region_gen_threshold": null,
+            "region_char_threshold": null,
+            "only_from_source": [],
+            "allowed_tags": [
+              "1girl",
+              "skirt",
+              "miniskirt",
+              "blue_eyes"
+            ],
+            "device": "auto",
+            "download_missing": true,
+            "full_image_only_tags": [],
+            "remove_tags_from_full_regex": [],
+            "remove_tags_from_region_regex": [],
+            "exclude_from_region_regex": [],
+            "only_from_source_regex": [],
+            "allowed_tags_regex": [],
+            "full_image_only_tags_regex": []
+          }
+        ],
+        "sam_model": {
+          "model_id": "fake-sam"
+        }
+      },
+      "schema_version": 1,
+      "stage": "results",
+      "model": {
+        "model_id": "test"
+      }
+    }
+  ],
+  "{\"prefix_tags\": \"manual\", \"remove_tags_regex\": [\"solo\"], \"tag_separator\": \" | \"}": [
+    {
+      "image_id": "first",
+      "image_size": [
+        8,
+        6
+      ],
+      "image_png": "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAGCAIAAABxZ0isAAAAFElEQVR4nGP8//8/AzbAhFWUThIAvm0DCRxYCEQAAAAASUVORK5CYII=",
+      "full_image": {
+        "general": {
+          "skirt": 0.95,
+          "solo": 0.99
+        },
+        "character": {
+          "hero_(series)": 0.91
+        },
+        "ratings": {
+          "general": 0.8
+        },
+        "caption": "hero_(series), skirt, solo",
+        "taglist": "hero (series), skirt, solo",
+        "raw_scores": {
+          "general": {
+            "skirt": 0.95,
+            "solo": 0.99,
+            "below": 0.1
+          },
+          "character": {
+            "hero_(series)": 0.91
+          },
+          "ratings": {
+            "general": 0.8
+          }
+        },
+        "provenance": {},
+        "decisions": {
+          "general": {
+            "skirt": {
+              "score": 0.95,
+              "status": "accepted",
+              "reason": "threshold_pass"
+            },
+            "solo": {
+              "score": 0.99,
+              "status": "accepted",
+              "reason": "threshold_pass",
+              "matched_rules": [
+                {
+                  "kind": "regex",
+                  "pattern": "solo",
+                  "action": "remove_tags",
+                  "source": "global"
+                }
+              ]
+            },
+            "below": {
+              "score": 0.1,
+              "status": "rejected",
+              "reason": "below_threshold"
+            }
+          },
+          "character": {
+            "hero_(series)": {
+              "score": 0.91,
+              "status": "accepted",
+              "reason": "threshold_pass"
+            }
+          }
+        }
+      },
+      "detectors": {
+        "clothes": [
+          {
+            "general": {
+              "skirt": 0.8,
+              "black_skirt": 0.9,
+              "1girl": 0.9
+            },
+            "character": {
+              "hero_(series)": 0.91
+            },
+            "ratings": {
+              "general": 0.8
+            },
+            "caption": "1girl, black_skirt, hero_(series), skirt",
+            "taglist": "1girl, black skirt, hero (series), skirt",
+            "region_id": 0,
+            "bbox": [
+              0,
+              0,
+              4,
+              4
+            ],
+            "raw_scores": {
+              "general": {
+                "skirt": 0.8,
+                "black_skirt": 0.9,
+                "1girl": 0.9
+              },
+              "character": {
+                "hero_(series)": 0.91
+              },
+              "ratings": {
+                "general": 0.8
+              }
+            },
+            "provenance": {},
+            "decisions": {
+              "general": {
+                "skirt": {
+                  "score": 0.8,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                },
+                "black_skirt": {
+                  "score": 0.9,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                },
+                "1girl": {
+                  "score": 0.9,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                }
+              },
+              "character": {
+                "hero_(series)": {
+                  "score": 0.91,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                }
+              }
+            }
+          },
+          {
+            "general": {
+              "skirt": 0.7,
+              "1girl": 0.9
+            },
+            "character": {
+              "hero_(series)": 0.91
+            },
+            "ratings": {
+              "general": 0.8
+            },
+            "caption": "1girl, hero_(series), skirt",
+            "taglist": "1girl, hero (series), skirt",
+            "region_id": 1,
+            "bbox": [
+              0,
+              0,
+              4,
+              4
+            ],
+            "raw_scores": {
+              "general": {
+                "skirt": 0.7,
+                "miniskirt": 0.3,
+                "1girl": 0.9
+              },
+              "character": {
+                "hero_(series)": 0.91
+              },
+              "ratings": {
+                "general": 0.8
+              }
+            },
+            "provenance": {},
+            "decisions": {
+              "general": {
+                "skirt": {
+                  "score": 0.7,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                },
+                "miniskirt": {
+                  "score": 0.3,
+                  "status": "rejected",
+                  "reason": "below_threshold"
+                },
+                "1girl": {
+                  "score": 0.9,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                }
+              },
+              "character": {
+                "hero_(series)": {
+                  "score": 0.91,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                }
+              }
+            }
+          }
+        ],
+        "face": [
+          {
+            "general": {
+              "skirt": 0.7,
+              "miniskirt": 0.9,
+              "blue_eyes": 0.8
+            },
+            "character": {},
+            "ratings": {
+              "general": 0.8
+            },
+            "caption": "blue_eyes, miniskirt, skirt",
+            "taglist": "blue eyes, miniskirt, skirt",
+            "region_id": 0,
+            "bbox": [
+              0,
+              0,
+              4,
+              4
+            ],
+            "mask_png": "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAGCAAAAADbboAnAAAAEUlEQVR4nGP8zwABTFCaKAYANkUBC0ocmd0AAAAASUVORK5CYII=",
+            "raw_scores": {
+              "general": {
+                "skirt": 0.7,
+                "miniskirt": 0.9,
+                "blue_eyes": 0.8
+              },
+              "character": {
+                "hero_(series)": 0.91
+              },
+              "ratings": {
+                "general": 0.8
+              }
+            },
+            "provenance": {},
+            "decisions": {
+              "general": {
+                "skirt": {
+                  "score": 0.7,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                },
+                "miniskirt": {
+                  "score": 0.9,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                },
+                "blue_eyes": {
+                  "score": 0.8,
+                  "status": "accepted",
+                  "reason": "threshold_pass"
+                },
+                "manual": {
+                  "score": 0.8,
+                  "status": "rejected",
+                  "reason": "not_in_allowed_tags"
+                }
+              },
+              "character": {
+                "hero_(series)": {
+                  "score": 0.91,
+                  "status": "rejected",
+                  "reason": "not_in_allowed_tags"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "source_settings": [
+        {
+          "name": "clothes",
+          "model_path": "fake",
+          "confidence": 0.25,
+          "classes": [
+            0
+          ],
+          "remove_tags_from_full": [],
+          "remove_tags_from_region": [],
+          "add_tags_to_region": {},
+          "exclude_from_region": [],
+          "region_gen_threshold": null,
+          "region_char_threshold": null,
+          "only_from_source": [],
+          "allowed_tags": [],
+          "device": "auto",
+          "download_missing": true,
+          "full_image_only_tags": [],
+          "remove_tags_from_full_regex": [],
+          "remove_tags_from_region_regex": [],
+          "exclude_from_region_regex": [],
+          "only_from_source_regex": [],
+          "allowed_tags_regex": [],
+          "full_image_only_tags_regex": []
+        },
+        {
+          "name": "face",
+          "model_path": "sam3",
+          "confidence": 0.25,
+          "classes": [
+            0
+          ],
+          "remove_tags_from_full": [],
+          "remove_tags_from_region": [],
+          "add_tags_to_region": {
+            "manual": 0.8
+          },
+          "exclude_from_region": [],
+          "region_gen_threshold": null,
+          "region_char_threshold": null,
+          "only_from_source": [],
+          "allowed_tags": [
+            "1girl",
+            "skirt",
+            "miniskirt",
+            "blue_eyes"
+          ],
+          "device": "auto",
+          "download_missing": true,
+          "full_image_only_tags": [],
+          "remove_tags_from_full_regex": [],
+          "remove_tags_from_region_regex": [],
+          "exclude_from_region_regex": [],
+          "only_from_source_regex": [],
+          "allowed_tags_regex": [],
+          "full_image_only_tags_regex": []
+        }
+      ],
+      "geometry": {
+        "sam_model": {
+          "model_id": "fake-sam"
+        }
+      },
+      "merged_tags": {
+        "general": {
+          "skirt": 0.95,
+          "black_skirt": 0.9,
+          "1girl": 0.9,
+          "miniskirt": 0.9,
+          "blue_eyes": 0.8,
+          "manual": 1.0
+        },
+        "character": {
+          "hero_(series)": 0.91
+        },
+        "ratings": {
+          "general": 0.8
+        },
+        "provenance": {
+          "skirt": {
+            "source": "full",
+            "model_score": 0.95
+          },
+          "hero_(series)": {
+            "source": "full",
+            "model_score": 0.91
+          },
+          "black_skirt": {
+            "source": "clothes:0",
+            "model_score": 0.9
+          },
+          "1girl": {
+            "source": "clothes:0",
+            "model_score": 0.9
+          },
+          "miniskirt": {
+            "source": "face:0",
+            "model_score": 0.9
+          },
+          "blue_eyes": {
+            "source": "face:0",
+            "model_score": 0.8
+          },
+          "manual": {
+            "source": "manual_rule",
+            "assigned_score": 1.0
+          }
+        },
+        "caption": "manual, 1girl, black_skirt, blue_eyes, hero_(series), miniskirt, skirt",
+        "taglist": "manual, 1girl, black skirt, blue eyes, hero (series), miniskirt, skirt"
+      },
+      "decisions": [
+        {
+          "score": 0.95,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "skirt",
+          "category": "general",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "score": 0.99,
+          "status": "rejected",
+          "reason": "global_remove",
+          "tag": "solo",
+          "category": "general",
+          "source": "full",
+          "region_id": null,
+          "matched_rules": [
+            {
+              "kind": "regex",
+              "pattern": "solo",
+              "action": "remove_tags",
+              "source": "global"
+            }
+          ]
+        },
+        {
+          "score": 0.1,
+          "status": "rejected",
+          "reason": "below_threshold",
+          "tag": "below",
+          "category": "general",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "score": 0.91,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "hero_(series)",
+          "category": "character",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "score": 0.8,
+          "status": "accepted",
+          "reason": "lower_score",
+          "tag": "skirt",
+          "category": "general",
+          "source": "clothes",
+          "region_id": 0
+        },
+        {
+          "score": 0.9,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "black_skirt",
+          "category": "general",
+          "source": "clothes",
+          "region_id": 0
+        },
+        {
+          "score": 0.9,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "1girl",
+          "category": "general",
+          "source": "clothes",
+          "region_id": 0
+        },
+        {
+          "score": 0.91,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "hero_(series)",
+          "category": "character",
+          "source": "clothes",
+          "region_id": 0
+        },
+        {
+          "score": 0.7,
+          "status": "accepted",
+          "reason": "lower_score",
+          "tag": "skirt",
+          "category": "general",
+          "source": "clothes",
+          "region_id": 1
+        },
+        {
+          "score": 0.3,
+          "status": "rejected",
+          "reason": "below_threshold",
+          "tag": "miniskirt",
+          "category": "general",
+          "source": "clothes",
+          "region_id": 1
+        },
+        {
+          "score": 0.9,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "1girl",
+          "category": "general",
+          "source": "clothes",
+          "region_id": 1
+        },
+        {
+          "score": 0.91,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "hero_(series)",
+          "category": "character",
+          "source": "clothes",
+          "region_id": 1
+        },
+        {
+          "score": 0.7,
+          "status": "accepted",
+          "reason": "lower_score",
+          "tag": "skirt",
+          "category": "general",
+          "source": "face",
+          "region_id": 0
+        },
+        {
+          "score": 0.9,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "miniskirt",
+          "category": "general",
+          "source": "face",
+          "region_id": 0
+        },
+        {
+          "score": 0.8,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "blue_eyes",
+          "category": "general",
+          "source": "face",
+          "region_id": 0
+        },
+        {
+          "score": 0.8,
+          "status": "rejected",
+          "reason": "not_in_allowed_tags",
+          "tag": "manual",
+          "category": "general",
+          "source": "face",
+          "region_id": 0
+        },
+        {
+          "score": 0.91,
+          "status": "rejected",
+          "reason": "not_in_allowed_tags",
+          "tag": "hero_(series)",
+          "category": "character",
+          "source": "face",
+          "region_id": 0
+        },
+        {
+          "tag": "manual",
+          "category": "general",
+          "source": "manual_rule",
+          "region_id": null,
+          "score": 1.0,
+          "status": "accepted",
+          "reason": "manual_rule"
+        }
+      ],
+      "settings": {
+        "options": {
+          "remove_tags_regex": [
+            "solo"
+          ],
+          "prefix_tags": "manual",
+          "tag_separator": " | "
+        },
+        "sources": [
+          {
+            "name": "clothes",
+            "model_path": "fake",
+            "confidence": 0.25,
+            "classes": [
+              0
+            ],
+            "remove_tags_from_full": [],
+            "remove_tags_from_region": [],
+            "add_tags_to_region": {},
+            "exclude_from_region": [],
+            "region_gen_threshold": null,
+            "region_char_threshold": null,
+            "only_from_source": [],
+            "allowed_tags": [],
+            "device": "auto",
+            "download_missing": true,
+            "full_image_only_tags": [],
+            "remove_tags_from_full_regex": [],
+            "remove_tags_from_region_regex": [],
+            "exclude_from_region_regex": [],
+            "only_from_source_regex": [],
+            "allowed_tags_regex": [],
+            "full_image_only_tags_regex": []
+          },
+          {
+            "name": "face",
+            "model_path": "sam3",
+            "confidence": 0.25,
+            "classes": [
+              0
+            ],
+            "remove_tags_from_full": [],
+            "remove_tags_from_region": [],
+            "add_tags_to_region": {
+              "manual": 0.8
+            },
+            "exclude_from_region": [],
+            "region_gen_threshold": null,
+            "region_char_threshold": null,
+            "only_from_source": [],
+            "allowed_tags": [
+              "1girl",
+              "skirt",
+              "miniskirt",
+              "blue_eyes"
+            ],
+            "device": "auto",
+            "download_missing": true,
+            "full_image_only_tags": [],
+            "remove_tags_from_full_regex": [],
+            "remove_tags_from_region_regex": [],
+            "exclude_from_region_regex": [],
+            "only_from_source_regex": [],
+            "allowed_tags_regex": [],
+            "full_image_only_tags_regex": []
+          }
+        ],
+        "sam_model": {
+          "model_id": "fake-sam"
+        }
+      },
+      "schema_version": 1,
+      "stage": "results",
+      "model": {
+        "model_id": "test"
+      }
+    },
+    {
+      "image_id": "second",
+      "image_size": [
+        8,
+        6
+      ],
+      "image_png": "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAGCAIAAABxZ0isAAAAFElEQVR4nGP8//8/AzbAhFWUThIAvm0DCRxYCEQAAAAASUVORK5CYII=",
+      "full_image": {
+        "general": {
+          "skirt": 0.95,
+          "solo": 0.99
+        },
+        "character": {
+          "hero_(series)": 0.91
+        },
+        "ratings": {
+          "general": 0.8
+        },
+        "caption": "hero_(series), skirt, solo",
+        "taglist": "hero (series), skirt, solo",
+        "raw_scores": {
+          "general": {
+            "skirt": 0.95,
+            "solo": 0.99,
+            "below": 0.1
+          },
+          "character": {
+            "hero_(series)": 0.91
+          },
+          "ratings": {
+            "general": 0.8
+          }
+        },
+        "provenance": {},
+        "decisions": {
+          "general": {
+            "skirt": {
+              "score": 0.95,
+              "status": "accepted",
+              "reason": "threshold_pass"
+            },
+            "solo": {
+              "score": 0.99,
+              "status": "accepted",
+              "reason": "threshold_pass",
+              "matched_rules": [
+                {
+                  "kind": "regex",
+                  "pattern": "solo",
+                  "action": "remove_tags",
+                  "source": "global"
+                }
+              ]
+            },
+            "below": {
+              "score": 0.1,
+              "status": "rejected",
+              "reason": "below_threshold"
+            }
+          },
+          "character": {
+            "hero_(series)": {
+              "score": 0.91,
+              "status": "accepted",
+              "reason": "threshold_pass"
+            }
+          }
+        }
+      },
+      "detectors": {
+        "clothes": [],
+        "face": []
+      },
+      "source_settings": [
+        {
+          "name": "clothes",
+          "model_path": "fake",
+          "confidence": 0.25,
+          "classes": [
+            0
+          ],
+          "remove_tags_from_full": [],
+          "remove_tags_from_region": [],
+          "add_tags_to_region": {},
+          "exclude_from_region": [],
+          "region_gen_threshold": null,
+          "region_char_threshold": null,
+          "only_from_source": [],
+          "allowed_tags": [],
+          "device": "auto",
+          "download_missing": true,
+          "full_image_only_tags": [],
+          "remove_tags_from_full_regex": [],
+          "remove_tags_from_region_regex": [],
+          "exclude_from_region_regex": [],
+          "only_from_source_regex": [],
+          "allowed_tags_regex": [],
+          "full_image_only_tags_regex": []
+        },
+        {
+          "name": "face",
+          "model_path": "sam3",
+          "confidence": 0.25,
+          "classes": [
+            0
+          ],
+          "remove_tags_from_full": [],
+          "remove_tags_from_region": [],
+          "add_tags_to_region": {
+            "manual": 0.8
+          },
+          "exclude_from_region": [],
+          "region_gen_threshold": null,
+          "region_char_threshold": null,
+          "only_from_source": [],
+          "allowed_tags": [
+            "1girl",
+            "skirt",
+            "miniskirt",
+            "blue_eyes"
+          ],
+          "device": "auto",
+          "download_missing": true,
+          "full_image_only_tags": [],
+          "remove_tags_from_full_regex": [],
+          "remove_tags_from_region_regex": [],
+          "exclude_from_region_regex": [],
+          "only_from_source_regex": [],
+          "allowed_tags_regex": [],
+          "full_image_only_tags_regex": []
+        }
+      ],
+      "geometry": {
+        "sam_model": {
+          "model_id": "fake-sam"
+        }
+      },
+      "merged_tags": {
+        "general": {
+          "skirt": 0.95,
+          "manual": 1.0
+        },
+        "character": {
+          "hero_(series)": 0.91
+        },
+        "ratings": {
+          "general": 0.8
+        },
+        "provenance": {
+          "skirt": {
+            "source": "full",
+            "model_score": 0.95
+          },
+          "hero_(series)": {
+            "source": "full",
+            "model_score": 0.91
+          },
+          "manual": {
+            "source": "manual_rule",
+            "assigned_score": 1.0
+          }
+        },
+        "caption": "manual, hero_(series), skirt",
+        "taglist": "manual, hero (series), skirt"
+      },
+      "decisions": [
+        {
+          "score": 0.95,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "skirt",
+          "category": "general",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "score": 0.99,
+          "status": "rejected",
+          "reason": "global_remove",
+          "tag": "solo",
+          "category": "general",
+          "source": "full",
+          "region_id": null,
+          "matched_rules": [
+            {
+              "kind": "regex",
+              "pattern": "solo",
+              "action": "remove_tags",
+              "source": "global"
+            }
+          ]
+        },
+        {
+          "score": 0.1,
+          "status": "rejected",
+          "reason": "below_threshold",
+          "tag": "below",
+          "category": "general",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "score": 0.91,
+          "status": "accepted",
+          "reason": "merged",
+          "tag": "hero_(series)",
+          "category": "character",
+          "source": "full",
+          "region_id": null
+        },
+        {
+          "tag": "manual",
+          "category": "general",
+          "source": "manual_rule",
+          "region_id": null,
+          "score": 1.0,
+          "status": "accepted",
+          "reason": "manual_rule"
+        }
+      ],
+      "settings": {
+        "options": {
+          "remove_tags_regex": [
+            "solo"
+          ],
+          "prefix_tags": "manual",
+          "tag_separator": " | "
+        },
+        "sources": [
+          {
+            "name": "clothes",
+            "model_path": "fake",
+            "confidence": 0.25,
+            "classes": [
+              0
+            ],
+            "remove_tags_from_full": [],
+            "remove_tags_from_region": [],
+            "add_tags_to_region": {},
+            "exclude_from_region": [],
+            "region_gen_threshold": null,
+            "region_char_threshold": null,
+            "only_from_source": [],
+            "allowed_tags": [],
+            "device": "auto",
+            "download_missing": true,
+            "full_image_only_tags": [],
+            "remove_tags_from_full_regex": [],
+            "remove_tags_from_region_regex": [],
+            "exclude_from_region_regex": [],
+            "only_from_source_regex": [],
+            "allowed_tags_regex": [],
+            "full_image_only_tags_regex": []
+          },
+          {
+            "name": "face",
+            "model_path": "sam3",
+            "confidence": 0.25,
+            "classes": [
+              0
+            ],
+            "remove_tags_from_full": [],
+            "remove_tags_from_region": [],
+            "add_tags_to_region": {
+              "manual": 0.8
+            },
+            "exclude_from_region": [],
+            "region_gen_threshold": null,
+            "region_char_threshold": null,
+            "only_from_source": [],
+            "allowed_tags": [
+              "1girl",
+              "skirt",
+              "miniskirt",
+              "blue_eyes"
+            ],
+            "device": "auto",
+            "download_missing": true,
+            "full_image_only_tags": [],
+            "remove_tags_from_full_regex": [],
+            "remove_tags_from_region_regex": [],
+            "exclude_from_region_regex": [],
+            "only_from_source_regex": [],
+            "allowed_tags_regex": [],
+            "full_image_only_tags_regex": []
+          }
+        ],
+        "sam_model": {
+          "model_id": "fake-sam"
+        }
+      },
+      "schema_version": 1,
+      "stage": "results",
+      "model": {
+        "model_id": "test"
+      }
+    }
+  ]
+}

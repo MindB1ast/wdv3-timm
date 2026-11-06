@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "first": {
+    "schema_version": 1,
+    "operation_id": "first",
+    "run_id": "230d86a32b26446f94e36a24af106586",
+    "entries": [
+      {
+        "relative_path": "one.png",
+        "schema_version": 1,
+        "run_id": "230d86a32b26446f94e36a24af106586",
+        "actions": [
+          {
+            "stage": "wd_full",
+            "dependencies": [],
+            "source": null,
+            "image_id": "6440c5e7f590a3a0b5dc36beca0033f29c4266b820711e27eb9262ec5fbc3996",
+            "version": 1,
+            "computation_key": "b86b95f295b2b675a54c63a621c05f3e0a84a5bda8771a47220681503874e054",
+            "status": "computed",
+            "reason": "cache_miss",
+            "artifact_id": "56707b4e05cb2e7dc9550d6c361399069ccf63c4d1c14866d216301c2aa148db",
+            "parent_refs": []
+          },
+          {
+            "stage": "yolo_geometry",
+            "dependencies": [],
+            "source": "body",
+            "image_id": "6440c5e7f590a3a0b5dc36beca0033f29c4266b820711e27eb9262ec5fbc3996",
+            "version": 1,
+            "computation_key": "e2dcfe8da240afdf6ebae4352766953b58f81150fc468d74a411b0b5b5eb5920",
+            "status": "computed",
+            "reason": "cache_miss",
+            "artifact_id": "a7885e571c5ac0adb9b1dc38e58dbc6607a3f428b4265510eb3a10177b10ae8c",
+            "parent_refs": []
+          },
+          {
+            "stage": "wd_crop",
+            "inputs": {
+              "pixels": "0005d4268c99bbc33b6345d77760d22a2a6a7503f4d91b7359b0bb4825e57fae",
+              "crop_policy": 1
+            },
+            "dependencies": [],
+            "source": null,
+            "image_id": "6440c5e7f590a3a0b5dc36beca0033f29c4266b820711e27eb9262ec5fbc3996",
+            "model": {
+              "model_id": "vit",
+              "local_path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\taggers\\wd-vit-tagger-v3",
+              "files": {
+                "config.json": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\taggers\\wd-vit-tagger-v3\\config.json",
+                "weights": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\taggers\\wd-vit-tagger-v3\\model.safetensors",
+                "selected_tags.csv": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\taggers\\wd-vit-tagger-v3\\selected_tags.csv"
+              },
+              "compute": {
+                "device": "cpu"
+              },
+              "adapter": "wdv3-v1",
+              "identity": {
+                "files": {
+                  "config.json": "038b25b517e0511475195bd1a45a19710929a3f2afa8f96d002ee28e1115dc1f",
+                  "selected_tags.csv": "298633d94d0031d2081c0893f29c82eab7f0df00b08483ba8f29d1e979441217",
+                  "weights": "ee78db0cd9f1c7e01578cc89661a10c73675d60c30e235e505c391f57ea4d4e5"
+                },
+                "weights_sha256": "28ab8bb474683d3f7cefd4e162d5dfd086bb4a61fcf86681d688f658bd5f25a1",
+                "adapter": "wdv3-v1",
+                "profile": {},
+                "compute": {
+                  "device": "cpu"
+                },
+                "engines": {
+                  "torch": "2.6.0",
+                  "timm": "1.0.30",
+                  "ultralytics": "8.3.85",
+                  "transformers": "5.22.1",
+                  "Pillow": "13.0.0"
+                }
+              },
+              "_resolved_identity": true
+            },
+            "version": 1,
+            "computation_key": "79838e0d24c4e822c12feeeff57efcaa7e1e7c884fae99a468208fe608434e4b",
+            "status": "computed",
+            "reason": "cache_miss",
+            "artifact_id": "5fbe6ac01d3999f6c9068e5d6e870cc96e02d36ab508f74b1c00e2fe7d48da5e",
+            "parent_refs": []
+          }
+        ],
+        "complete": true,
+        "evidence_ref": "4fffd38f13f9fdccd43074fa8dd8c5c736d5f43499d8b5110854e4297d84f374",
+        "counters": {
+          "wd_load": 1,
+          "wd_inference": 2,
+          "yolo_load": 1,
+          "yolo_inference": 1,
+          "sam_inference": 0
+        },
+        "status": "complete"
+      }
+    ],
+    "complete": true,
+    "counters": {
+      "wd_load": 1,
+      "wd_inference": 2,
+      "yolo_load": 1,
+      "yolo_inference": 1,
+      "sam_inference": 0
+    },
+    "manifest_run_id": "003404585e3b4786a4252fbc4a69ca64"
+  },
+  "extended": {
+    "schema_version": 1,
+    "operation_id": "extend",
+    "run_id": "19031390300e42d2a536caaab6f2a082",
+    "entries": [
+      {
+        "relative_path": "one.png",
+        "schema_version": 1,
+        "run_id": "19031390300e42d2a536caaab6f2a082",
+        "actions": [
+          {
+            "stage": "wd_full",
+            "dependencies": [],
+            "source": null,
+            "image_id": "6440c5e7f590a3a0b5dc36beca0033f29c4266b820711e27eb9262ec5fbc3996",
+            "version": 1,
+            "computation_key": "b86b95f295b2b675a54c63a621c05f3e0a84a5bda8771a47220681503874e054",
+            "status": "reused",
+            "reason": "compatible",
+            "artifact_id": "56707b4e05cb2e7dc9550d6c361399069ccf63c4d1c14866d216301c2aa148db",
+            "parent_refs": []
+          },
+          {
+            "stage": "yolo_geometry",
+            "dependencies": [],
+            "source": "body",
+            "image_id": "6440c5e7f590a3a0b5dc36beca0033f29c4266b820711e27eb9262ec5fbc3996",
+            "version": 1,
+            "computation_key": "e2dcfe8da240afdf6ebae4352766953b58f81150fc468d74a411b0b5b5eb5920",
+            "status": "reused",
+            "reason": "compatible",
+            "artifact_id": "a7885e571c5ac0adb9b1dc38e58dbc6607a3f428b4265510eb3a10177b10ae8c",
+            "parent_refs": []
+          },
+          {
+            "stage": "yolo_geometry",
+            "dependencies": [],
+            "source": "face",
+            "image_id": "6440c5e7f590a3a0b5dc36beca0033f29c4266b820711e27eb9262ec5fbc3996",
+            "version": 1,
+            "computation_key": "3bfc7cf74f9431910b3ff44af9893a95de77e7cc5d7d7360de0e1db2425b2048",
+            "status": "computed",
+            "reason": "cache_miss",
+            "artifact_id": "053e2738d83be6f3f3e7ca8bb552c42de3a3d22028cb143dcc908f7eca707afd",
+            "parent_refs": []
+          },
+          {
+            "stage": "wd_crop",
+            "inputs": {
+              "pixels": "0005d4268c99bbc33b6345d77760d22a2a6a7503f4d91b7359b0bb4825e57fae",
+              "crop_policy": 1
+            },
+            "dependencies": [],
+            "source": null,
+            "image_id": "6440c5e7f590a3a0b5dc36beca0033f29c4266b820711e27eb9262ec5fbc3996",
+            "model": {
+              "model_id": "vit",
+              "local_path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\taggers\\wd-vit-tagger-v3",
+              "files": {
+                "config.json": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\taggers\\wd-vit-tagger-v3\\config.json",
+                "weights": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\taggers\\wd-vit-tagger-v3\\model.safetensors",
+                "selected_tags.csv": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\taggers\\wd-vit-tagger-v3\\selected_tags.csv"
+              },
+              "compute": {
+                "device": "cpu"
+              },
+              "adapter": "wdv3-v1",
+              "identity": {
+                "files": {
+                  "config.json": "038b25b517e0511475195bd1a45a19710929a3f2afa8f96d002ee28e1115dc1f",
+                  "selected_tags.csv": "298633d94d0031d2081c0893f29c82eab7f0df00b08483ba8f29d1e979441217",
+                  "weights": "ee78db0cd9f1c7e01578cc89661a10c73675d60c30e235e505c391f57ea4d4e5"
+                },
+                "weights_sha256": "28ab8bb474683d3f7cefd4e162d5dfd086bb4a61fcf86681d688f658bd5f25a1",
+                "adapter": "wdv3-v1",
+                "profile": {},
+                "compute": {
+                  "device": "cpu"
+                },
+                "engines": {
+                  "torch": "2.6.0",
+                  "timm": "1.0.30",
+                  "ultralytics": "8.3.85",
+                  "transformers": "5.22.1",
+                  "Pillow": "13.0.0"
+                }
+              },
+              "_resolved_identity": true
+            },
+            "version": 1,
+            "computation_key": "79838e0d24c4e822c12feeeff57efcaa7e1e7c884fae99a468208fe608434e4b",
+            "status": "reused",
+            "reason": "compatible",
+            "artifact_id": "5fbe6ac01d3999f6c9068e5d6e870cc96e02d36ab508f74b1c00e2fe7d48da5e"
+          }
+        ],
+        "complete": true,
+        "evidence_ref": "7d75aba71e5da07a8399aa02e1fbbe2f0dbcd646f3bb6588f6d6e0970809d7cf",
+        "counters": {
+          "wd_load": 0,
+          "wd_inference": 0,
+          "yolo_load": 1,
+          "yolo_inference": 1,
+          "sam_inference": 0
+        },
+        "status": "complete"
+      },
+      {
+        "relative_path": "two.png",
+        "schema_version": 1,
+        "run_id": "19031390300e42d2a536caaab6f2a082",
+        "actions": [
+          {
+            "stage": "wd_full",
+            "dependencies": [],
+            "source": null,
+            "image_id": "1ec5663620a95816dc96bd745616bb11bbc09f6b7b08f3dc7dcb77cc4b762dab",
+            "version": 1,
+            "computation_key": "46e138ba5b89acc872aba300cca32e63c95de6efabc1ef7984cbf99999341178",
+            "status": "computed",
+            "reason": "cache_miss",
+            "artifact_id": "1a8211a7e728790784a0186a3ce6951670986835fa851ccd49fae50dea5f4d99",
+            "parent_refs": []
+          },
+          {
+            "stage": "yolo_geometry",
+            "dependencies": [],
+            "source": "body",
+            "image_id": "1ec5663620a95816dc96bd745616bb11bbc09f6b7b08f3dc7dcb77cc4b762dab",
+            "version": 1,
+            "computation_key": "6587515b8e9f3e28bf8387126a9d2b4699eebdcb0cdcd66eb0397ac714eb2eca",
+            "status": "computed",
+            "reason": "cache_miss",
+            "artifact_id": "db64def2dca54ae53d15e74bc13294f2d58617814d218d8f0b7d8c2b61e56c31",
+            "parent_refs": []
+          },
+          {
+            "stage": "yolo_geometry",
+            "dependencies": [],
+            "source": "face",
+            "image_id": "1ec5663620a95816dc96bd745616bb11bbc09f6b7b08f3dc7dcb77cc4b762dab",
+            "version": 1,
+            "computation_key": "bb91d2b61aa05a1e2d24b356cef3ddaffcdc32ad249ac90f41294c2d702940bb",
+            "status": "computed",
+            "reason": "cache_miss",
+            "artifact_id": "eee91d183a58b7456414a421f9da1612e854b928920d7fe16c9ac4be84a5080f",
+            "parent_refs": []
+          },
+          {
+            "stage": "wd_crop",
+            "inputs": {
+              "pixels": "6c55f2af83baa8d91ea0f5f60531ff3f982124419d6f57711caa9a8bf5a63168",
+              "crop_policy": 1
+            },
+            "dependencies": [],
+            "source": null,
+            "image_id": "1ec5663620a95816dc96bd745616bb11bbc09f6b7b08f3dc7dcb77cc4b762dab",
+            "model": {
+              "model_id": "vit",
+              "local_path": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\taggers\\wd-vit-tagger-v3",
+              "files": {
+                "config.json": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\taggers\\wd-vit-tagger-v3\\config.json",
+                "weights": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\taggers\\wd-vit-tagger-v3\\model.safetensors",
+                "selected_tags.csv": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\taggers\\wd-vit-tagger-v3\\selected_tags.csv"
+              },
+              "compute": {
+                "device": "cpu"
+              },
+              "adapter": "wdv3-v1",
+              "identity": {
+                "files": {
+                  "config.json": "038b25b517e0511475195bd1a45a19710929a3f2afa8f96d002ee28e1115dc1f",
+                  "selected_tags.csv": "298633d94d0031d2081c0893f29c82eab7f0df00b08483ba8f29d1e979441217",
+                  "weights": "ee78db0cd9f1c7e01578cc89661a10c73675d60c30e235e505c391f57ea4d4e5"
+                },
+                "weights_sha256": "28ab8bb474683d3f7cefd4e162d5dfd086bb4a61fcf86681d688f658bd5f25a1",
+                "adapter": "wdv3-v1",
+                "profile": {},
+                "compute": {
+                  "device": "cpu"
+                },
+                "engines": {
+                  "torch": "2.6.0",
+                  "timm": "1.0.30",
+                  "ultralytics": "8.3.85",
+                  "transformers": "5.22.1",
+                  "Pillow": "13.0.0"
+                }
+              },
+              "_resolved_identity": true
+            },
+            "version": 1,
+            "computation_key": "4cf4e52a7fb59bf813d465c273573c6e5b16bc574798f0675ae8c10c4fcf1a4c",
+            "status": "computed",
+            "reason": "cache_miss",
+            "artifact_id": "587bc0aaad539707f39591c0472fc5374c71956d1a78cf7a528565da0927284e",
+            "parent_refs": []
+          }
+        ],
+        "complete": true,
+        "evidence_ref": "ee2cf144d985038f8498e0f8a1900192885f6c681d9783a7885b78a990540f89",
+        "counters": {
+          "wd_load": 1,
+          "wd_inference": 2,
+          "yolo_load": 2,
+          "yolo_inference": 3,
+          "sam_inference": 0
+        },
+        "status": "complete"
+      }
+    ],
+    "complete": true,
+    "counters": {
+      "wd_load": 1,
+      "wd_inference": 2,
+      "yolo_load": 2,
+      "yolo_inference": 3,
+      "sam_inference": 0
+    },
+    "manifest_run_id": "5264fa92969843f5ad929effa6c1d0c9"
+  },
+  "cold_refilter_without_loaders": true,
+  "final_neighbor_txt": true,
+  "raw_ref_unchanged": "4fffd38f13f9fdccd43074fa8dd8c5c736d5f43499d8b5110854e4297d84f374",
+  "local_weights": [
+    "wd-vit-tagger-v3",
+    "person_yolov8s-seg.pt",
+    "face_yolov9c.pt"
+  ],
+  "sam_real_inference": false
+}

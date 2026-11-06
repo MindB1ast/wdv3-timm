@@ -1,0 +1,644 @@
+{
+  "last_node_id": 11,
+  "last_link_id": 12,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "WDV3CalculationStore",
+      "pos": [
+        20,
+        800
+      ],
+      "size": [
+        350,
+        236
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "calculation_store",
+          "type": "WDV3_CALCULATION_STORE",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3CalculationStore"
+      },
+      "widgets_values": [
+        "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\readme-benchmark\\dataset",
+        "",
+        "reuse_only",
+        ""
+      ]
+    },
+    {
+      "id": 2,
+      "type": "WDV3LoadEvidence",
+      "pos": [
+        440,
+        800
+      ],
+      "size": [
+        350,
+        236
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "calculation_store",
+          "type": "WDV3_CALCULATION_STORE",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "evidence",
+          "type": "WDV3_EVIDENCE",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3LoadEvidence"
+      },
+      "widgets_values": [
+        "",
+        "a03fd4303a1b47cb948da22937676756",
+        0,
+        2
+      ]
+    },
+    {
+      "id": 3,
+      "type": "WDV3Options",
+      "pos": [
+        20,
+        20
+      ],
+      "size": [
+        350,
+        660
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "options",
+          "type": "WDV3_OPTIONS",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3Options"
+      },
+      "widgets_values": [
+        0.35,
+        0.75,
+        2,
+        8,
+        false,
+        false,
+        "",
+        "",
+        "",
+        "",
+        ", ",
+        1,
+        "reuse_only",
+        "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\readme-benchmark\\dataset",
+        ""
+      ]
+    },
+    {
+      "id": 4,
+      "type": "WDV3YOLODetector",
+      "pos": [
+        1400,
+        20
+      ],
+      "size": [
+        350,
+        338
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "rules",
+          "type": "WDV3_RULES",
+          "link": 2
+        },
+        {
+          "name": "previous_detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "detectors",
+          "type": "WDV3_DETECTORS",
+          "links": [
+            12
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3YOLODetector"
+      },
+      "widgets_values": [
+        "person_yolov8s-seg.pt",
+        "person_detector",
+        0.4,
+        "0",
+        "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\yolo\\person_yolov8s-seg.pt",
+        "auto",
+        true
+      ],
+      "title": "Person · YOLO Detector"
+    },
+    {
+      "id": 5,
+      "type": "WDV3FilterTagSets",
+      "pos": [
+        1860,
+        270
+      ],
+      "size": [
+        350,
+        170
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "evidence",
+          "type": "WDV3_EVIDENCE",
+          "link": 3
+        },
+        {
+          "name": "options",
+          "type": "WDV3_OPTIONS",
+          "link": 4
+        },
+        {
+          "name": "detectors",
+          "type": "WDV3_DETECTORS",
+          "link": 5
+        },
+        {
+          "name": "sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        },
+        {
+          "name": "postprocessing",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "links": [
+            6
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3FilterTagSets"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 6,
+      "type": "WDV3MergeTagSets",
+      "pos": [
+        2280,
+        270
+      ],
+      "size": [
+        350,
+        170
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "results",
+          "type": "WDV3_RESULTS",
+          "links": null,
+          "slot_index": 0
+        },
+        {
+          "name": "tags",
+          "type": "STRING",
+          "links": [
+            8,
+            10
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "results_json",
+          "type": "STRING",
+          "links": [
+            7,
+            9
+          ],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3MergeTagSets"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 7,
+      "type": "WDV3SaveResult",
+      "pos": [
+        2690,
+        20
+      ],
+      "size": [
+        350,
+        304
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "results_json",
+          "type": "STRING",
+          "link": 7
+        },
+        {
+          "name": "tags",
+          "type": "STRING",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "txt_path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        },
+        {
+          "name": "json_path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3SaveResult"
+      },
+      "widgets_values": [
+        "C:/Users/annak/Downloads/full_tagger_project/wdv3-timm/docs/benchmarks/2026-11-05-test-yolo-wd/comfyui-pipeline-optimized/gui-preview",
+        "preview_image_000",
+        0,
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "id": 8,
+      "type": "WDV3SaveResult",
+      "pos": [
+        2690,
+        450
+      ],
+      "size": [
+        350,
+        304
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "results_json",
+          "type": "STRING",
+          "link": 9
+        },
+        {
+          "name": "tags",
+          "type": "STRING",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "txt_path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        },
+        {
+          "name": "json_path",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3SaveResult"
+      },
+      "widgets_values": [
+        "C:/Users/annak/Downloads/full_tagger_project/wdv3-timm/docs/benchmarks/2026-11-05-test-yolo-wd/comfyui-pipeline-optimized/gui-preview",
+        "preview_image_001",
+        1,
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "id": 9,
+      "type": "WDV3RegionRules",
+      "pos": [
+        440,
+        20
+      ],
+      "size": [
+        440,
+        720
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "rules",
+          "type": "WDV3_RULES",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3RegionRules"
+      },
+      "widgets_values": [
+        0.3,
+        0.8,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1boy, 1girl, 1other, 2boys, 2girls, 2others, 3boys, 3girls, 3others, 4boys, 4girls, 4others, 5boys, 5girls, 5others, 6+boys, 6+girls, 6+others, abstract_background, animal_focus, aqua_background, argyle_background, armpit_focus, ass_focus, back_focus, black_background, black_border, blue_background, blue_sky, blurry, blurry_background, blurry_foreground, border, breast_focus, bright_background, brown_background, checkered_background, close-up, colorful_background, cowboy_shot, creature_focus, cross_background, crotch_focus, dark_background, depth_of_field, diagonal-striped_background, dithered_background, dotted_background, drama_layer, ear_focus, eye_focus, feet_out_of_frame, film_grain, flower_focus, food_focus, foot_focus, foot_out_of_frame, footwear_focus, full_body, gradient_background, green_background, grey_background, grid_background, hair_focus, halftone_background, hand_focus, heaven_condition, hip_focus, honeycomb_background, kanji_focus, lace_background, leg_focus, looking_ahead, looking_at_another, looking_at_viewer, looking_away, looking_back, looking_to_the_side, male_focus, marble_background, mecha_focus, meme, monochrome_background, monster_focus, mosaic_background, mouth_focus, multiple_boys, multiple_girls, multiple_others, multiple_views, navel_focus, neck_focus, night, night_sky, object_focus, oekaki, orange_background, other_focus, out_of_frame, parody, patterned_background, pectoral_focus, penis_focus, pink_background, plaid_background, plant_focus, pokemon_focus, polka_dot_background, portrait, pov, pov_hands, purple_background, pussy_focus, rainbow_background, red_background, reflection_focus, simple_background, sky, sky_focus, solo, solo_focus, spiral_background, splatter_background, striped_background, sunburst_background, text_focus, thigh_focus, triangle_background, two-tone_background, upper_body, vehicle_focus, weapon_focus, white_background, white_border",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "title": "Person · Region Tag Rules"
+    },
+    {
+      "id": 10,
+      "type": "WDV3RegionRules",
+      "pos": [
+        910,
+        20
+      ],
+      "size": [
+        440,
+        720
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "rules",
+          "type": "WDV3_RULES",
+          "links": [
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3RegionRules"
+      },
+      "widgets_values": [
+        0.3,
+        0.85,
+        "fang\nfangs\nskin fang\nskin fangs\nfang out\ntongue\ntongue out\nlicking lips\naqua eyes\nblack eyes\nblue eyes\nbrown eyes\ngreen eyes\ngrey eyes\norange eyes\npurple eyes\npink eyes\nred eyes\nwhite eyes\nyellow eyes\nheterochromia\nmulticolored eyes\ngradient eyes\ntwo-tone eyes\nrainbow eyes\n@ @\nmismatched irises\ndashed eyes\nPac-man eyes\nringed eyes\nsquiggle eyes\naqua pupils\nblue pupils\nbrown pupils\ngreen pupils\ngrey pupils\norange pupils\npink pupils\npurple pupils\nred pupils\nwhite pupils\nyellow pupils\nconstricted pupils\nextra pupils\nhorizontal pupils\nno pupils\nslit pupils\nsymbol-shaped pupils\ndiamond-shaped pupils\nflower-shaped pupils\nheart-shaped pupils\nstar-shaped pupils\nsolid circle pupils\ncross-shaped pupils\nx-shaped pupils\nmismatched pupils\nblue sclera\nblack sclera\nblank eyes\nbloodshot eyes\ngreen sclera\nmismatched sclera\nno sclera\norange sclera\nred sclera\nyellow sclera\nbags under eyes\naegyo sal\nbruised eye\nflaming eyes\nbutton eyes\ncephalopod eyes\ncompound eyes\nhorizontal pupils\nlens eye\npixel eyes\ncrazy eyes\nempty eyes\nheart-shaped eyes\nnonowa\nsolid circle eyes\no o\n0 0\nspiral-only eyes\njitome\ntareme\ntsurime\nsanpaku\nsparkling eyes\ngeass\nsharingan\nmangekyou sharingan\nrinnegan\nbyakugan\nmissing eye\nthird eye\nextra eyes\nno eyes\n> <\nX3\nXD\nDX\nO o\n3 3\n6 9\n^ ^\n^o^\n|_|\n= =\n+ +\n. .\n<o> <o>\n<|>_<|>\nclosed eyes\nwince\none eye closed\n;<\n;>\n;p\ncovering own eyes\nhair over eyes\nhair over one eye\neyelashes\ncolored eyelashes\nfake eyelashes\neyes visible through hair\nmakeup\neyeliner\neyeshadow\nmascara\nakanbe\nartificial eye\nmechanical eye\nasymmetrical eyes\nblind\npartially blind\ncross-eyed\nrolling eyes\nsideways glance\nsquinting\nuneven eyes\nunusually open eyes\nupturned eyes\nwall-eyed\nwide-eyed\nparted lips\ncrazy smile\nevil smile\nfingersmile\nforced smile\nglasgow smile\ngrin\nevil grin\nlight smile\nsad smile\nseductive smile\nsmile\nsmirk\nsmug\ntroll face\nwavy mouth\nsobbing\ndot nose\nno nose\nchestnut mouth\ndot mouth\nmouth drool\nno mouth\nrectangular mouth\nsideways mouth\nsplit mouth\nYurie mouth\nnose blush\npout",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1boy, 1girl, 1other, 2boys, 2girls, 2others, 3boys, 3girls, 3others, 4boys, 4girls, 4others, 5boys, 5girls, 5others, 6+boys, 6+girls, 6+others, abstract_background, animal_focus, aqua_background, argyle_background, armpit_focus, ass_focus, back_focus, black_background, black_border, blue_background, blue_sky, blurry, blurry_background, blurry_foreground, border, breast_focus, bright_background, brown_background, checkered_background, close-up, colorful_background, cowboy_shot, creature_focus, cross_background, crotch_focus, dark_background, depth_of_field, diagonal-striped_background, dithered_background, dotted_background, drama_layer, ear_focus, eye_focus, feet_out_of_frame, film_grain, flower_focus, food_focus, foot_focus, foot_out_of_frame, footwear_focus, full_body, gradient_background, green_background, grey_background, grid_background, hair_focus, halftone_background, hand_focus, heaven_condition, hip_focus, honeycomb_background, kanji_focus, lace_background, leg_focus, looking_ahead, looking_at_another, looking_at_viewer, looking_away, looking_back, looking_to_the_side, male_focus, marble_background, mecha_focus, meme, monochrome_background, monster_focus, mosaic_background, mouth_focus, multiple_boys, multiple_girls, multiple_others, multiple_views, navel_focus, neck_focus, night, night_sky, object_focus, oekaki, orange_background, other_focus, out_of_frame, parody, patterned_background, pectoral_focus, penis_focus, pink_background, plaid_background, plant_focus, pokemon_focus, polka_dot_background, portrait, pov, pov_hands, purple_background, pussy_focus, rainbow_background, red_background, reflection_focus, simple_background, sky, sky_focus, solo, solo_focus, spiral_background, splatter_background, striped_background, sunburst_background, text_focus, thigh_focus, triangle_background, two-tone_background, upper_body, vehicle_focus, weapon_focus, white_background, white_border",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "title": "Face · Region Tag Rules"
+    },
+    {
+      "id": 11,
+      "type": "WDV3YOLODetector",
+      "pos": [
+        1400,
+        470
+      ],
+      "size": [
+        350,
+        338
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "rules",
+          "type": "WDV3_RULES",
+          "link": 11
+        },
+        {
+          "name": "previous_detectors",
+          "type": "WDV3_DETECTORS",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "name": "detectors",
+          "type": "WDV3_DETECTORS",
+          "links": [
+            5
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3YOLODetector"
+      },
+      "widgets_values": [
+        "face_yolov9c.pt",
+        "face_detector",
+        0.4,
+        "0",
+        "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\models\\yolo\\face_yolov9c.pt",
+        "auto",
+        true
+      ],
+      "title": "Face · YOLO Detector"
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      2,
+      0,
+      "WDV3_CALCULATION_STORE"
+    ],
+    [
+      2,
+      9,
+      0,
+      4,
+      0,
+      "WDV3_RULES"
+    ],
+    [
+      3,
+      2,
+      0,
+      5,
+      0,
+      "WDV3_EVIDENCE"
+    ],
+    [
+      4,
+      3,
+      0,
+      5,
+      1,
+      "WDV3_OPTIONS"
+    ],
+    [
+      5,
+      11,
+      0,
+      5,
+      2,
+      "WDV3_DETECTORS"
+    ],
+    [
+      6,
+      5,
+      0,
+      6,
+      0,
+      "WDV3_TAG_SETS"
+    ],
+    [
+      7,
+      6,
+      2,
+      7,
+      0,
+      "STRING"
+    ],
+    [
+      8,
+      6,
+      1,
+      7,
+      1,
+      "STRING"
+    ],
+    [
+      9,
+      6,
+      2,
+      8,
+      0,
+      "STRING"
+    ],
+    [
+      10,
+      6,
+      1,
+      8,
+      1,
+      "STRING"
+    ],
+    [
+      11,
+      10,
+      0,
+      11,
+      0,
+      "WDV3_RULES"
+    ],
+    [
+      12,
+      4,
+      0,
+      11,
+      1,
+      "WDV3_DETECTORS"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.4,
+      "offset": [
+        35,
+        30
+      ]
+    }
+  },
+  "version": 0.4
+}

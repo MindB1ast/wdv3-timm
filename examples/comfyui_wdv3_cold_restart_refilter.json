@@ -1,0 +1,548 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "WDV3CalculationStore",
+      "pos": [
+        20,
+        20
+      ],
+      "size": [
+        340,
+        198
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "calculation_store",
+          "type": "WDV3_CALCULATION_STORE",
+          "links": [
+            1,
+            8
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3CalculationStore"
+      },
+      "widgets_values": [
+        "CHANGE_TO_DATASET_FOLDER",
+        "",
+        "reuse_only",
+        ""
+      ]
+    },
+    {
+      "id": 2,
+      "type": "WDV3Options",
+      "pos": [
+        20,
+        400
+      ],
+      "size": [
+        340,
+        640
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "options",
+          "type": "WDV3_OPTIONS",
+          "links": [
+            3,
+            7
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3Options"
+      },
+      "widgets_values": [
+        0.35,
+        0.75,
+        2,
+        8,
+        true,
+        true,
+        "",
+        "",
+        "",
+        "",
+        ", ",
+        1,
+        "reuse",
+        "",
+        "",
+        true
+      ]
+    },
+    {
+      "id": 3,
+      "type": "WDV3LoadEvidence",
+      "pos": [
+        430,
+        20
+      ],
+      "size": [
+        340,
+        198
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "calculation_store",
+          "type": "WDV3_CALCULATION_STORE",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "evidence",
+          "type": "WDV3_EVIDENCE",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3LoadEvidence"
+      },
+      "widgets_values": [
+        "PASTE_ARTIFACT_ID",
+        "",
+        0,
+        64
+      ]
+    },
+    {
+      "id": 10,
+      "type": "WDV3FilterTagSets",
+      "pos": [
+        1660,
+        20
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "evidence",
+          "type": "WDV3_EVIDENCE",
+          "link": 2
+        },
+        {
+          "name": "options",
+          "type": "WDV3_OPTIONS",
+          "link": 3
+        },
+        {
+          "name": "detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        },
+        {
+          "name": "sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        },
+        {
+          "name": "postprocessing",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3FilterTagSets"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 11,
+      "type": "WDV3RemoveRedundantTags",
+      "pos": [
+        2070,
+        20
+      ],
+      "size": [
+        340,
+        326
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "links": [
+            5
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3RemoveRedundantTags"
+      },
+      "widgets_values": [
+        false,
+        true,
+        "[]",
+        "",
+        "all",
+        "",
+        false,
+        "[]"
+      ]
+    },
+    {
+      "id": 12,
+      "type": "WDV3MergeTagSets",
+      "pos": [
+        2480,
+        20
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "results",
+          "type": "WDV3_RESULTS",
+          "links": [
+            6
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "tags",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 1
+        },
+        {
+          "name": "results_json",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3MergeTagSets"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 13,
+      "type": "WDV3CombineCaptions",
+      "pos": [
+        2890,
+        20
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "results",
+          "type": "WDV3_RESULTS",
+          "link": 6
+        },
+        {
+          "name": "captions",
+          "type": "WDV3_CAPTIONS",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "captions",
+          "type": "WDV3_CAPTIONS",
+          "links": [
+            9
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3CombineCaptions"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 20,
+      "type": "WDV3CaptionExportSettings",
+      "pos": [
+        3300,
+        400
+      ],
+      "size": [
+        340,
+        326
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "options",
+          "type": "WDV3_OPTIONS",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "caption_export",
+          "type": "WDV3_CAPTION_EXPORT",
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3CaptionExportSettings"
+      },
+      "widgets_values": [
+        "error",
+        "stem_txt",
+        true,
+        "",
+        "{}",
+        "comma_newline",
+        ", ",
+        false
+      ]
+    },
+    {
+      "id": 21,
+      "type": "WDV3PlanCaptionExport",
+      "pos": [
+        3710,
+        20
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "calculation_store",
+          "type": "WDV3_CALCULATION_STORE",
+          "link": 8
+        },
+        {
+          "name": "captions",
+          "type": "WDV3_CAPTIONS",
+          "link": 9
+        },
+        {
+          "name": "caption_export",
+          "type": "WDV3_CAPTION_EXPORT",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "caption_plan",
+          "type": "WDV3_CAPTION_PLAN",
+          "links": [
+            11
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "preview_json",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3PlanCaptionExport"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 22,
+      "type": "WDV3SaveCaptions",
+      "pos": [
+        4120,
+        20
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "caption_plan",
+          "type": "WDV3_CAPTION_PLAN",
+          "link": 11
+        }
+      ],
+      "outputs": [
+        {
+          "name": "export_report",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3SaveCaptions"
+      },
+      "widgets_values": []
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      3,
+      0,
+      "WDV3_CALCULATION_STORE"
+    ],
+    [
+      2,
+      3,
+      0,
+      10,
+      0,
+      "WDV3_EVIDENCE"
+    ],
+    [
+      3,
+      2,
+      0,
+      10,
+      1,
+      "WDV3_OPTIONS"
+    ],
+    [
+      4,
+      10,
+      0,
+      11,
+      0,
+      "WDV3_TAG_SETS"
+    ],
+    [
+      5,
+      11,
+      0,
+      12,
+      0,
+      "WDV3_TAG_SETS"
+    ],
+    [
+      6,
+      12,
+      0,
+      13,
+      0,
+      "WDV3_RESULTS"
+    ],
+    [
+      7,
+      2,
+      0,
+      20,
+      0,
+      "WDV3_OPTIONS"
+    ],
+    [
+      8,
+      1,
+      0,
+      21,
+      0,
+      "WDV3_CALCULATION_STORE"
+    ],
+    [
+      9,
+      13,
+      0,
+      21,
+      1,
+      "WDV3_CAPTIONS"
+    ],
+    [
+      10,
+      20,
+      0,
+      21,
+      2,
+      "WDV3_CAPTION_EXPORT"
+    ],
+    [
+      11,
+      21,
+      0,
+      22,
+      0,
+      "WDV3_CAPTION_PLAN"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4,
+  "last_node_id": 22,
+  "last_link_id": 11
+}

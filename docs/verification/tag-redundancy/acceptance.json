@@ -1,0 +1,27 @@
+{
+  "nodes": 26,
+  "model_calls": 0,
+  "mixed_sources": [
+    "full",
+    "clothes:YOLO",
+    "face:SAM"
+  ],
+  "immutable_evidence": true,
+  "valid_prompt": true,
+  "invalid_cycle_rejected": true,
+  "preset_roundtrip": true,
+  "global_caption_preserved": true,
+  "regex_families": true,
+  "regex_preset_roundtrip": true,
+  "local_report": {
+    "json": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\tag-redundancy-acceptance\\wdv3-report-b741a20316c24ecf8fa1dc85605f6c0e\\report.json",
+    "html": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\tag-redundancy-acceptance\\wdv3-report-b741a20316c24ecf8fa1dc85605f6c0e\\report.html"
+  },
+  "merged_report": {
+    "json": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\tag-redundancy-acceptance\\wdv3-report-63ad5fd36e654311bf08dee5f4b3fbbf\\report.json",
+    "txt": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\tag-redundancy-acceptance\\wdv3-report-63ad5fd36e654311bf08dee5f4b3fbbf\\tags.txt",
+    "html": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\tag-redundancy-acceptance\\wdv3-report-63ad5fd36e654311bf08dee5f4b3fbbf\\report.html"
+  },
+  "python": "3.13.12 (main, Feb 12 2026, 00:38:53) [MSC v.1944 64 bit (AMD64)]",
+  "browser_tested": false
+}

@@ -1,0 +1,73 @@
+{
+  "categories": {
+    "All": {
+      "n": 108,
+      "known": {
+        "precision": 0.7214731170458285,
+        "recall": 0.793324926272526,
+        "f1": 0.742688744775549
+      },
+      "all": {
+        "precision": 0.7214731170458285,
+        "recall": 0.6929454307102697,
+        "f1": 0.6912358936325892
+      }
+    },
+    "NoDetection": {
+      "n": 33,
+      "known": {
+        "precision": 0.7936886150982674,
+        "recall": 0.8506594177977893,
+        "f1": 0.8132411183729437
+      },
+      "all": {
+        "precision": 0.7936886150982674,
+        "recall": 0.697690909616483,
+        "f1": 0.7357917325105108
+      }
+    },
+    "Normal": {
+      "n": 37,
+      "known": {
+        "precision": 0.7227572730155445,
+        "recall": 0.9044725851259225,
+        "f1": 0.7927114428978492
+      },
+      "all": {
+        "precision": 0.7227572730155445,
+        "recall": 0.8693921731035651,
+        "f1": 0.7780897008417672
+      }
+    },
+    "Wide_shot": {
+      "n": 38,
+      "known": {
+        "precision": 0.6575092958192503,
+        "recall": 0.635311726327543,
+        "f1": 0.6327132669008351
+      },
+      "all": {
+        "precision": 0.6575092958192503,
+        "recall": 0.517020949856139,
+        "f1": 0.567974484429668
+      }
+    }
+  },
+  "graphs_completed": 54,
+  "graph_execution_seconds": 131.227,
+  "first_start_to_last_finish_seconds": 135.072,
+  "images_matching_previous": 108,
+  "mismatches": [],
+  "node_classes": [
+    "WDV3CalculationStore",
+    "WDV3DetectorLoader",
+    "WDV3FilterTagSets",
+    "WDV3LoadEvidence",
+    "WDV3MergeTagSets",
+    "WDV3Options",
+    "WDV3SaveResult"
+  ],
+  "inference_calls": 0,
+  "config": "copy1-region-thresholds/effective-detectors.json",
+  "note": "Actual local ComfyUI server queue, cached evidence, region WD general thresholds 0.3; YOLO confidence stays 0.4."
+}

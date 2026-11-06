@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "tests_run": 25,
+  "passed": 25,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "tests": [
+    {
+      "test": "audit.test_cascade.PlanTests.test_documented_json",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade.PlanTests.test_invalid_before_loaders",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade.PlanTests.test_parent_and_frame_identity",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade.PlanTests.test_topology_branching_and_roundtrip",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade.PlanTests.test_yolo_all_classes_and_json_view_types",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_runtime.ExecutionTests.test_actual_sam_adapter_and_model_reuse",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_runtime.ExecutionTests.test_changed_bbox_invalidates_only_dependent_branch",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_runtime.ExecutionTests.test_child_sam_own_fill_toggle",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_runtime.ExecutionTests.test_empty_failed_limits_and_cancellation",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_runtime.ExecutionTests.test_sam_parent_fill_does_not_touch_child_and_cache",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_runtime.ExecutionTests.test_selective_reuse_added_branch_new_frame_and_batch_limits",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_runtime.ExecutionTests.test_two_parents_skips_disabled_and_roundtrip",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_runtime.GeometryTests.test_exif_and_clipped_half_open_bounds",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_runtime.GeometryTests.test_legacy_adaptation_and_bad_links",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_runtime.GeometryTests.test_three_levels_source_pixels_and_masks",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_tags.RoutingTests.test_aggregate_cleanup_and_separate_descendant",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_tags.RoutingTests.test_disabled_parent_still_receives_and_siblings_do_not_mix",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_tags.RoutingTests.test_explicit_route_preserves_raw_ratings_and_ancestors",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_tags.RoutingTests.test_full_confirmation_and_global_remove",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_cascade_tags.RoutingTests.test_merge_rejects_route_geometry_and_policy_conflicts",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_nested_detectors.NestedTests.test_depth_cycle_and_reuse_only",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_nested_detectors.NestedTests.test_flat_config_byte_shape_and_nested_roundtrip",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_nested_detectors.NestedTests.test_sam_parent_and_mixed_child_stack",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_nested_detectors.NestedTests.test_same_child_names_under_different_parents_and_duplicates",
+      "status": "passed"
+    },
+    {
+      "test": "audit.test_nested_detectors.NestedTests.test_standard_tagger_collect_and_automatic_merge",
+      "status": "passed"
+    }
+  ]
+}

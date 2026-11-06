@@ -1,6 +1,7 @@
 import { app } from "../../scripts/app.js";
 import { ruleWidgetValues, taggingWidgetValues } from "./rule_presets.mjs";
 import { repairTaggingSettings } from "./tagging_settings.mjs";
+import { repairRegionRuleDefaults } from "./region_rule_defaults.mjs";
 const presets={
     "Full image":{},"Generic region":{exclude_from_region:["close-up","cowboy_shot","full_body"]},
     "Person":{remove_tags_from_full:["1girl","1boy"],add_tags_to_region:{person:1},exclude_from_region:["close-up","cowboy_shot","full_body"]},
@@ -11,11 +12,12 @@ app.registerExtension({name:"wdv3.rule-presets",async beforeRegisterNodeDef(Type
     if(!["WDV3RegionRules","WDV3Options"].includes(data.name))return;
     const fullSettings=data.name==="WDV3Options";
     const configured=Type.prototype.onConfigure;
-    Type.prototype.onConfigure=function(){const result=configured?.apply(this,arguments);if(fullSettings)repairTaggingSettings(this);this.setSize([Math.max(360,this.size[0]),Math.max(fullSettings?640:1000,this.size[1])]);return result;};
+    Type.prototype.onConfigure=function(){const result=configured?.apply(this,arguments);if(fullSettings)repairTaggingSettings(this);else repairRegionRuleDefaults(this);this.setSize([Math.max(360,this.size[0]),Math.max(fullSettings?640:1000,this.size[1])]);return result;};
     const created=Type.prototype.onNodeCreated;
     Type.prototype.onNodeCreated=function(){
         const result=created?.apply(this,arguments),node=this;
         if(fullSettings)repairTaggingSettings(node);
+        else repairRegionRuleDefaults(node);
         const compositionDefault=node.widgets?.find(w=>w.name==="full_image_only_tags")?.value;
         const panel=document.createElement("div");panel.style.cssText="padding:6px;color:#ddd;background:#242832;font:12px sans-serif";
         const select=document.createElement("select");

@@ -1,0 +1,1 @@
+bare_tree, broken_window, ceiling, ceiling_light, chair, chalkboard, classroom, clock, day, desk, indoors, no_humans, rubble, ruins, scenery, school, school_chair, school_desk, shadow, sunlight, tree, window

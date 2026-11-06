@@ -1,4 +1,5 @@
 // Pure node-definition catalog. No canvas, model loading, or backend calls.
+import {portLabel} from './port_labels.mjs';
 const widgetTypes = new Set(["STRING", "INT", "FLOAT", "BOOLEAN", "COMBO"]);
 
 export function normalizeNodeDefinition(definition, id = definition.name) {
@@ -14,17 +15,18 @@ export function normalizeNodeDefinition(definition, id = definition.name) {
                 const template = options.template;
                 for (const [innerName, inner] of Object.entries(template?.input?.required || {})) {
                     const prefix = `${name}.${template.prefix || innerName}`;
-                    inputs.push({name: `${prefix}0`, type: inner[0], index: inputs.length,
+                    inputs.push({name: `${prefix}0`, displayLabel: portLabel(id, `${prefix}0`, inner[0]), type: inner[0], index: inputs.length,
                         optional: section === "optional", prefix});
                 }
             } else if (typeof type === "string" && (!widgetTypes.has(type) || options.forceInput)) {
-                inputs.push({name, type, index: inputs.length, optional: section === "optional"});
+                inputs.push({name, displayLabel: portLabel(id,name,type), type, index: inputs.length, optional: section === "optional"});
             }
         }
     }
     return {id, displayName: definition.display_name || id, inputs,
         outputs: (definition.output || []).map((type, index) => ({
             name: definition.output_name?.[index] || String(type), type, index,
+            displayLabel:portLabel(id,definition.output_name?.[index] || String(type),type),
         }))};
 }
 
@@ -70,10 +72,21 @@ const producerPriority = {
     WDV3_RESULTS: ['WDV3ApplyFilters', 'WDV3MergeResults'],
     WDV3_REGIONS: ['WDV3CollectEvidence'],
     WDV3_REPORT: ['WDV3Inspect'],
+    WDV3_TAG_SETS: ['WDV3FilterTagSets', 'WDV3RemoveRedundantTags'],
+    WDV3_POSTPROCESSING: ['WDV3PostprocessingConfig', 'WDV3LoadConfig'],
+    WDV3_CALCULATION_STORE: ['WDV3CalculationStore', 'WDV3LoadConfig'],
+    WDV3_INFERENCE: ['WDV3InferenceSettings', 'WDV3LoadConfig'],
+    WDV3_CALCULATION_PLAN: ['WDV3PlanCalculations'],
+    WDV3_CAPTIONS: ['WDV3LoadCaptions', 'WDV3CombineCaptions', 'WDV3EditCaptions'],
+    WDV3_CAPTION_EXPORT: ['WDV3CaptionExportSettings', 'WDV3LoadConfig'],
+    WDV3_CAPTION_PLAN: ['WDV3PlanCaptionExport'],
+    WDV3_CAPTION_READ: ['WDV3CaptionReadSettings', 'WDV3LoadConfig'],
+    WDV3_CAPTION_EDIT: ['WDV3CaptionEditSettings', 'WDV3LoadConfig'],
     IMAGE: ['LoadImage'],
 };
 
 export function portRole(name) {
+    if (['artifact_id', 'artifact_ids', 'evidence_refs'].includes(name)) return 'artifact_refs';
     if (name === 'results_json') return 'results_json';
     if (name === 'tags') return 'tags';
     if (name.endsWith('_path')) return 'path';
@@ -89,7 +102,11 @@ export function suggestConnections(context, catalog) {
     if (!isWDV3Context(context)) return [];
     const wanted = context.direction === 'input' ? 'outputs' : 'inputs';
     const role = portRole(context.name);
-    const preferred = wanted === 'outputs' ? producerPriority[context.type] || [] : [];
+    const preferred = context.type === 'STRING' && role === 'results_json'
+        ? (wanted === 'outputs'
+            ? ['WDV3TagFolder', 'WDV3Tagger', 'WDV3MergeTagSets', 'WDV3ApplyFilters', 'WDV3MergeResults']
+            : ['WDV3Preview', 'WDV3SaveResult'])
+        : (wanted === 'outputs' ? producerPriority[context.type] || [] : []);
     const candidates = [];
     for (const node of catalog.values()) {
         for (const slot of node[wanted]) {
@@ -100,7 +117,7 @@ export function suggestConnections(context, catalog) {
             candidates.push({nodeId: node.id, displayName: node.displayName, ...slot,
                 direction: wanted === 'outputs' ? 'output' : 'input',
                 priority: rank < 0 ? preferred.length + 1 : rank,
-                label: `${node.displayName} · ${slot.name}`});
+                label: `${node.displayName} · ${slot.displayLabel || slot.name}`});
         }
     }
     const unique = new Map(candidates.map(c => [`${c.nodeId}:${c.direction}:${c.name}`, c]));

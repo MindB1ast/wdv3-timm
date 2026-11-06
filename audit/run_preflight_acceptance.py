@@ -1,6 +1,7 @@
 """Exercise preflight through the installed ComfyUI validator, without inference."""
 import argparse
 import copy
+import json
 import importlib.util
 import os
 from pathlib import Path
@@ -72,8 +73,12 @@ def main():
             link('results', 'WDV3_RESULTS')
         if node_id == 'WDV3SaveConfig':
             link('options', 'WDV3_OPTIONS')
+        if node_id == 'WDV3PlanCalculations':
+            link('images', 'IMAGE')
         if node_id == 'WDV3LoadFolder':
             inputs['directory'] = str(work)
+        if 'dataset_root' in inputs:
+            inputs['dataset_root'] = str(work)
         inputs.update(overrides or {})
         result['target'] = {'class_type': node_id, 'inputs': inputs}
         return result
@@ -91,6 +96,11 @@ def main():
             assert cls.__dict__.get('_wdv3_preflight') == node_id
             await check(node_id)
         cases = [
+            ('WDV3RemoveRedundantTags', {'regex_relations_json': '[{"id":"broken","specific":"(","general":"skirt"}]'}),
+            ('WDV3RemoveRedundantTags', {'regex_relations_json': json.dumps([{'id': 'broken', 'specific': '.*', 'general': r'\g<missing>'}])}),
+            ('WDV3RemoveRedundantTags', {'relations_json': '['}),
+            ('WDV3RemoveRedundantTags', {'relations_json': '[{"specific":"a","general":"b"},{"specific":"b","general":"a"}]'}),
+            ('WDV3PostprocessingConfig', {'postprocessing_json': '[{"unexpected":true}]'}),
             ('WDV3Options', {'sam_batch_size': 0}),
             ('WDV3Options', {'general_threshold': 1.5}),
             ('WDV3Options', {'remove_tags_regex': '['}),
@@ -117,6 +127,28 @@ def main():
         ]
         for node_id, overrides in cases:
             await check(node_id, overrides, False)
+        for restored in ('', '  ', None):
+            await check('WDV3RegionRules', {'child_tag_route': restored, 'tag_enabled': restored})
+        await check('WDV3RegionRules', {'child_tag_route': 'merge_to_parent', 'tag_enabled': False})
+        await check('WDV3RegionRules', {'child_tag_route': 'invalid'}, False)
+        # ComfyUI coerces BOOLEAN before calling custom validators. Exercise
+        # rejection of a raw malformed boolean at our own validation boundary.
+        preflight = sys.modules[package.__name__ + '.comfy_preflight']
+        assert preflight.validate_preflight('WDV3RegionRules',
+            package.NODE_CLASS_MAPPINGS['WDV3RegionRules'].INPUT_TYPES(),
+            values={'tag_enabled': 'invalid'}) is not True
+        prompt = graph('WDV3RegionRules')
+        prompt['child'] = {'class_type': 'Test_WDV3_DETECTORS', 'inputs': {}}
+        prompt['target']['inputs']['child_detectors'] = ['child', 0]
+        assert (await execution.validate_inputs('nested-yolo', prompt, 'target', {}))[0] is True
+        prompt['sam_queries'] = {'class_type': 'Test_WDV3_SAM_SOURCES', 'inputs': {}}
+        prompt['target']['inputs']['child_sources'] = ['sam_queries', 0]
+        assert (await execution.validate_inputs('nested-missing-model', prompt, 'target', {}))[0] is False
+        prompt['sam'] = {'class_type': 'Test_WDV3_SAM_MODEL', 'inputs': {}}
+        prompt['target']['inputs']['child_sam_model'] = ['sam', 0]
+        assert (await execution.validate_inputs('nested-mixed', prompt, 'target', {}))[0] is True
+        prompt['child']['class_type'] = 'Test_IMAGE'
+        assert (await execution.validate_inputs('nested-wrong-type', prompt, 'target', {}))[0] is False
         # Prompt validation, the actual server pre-queue entry point, must reject
         # inconsistent optional links and wrong types before invoking any loader.
         for node_id in ('WDV3Tagger', 'WDV3TagFolder', 'WDV3CollectEvidence'):

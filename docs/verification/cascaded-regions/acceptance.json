@@ -1,0 +1,32 @@
+{
+  "interface": "Region Tag Rules child stacks",
+  "removed_public_stage_nodes": true,
+  "schema_api": true,
+  "preset_roundtrip": true,
+  "standard_tagger": true,
+  "standard_collect": true,
+  "standard_folder": true,
+  "automatic_merge": true,
+  "two_parents": true,
+  "mixed_yolo_sam": true,
+  "tree_export": true,
+  "prompt_validation": true,
+  "generated_examples": true,
+  "legacy_widget_defaults": true,
+  "actual_weight_inference": false,
+  "browser_tested": false,
+  "report": {
+    "json": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\cascade-acceptance\\reports\\wdv3-report-2b218f71516b4ed198d850c1a3d383e1\\report.json",
+    "txt": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\cascade-acceptance\\reports\\wdv3-report-2b218f71516b4ed198d850c1a3d383e1\\tags.txt",
+    "html": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\cascade-acceptance\\reports\\wdv3-report-2b218f71516b4ed198d850c1a3d383e1\\report.html"
+  },
+  "fake_detector_calls": [
+    "body",
+    "body/face",
+    "body/face/eyes",
+    "body",
+    "body/face",
+    "body/face/eyes"
+  ],
+  "python": "3.13.12 (main, Feb 12 2026, 00:38:53) [MSC v.1944 64 bit (AMD64)]"
+}

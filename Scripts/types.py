@@ -72,6 +72,15 @@ class RegionGeometry(TypedDict):
     segmentation_score: NotRequired[float]
     prompt: NotRequired[str]
     model_bbox: NotRequired[list[float]]
+    region_uid: NotRequired[str]
+    parent_region_uid: NotRequired[str | None]
+    stage_id: NotRequired[str]
+    depth: NotRequired[int]
+    local_detection_index: NotRequired[int]
+    local_bbox: NotRequired[list[int]]
+    detector_input_bbox: NotRequired[list[int]]
+    detector_input_transform: NotRequired[list[list[int]]]
+    relation: NotRequired[str]
 
 
 class RegionViewMetadata(TypedDict):

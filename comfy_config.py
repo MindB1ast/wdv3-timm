@@ -7,6 +7,7 @@ from pathlib import Path
 from .Scripts.configs import DetectorConfig
 from .Scripts.sam_config import finite_number, positive_integer
 from .Scripts.tag_utils import parse_tags, TagMatcher, REGEX_RULE_FIELDS
+from .Scripts.tag_postprocessing import validate_chain
 
 
 DEFAULT_SAM_MODEL = {"model": "unsloth/sam3.1", "device": "auto", "download_missing": True,
@@ -46,10 +47,12 @@ def validate_config(data):
     options = data.setdefault("options", {})
     allowed = {"general_threshold", "character_threshold", "image_batch_size", "region_batch_size",
                "replace_underscores", "escape_parentheses", "remove_tags", "prefix_tags", "suffix_tags",
-               "remove_tags_regex", "tag_separator", "sam_batch_size"}
+               "remove_tags_regex", "tag_separator", "sam_batch_size",'cache_mode','cache_dataset_root','cache_refresh','low_memory_mode'}
     if not isinstance(options, dict) or set(options) - allowed:
         raise ValueError("Unknown tagging settings in config")
     for name, value in options.items():
+        if name=='cache_mode' and value not in ('reuse','reuse_only','refresh','off'):
+            raise ValueError('Invalid cache_mode')
         if name == 'remove_tags_regex':
             if not isinstance(value, list):
                 raise ValueError('remove_tags_regex must be a list of patterns')
@@ -58,7 +61,7 @@ def validate_config(data):
             finite_number(value, name, maximum=1)
         elif name.endswith("batch_size"):
             positive_integer(value, name)
-        elif name in ("replace_underscores", "escape_parentheses"):
+        elif name in ("replace_underscores", "escape_parentheses", "low_memory_mode"):
             if not isinstance(value, bool):
                 raise ValueError(f"{name} must be boolean")
         elif not isinstance(value, str):
@@ -108,12 +111,33 @@ def validate_config(data):
         if not isinstance(model["download_missing"], bool) or not isinstance(model["local_model_path"], str):
             raise ValueError("Invalid SAM download setting or local path")
     data["sam_model"] = model
+    if 'postprocessing' in data:
+        data['postprocessing'] = validate_chain(data['postprocessing'])
+    if 'calculation_store' in data and data['calculation_store'] is not None:
+        store=data['calculation_store']
+        if not isinstance(store,dict) or not isinstance(store.get('dataset_root'),str) or store.get('mode','reuse') not in ('reuse','reuse_only','refresh'):
+            raise ValueError('Invalid calculation_store settings')
+    if 'inference' in data and data['inference'] is not None:
+        from .comfy_persistent_runtime import normalize_inference
+        data['inference']=normalize_inference(data['inference'])
+    if 'caption_read' in data and data['caption_read'] is not None:
+        from .Scripts.caption_files import parse_caption
+        parse_caption('',**data['caption_read'])
+    if 'caption_edit' in data and data['caption_edit'] is not None:
+        from .Scripts.caption_files import edit_caption,document_from_tags
+        edit_caption(document_from_tags([]),data['caption_edit'])
+    if 'caption_export' in data and data['caption_export'] is not None:
+        from .Scripts.caption_files import export_config
+        data['caption_export']=export_config(**data['caption_export'])
     return data
 
 
 def validate_rules(rules):
     if not isinstance(rules, dict):
         raise ValueError("Region rules must be an object")
+    if rules.get('children') is not None:
+        from .comfy_nested import validate_children
+        validate_children(rules['children'])
     for field in REGEX_RULE_FIELDS:
         name = field + '_regex'
         value = rules.get(name, [])
@@ -135,12 +159,18 @@ def validate_rules(rules):
         finite_number(value, "Assigned tag score", maximum=1)
 
 
-def config_data(options=None, detectors=None, sources=None, sam_model=None):
+def config_data(options=None, detectors=None, sources=None, sam_model=None, postprocessing=None, **dataset_settings):
     configs = detectors[0] if detectors is not None else []
-    return validate_config({"schema_version": 1, "options": dict(options or {}),
-                            "detectors": [asdict(config) for config in configs],
+    data = {"schema_version": 1, "options": dict(options or {}),
+                            "detectors": [config.to_dict() for config in configs],
                             "sam_sources": sources or [],
-                            "sam_model": sam_model.get("loader_options") if sam_model is not None else None})
+                            "sam_model": sam_model.get("loader_options") if sam_model is not None else None}
+    if postprocessing is not None:
+        data['postprocessing'] = postprocessing
+    if set(dataset_settings)-{'calculation_store','inference','caption_read','caption_edit','caption_export'}:
+        raise ValueError('Unknown dataset settings')
+    data.update({k:v for k,v in dataset_settings.items() if v is not None})
+    return validate_config(data)
 
 
 def config_values(data):

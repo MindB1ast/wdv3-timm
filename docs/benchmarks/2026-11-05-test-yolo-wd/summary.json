@@ -1,0 +1,137 @@
+{
+  "categories": {
+    "All": {
+      "n": 108,
+      "known": {
+        "full": {
+          "precision": 0.7733378699674798,
+          "recall": 0.6710397782129595,
+          "f1": 0.6960750970997878,
+          "f1_project_harmonic_mean_PR": 0.7185661863537789
+        },
+        "regional": {
+          "precision": 0.7474495790654005,
+          "recall": 0.7619456461490305,
+          "f1": 0.7414233336254472,
+          "f1_project_harmonic_mean_PR": 0.7546279982842262
+        }
+      },
+      "all_reference": {
+        "full": {
+          "precision": 0.7733378699674798,
+          "recall": 0.5840836989606828,
+          "f1": 0.6438770504609734,
+          "f1_project_harmonic_mean_PR": 0.6655177000996912
+        },
+        "regional": {
+          "precision": 0.7474495790654005,
+          "recall": 0.6665847427603239,
+          "f1": 0.6892988641611,
+          "f1_project_harmonic_mean_PR": 0.7047049342066878
+        }
+      },
+      "full_seconds": 440.7251615001587,
+      "regional_seconds": 1247.219205400208
+    },
+    "NoDetection": {
+      "n": 33,
+      "known": {
+        "full": {
+          "precision": 0.8240220892590926,
+          "recall": 0.846026623693677,
+          "f1": 0.8301352056183295,
+          "f1_project_harmonic_mean_PR": 0.8348793857849567
+        },
+        "regional": {
+          "precision": 0.8061878280250062,
+          "recall": 0.8492164163554751,
+          "f1": 0.8214416081611919,
+          "f1_project_harmonic_mean_PR": 0.8271429004886968
+        }
+      },
+      "all_reference": {
+        "full": {
+          "precision": 0.8240220892590926,
+          "recall": 0.6937239674694596,
+          "f1": 0.7496986196605602,
+          "f1_project_harmonic_mean_PR": 0.7532799927137337
+        },
+        "regional": {
+          "precision": 0.8061878280250062,
+          "recall": 0.6964787884048466,
+          "f1": 0.7427257188674096,
+          "f1_project_harmonic_mean_PR": 0.7473283984800105
+        }
+      },
+      "full_seconds": 134.05643480014987,
+      "regional_seconds": 187.33462479966693
+    },
+    "Normal": {
+      "n": 37,
+      "known": {
+        "full": {
+          "precision": 0.8112824566648998,
+          "recall": 0.7506651837867343,
+          "f1": 0.7526027302043657,
+          "f1_project_harmonic_mean_PR": 0.7797975742134748
+        },
+        "regional": {
+          "precision": 0.7768072660816219,
+          "recall": 0.8905749190652179,
+          "f1": 0.8172646929499702,
+          "f1_project_harmonic_mean_PR": 0.8298098302039132
+        }
+      },
+      "all_reference": {
+        "full": {
+          "precision": 0.8112824566648998,
+          "recall": 0.7193720748690243,
+          "f1": 0.7370019282470082,
+          "f1_project_harmonic_mean_PR": 0.7625678143822155
+        },
+        "regional": {
+          "precision": 0.7768072660816219,
+          "recall": 0.8561201778982936,
+          "f1": 0.8017937783092026,
+          "f1_project_harmonic_mean_PR": 0.8145375634534039
+        }
+      },
+      "full_seconds": 153.6411415002076,
+      "regional_seconds": 653.7694500004873
+    },
+    "Wide_shot": {
+      "n": 38,
+      "known": {
+        "full": {
+          "precision": 0.6923765819562226,
+          "recall": 0.4415475174999765,
+          "f1": 0.5246144127318596,
+          "f1_project_harmonic_mean_PR": 0.5392197914982215
+        },
+        "regional": {
+          "precision": 0.6678549307688958,
+          "recall": 0.5609135799724093,
+          "f1": 0.5980882453442125,
+          "f1_project_harmonic_mean_PR": 0.6097306267152884
+        }
+      },
+      "all_reference": {
+        "full": {
+          "precision": 0.6923765819562226,
+          "recall": 0.357141626081781,
+          "f1": 0.4613051488380878,
+          "f1_project_harmonic_mean_PR": 0.47121906812262093
+        },
+        "regional": {
+          "precision": 0.6678549307688958,
+          "recall": 0.4560764636452151,
+          "f1": 0.5333673370877313,
+          "f1_project_harmonic_mean_PR": 0.5420133539410757
+        }
+      },
+      "full_seconds": 153.02758519980125,
+      "regional_seconds": 406.1151306000538
+    }
+  },
+  "reference_unchanged": true
+}

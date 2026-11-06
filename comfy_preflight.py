@@ -110,6 +110,11 @@ def validate_preflight(node_id, schema, input_types=None, values=None):
     connected = set(received)
     roots = {name.split('.', 1)[0] for name in connected}
     known = {name: value for name, value in values.items() if name not in roots}
+    if node_id == 'WDV3RegionRules':
+        from .Scripts.region_rule_defaults import child_route_default, tag_enabled_default
+        for name, normalize in [('child_tag_route', child_route_default), ('tag_enabled', tag_enabled_default)]:
+            if name in known:
+                known[name] = normalize(known[name])
     try:
         # input_types opts out of Comfy's default linked-type check; preserve it explicitly.
         for name, actual in received.items():
@@ -121,14 +126,19 @@ def validate_preflight(node_id, schema, input_types=None, values=None):
             spec = _input_spec(schema, name)
             if spec is not None:
                 _validate_scalar(name, value, spec)
+        if node_id=='WDV3Options' and known.get('cache_dataset_root','').strip():
+            if not Path(known['cache_dataset_root']).expanduser().is_dir():
+                raise ValueError('Папка датасета для кэша не существует: cache_dataset_root.')
         if node_id in ('WDV3Tagger', 'WDV3TagFolder', 'WDV3CollectEvidence'):
             _sam_pair(roots)
-        if node_id == 'WDV3Inspect' and len(roots & {'results', 'evidence', 'regions'}) != 1:
-            raise ValueError('Inspect: подключите ровно один вход — results, evidence или regions.')
-        if node_id == 'WDV3SaveConfig' and not roots & {'options', 'detectors', 'sources', 'sam_model'}:
+        if node_id == 'WDV3Inspect' and len(roots & {'results', 'evidence', 'regions', 'tag_sets'}) != 1:
+            raise ValueError('Inspect: подключите ровно один вход — results, evidence, regions или tag_sets.')
+        if node_id == 'WDV3SaveConfig' and not roots & {'options', 'detectors', 'sources', 'sam_model', 'postprocessing','calculation_store','inference','caption_read','caption_edit','caption_export'}:
             raise ValueError('Save Pipeline Config: подключите хотя бы один набор настроек.')
         if node_id in ('WDV3CombineDetectors', 'WDV3CombineSAMSources') and not connected:
             raise ValueError('Combine: подключите хотя бы один источник.')
+        if node_id == 'WDV3RegionRules' and ('child_sam_model' in roots) != ('child_sources' in roots):
+            raise ValueError('Дочерний SAM требует child_sam_model + child_sources.')
         if node_id in ('WDV3SaveResult', 'WDV3ExportReport'):
             formats = ('save_txt', 'save_json') + (('save_html',) if node_id == 'WDV3ExportReport' else ())
             if all(name in known for name in formats) and not any(known[name] for name in formats):
@@ -171,6 +181,31 @@ def validate_preflight(node_id, schema, input_types=None, values=None):
             ids = [int(text.strip()) for text in known['classes'].split(',') if text.strip()]
             if any(value < 0 for value in ids):
                 raise ValueError('classes: ID классов должны быть неотрицательными целыми числами.')
+        if node_id == 'WDV3RemoveRedundantTags':
+            from .Scripts.tag_postprocessing import operation_from_fields
+            operation_from_fields(**{name: value for name, value in known.items() if name != 'tag_sets'})
+        if node_id == 'WDV3PostprocessingConfig' and 'postprocessing_json' in known:
+            from .Scripts.tag_postprocessing import validate_chain
+            validate_chain(json.loads(known['postprocessing_json']))
+        if node_id=='WDV3PlanCalculations' and len(roots & {'images','files'})!=1:
+            raise ValueError('Plan Calculations: подключите ровно один вход images или files.')
+        if node_id=='WDV3CalculationStore' and 'dataset_root' in known:
+            if not known['dataset_root'].strip() or not Path(known['dataset_root']).expanduser().is_dir():
+                raise ValueError('dataset_root: папка датасета не существует.')
+        if node_id in ('WDV3EditCaptions','WDV3CaptionEditSettings') and 'operations_json' in known:
+            from .Scripts.caption_files import edit_caption,document_from_tags
+            edit_caption(document_from_tags([]),json.loads(known['operations_json']))
+        if node_id in ('WDV3LoadCaptions','WDV3CaptionReadSettings','WDV3CaptionExportSettings'):
+            from .Scripts.caption_files import parse_caption
+            parse_caption('',**{k:v for k,v in known.items() if k in ('input_format','input_separator','escaped_parentheses')})
+        if node_id=='WDV3InferenceSettings':
+            if 'sources_json' in known:
+                from .comfy_persistent_runtime import normalize_inference
+                normalize_inference({'wd':{'files':{}},'sources':json.loads(known['sources_json'])})
+            if 'pinned_identity_json' in known:
+                from .Scripts.inference_plan import model_identity
+                pin=json.loads(known['pinned_identity_json'])
+                if pin:model_identity({'identity':pin})
         if node_id == 'WDV3ModelLoader' and ('repo_id' in known or 'model' in known):
             from .Scripts.tagger_catalog import resolve_model_id
             resolve_model_id(known.get('repo_id', '').strip() or known.get('model', 'vit'))

@@ -9,11 +9,40 @@ import requests
 import torch
 from huggingface_hub.errors import HfHubHTTPError, EntryNotFoundError
 
-from Scripts.tagger_resources import ensure_resources, load_tagger
+from Scripts.tagger_resources import ensure_resources, load_tagger, load_weight_state
 from Scripts.tagger_catalog import model_path
 
 
 class ResourceTests(unittest.TestCase):
+    def test_windows_weights_use_non_mmap_reader(self):
+        calls=[]
+        def reader(path,device='cpu',*,backend='mmap'):
+            calls.append((path,device,backend))
+            return {'weight':torch.tensor([1.])}
+        with patch('Scripts.tagger_resources.sys.platform','win32'), \
+             patch('Scripts.tagger_resources.safetensors.torch.load_file',reader):
+            state=load_weight_state(Path('model.safetensors'))
+        self.assertEqual(calls,[(Path('model.safetensors'),'cpu','pread')])
+        self.assertEqual(state['weight'].item(),1.)
+
+    def test_old_windows_safetensors_api_uses_bytes_without_mmap(self):
+        with tempfile.TemporaryDirectory(dir='temp') as directory:
+            path=Path(directory)/'model.safetensors';path.write_bytes(b'checkpoint')
+            def old_reader(filename,device='cpu'):
+                raise AssertionError('Legacy mmap reader must not be called on Windows')
+            with patch('Scripts.tagger_resources.sys.platform','win32'), \
+                 patch('Scripts.tagger_resources.safetensors.torch.load_file',old_reader), \
+                 patch('Scripts.tagger_resources.safetensors.torch.load',return_value={'weight':1}) as reader:
+                self.assertEqual(load_weight_state(path),{'weight':1})
+            reader.assert_called_once_with(b'checkpoint')
+
+    def test_non_windows_keeps_normal_reader(self):
+        def reader(path):return {'weight':1}
+        with patch('Scripts.tagger_resources.sys.platform','linux'), \
+             patch('Scripts.tagger_resources.safetensors.torch.load_file',side_effect=reader) as load:
+            self.assertEqual(load_weight_state(Path('model.safetensors')),{'weight':1})
+        load.assert_called_once_with(Path('model.safetensors'))
+
     def test_complete_bundle_download_once_and_offline(self):
         with tempfile.TemporaryDirectory(dir='temp') as directory:
             root = Path(directory)

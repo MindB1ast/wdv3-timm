@@ -1,0 +1,47 @@
+{
+  "status": "failed",
+  "message": "Error: Panel shrank against native node: {\"expected\":555,\"label\":\"frame-0-0\",\"node\":[760,950],\"nodeWidth\":760,\"renderingSize\":[760,950],\"widgetWidthDescriptor\":\"undefined\",\"allWidgetWidths\":[{\"name\":\"preview_limit\"},{\"name\":\"wdv3_results\",\"width\":233}],\"scale\":0.75,\"widgetWidth\":233,\"widgetHeight\":624,\"panel\":[159.75,453],\"mount\":[159.75,453],\"cssPanel\":[198,589],\"hostStyle\":\"position: fixed; transform-origin: 0px 0px; transform: scale(0.75); left: 82.5px; top: 150px; width: 213px; height: 604px; z-index: 0; pointer-events: auto; opacity: 1;\",\"panelStyle\":\"display: block; width: 100%; max-width: 100%; min-width: 0px; min-height: 0px; height: 100%; align-self: stretch; flex: 1 1 0%; overflow: auto; scrollbar-gutter: stable; padding: 10px; background: rgb(32, 36, 44); color: rgb(238, 238, 238); font: 13px sans-serif; box-sizing: border-box; border-radius: 8px;\"}",
+  "stack": "Error: Panel shrank against native node: {\"expected\":555,\"label\":\"frame-0-0\",\"node\":[760,950],\"nodeWidth\":760,\"renderingSize\":[760,950],\"widgetWidthDescriptor\":\"undefined\",\"allWidgetWidths\":[{\"name\":\"preview_limit\"},{\"name\":\"wdv3_results\",\"width\":233}],\"scale\":0.75,\"widgetWidth\":233,\"widgetHeight\":624,\"panel\":[159.75,453],\"mount\":[159.75,453],\"cssPanel\":[198,589],\"hostStyle\":\"position: fixed; transform-origin: 0px 0px; transform: scale(0.75); left: 82.5px; top: 150px; width: 213px; height: 604px; z-index: 0; pointer-events: auto; opacity: 1;\",\"panelStyle\":\"display: block; width: 100%; max-width: 100%; min-width: 0px; min-height: 0px; height: 100%; align-self: stretch; flex: 1 1 0%; overflow: auto; scrollbar-gutter: stable; padding: 10px; background: rgb(32, 36, 44); color: rgb(238, 238, 238); font: 13px sans-serif; box-sizing: border-box; border-radius: 8px;\"}\n    at verify (http://127.0.0.1:55060/__wdv3_native_test.js:22:425)\n    at async http://127.0.0.1:55060/__wdv3_native_test.js:23:81",
+  "phase": "frame-0-0",
+  "checks": [
+    {
+      "label": "frame-0-0",
+      "node": [
+        760,
+        950
+      ],
+      "nodeWidth": 760,
+      "renderingSize": [
+        760,
+        950
+      ],
+      "widgetWidthDescriptor": "undefined",
+      "allWidgetWidths": [
+        {
+          "name": "preview_limit"
+        },
+        {
+          "name": "wdv3_results",
+          "width": 233
+        }
+      ],
+      "scale": 0.75,
+      "widgetWidth": 233,
+      "widgetHeight": 624,
+      "panel": [
+        159.75,
+        453
+      ],
+      "mount": [
+        159.75,
+        453
+      ],
+      "cssPanel": [
+        198,
+        589
+      ],
+      "hostStyle": "position: fixed; transform-origin: 0px 0px; transform: scale(0.75); left: 82.5px; top: 150px; width: 213px; height: 604px; z-index: 0; pointer-events: auto; opacity: 1;",
+      "panelStyle": "display: block; width: 100%; max-width: 100%; min-width: 0px; min-height: 0px; height: 100%; align-self: stretch; flex: 1 1 0%; overflow: auto; scrollbar-gutter: stable; padding: 10px; background: rgb(32, 36, 44); color: rgb(238, 238, 238); font: 13px sans-serif; box-sizing: border-box; border-radius: 8px;"
+    }
+  ]
+}

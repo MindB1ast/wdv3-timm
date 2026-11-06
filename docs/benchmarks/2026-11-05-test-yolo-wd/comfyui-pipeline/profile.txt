@@ -1,0 +1,43 @@
+         753552 function calls (707828 primitive calls) in 1.651 seconds
+
+   Ordered by: cumulative time
+   List reduced from 381 to 35 due to restriction <35>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+       18    0.000    0.000    0.729    0.040 __init__.py:304(loads)
+       18    0.000    0.000    0.728    0.040 decoder.py:340(decode)
+       18    0.728    0.040    0.728    0.040 decoder.py:351(raw_decode)
+        4    0.000    0.000    0.682    0.171 evidence.py:22(pack)
+        6    0.000    0.000    0.558    0.093 __init__.py:185(dumps)
+        6    0.000    0.000    0.558    0.093 encoder.py:185(encode)
+        6    0.558    0.093    0.558    0.093 encoder.py:207(iterencode)
+        1    0.022    0.022    0.457    0.457 comfy_evidence.py:296(merge_tag_sets)
+        1    0.000    0.000    0.422    0.422 comfy_evidence.py:259(filter_tag_sets)
+        4    0.000    0.000    0.389    0.097 region_export.py:20(json_text)
+        1    0.001    0.001    0.332    0.332 comfy_evidence.py:402(outputs)
+        1    0.001    0.001    0.318    0.318 workflow_api.py:151(load)
+        5    0.000    0.000    0.296    0.059 evidence.py:28(data)
+        4    0.017    0.004    0.293    0.073 <string>:2(__init__)
+        4    0.000    0.000    0.276    0.069 evidence.py:15(__post_init__)
+        1    0.001    0.001    0.222    0.222 persistent_evidence.py:118(load_evidence)
+        3    0.064    0.021    0.172    0.057 comfy_evidence.py:219(filter_record)
+        1    0.000    0.000    0.169    0.169 comfy_processing.py:153(json_result)
+        1    0.000    0.000    0.123    0.123 comfy_export.py:6(save_result)
+        1    0.001    0.001    0.062    0.062 persistent_evidence.py:11(validate_evidence)
+    33150    0.022    0.000    0.062    0.000 tag_utils.py:50(__contains__)
+        1    0.000    0.000    0.054    0.054 artifact_store.py:215(load)
+  43859/1    0.029    0.000    0.046    0.046 persistent_evidence.py:55(_assets)
+       11    0.004    0.000    0.041    0.004 {built-in method builtins.all}
+    45827    0.023    0.000    0.038    0.000 tag_names.py:6(canonical_tag)
+    32592    0.023    0.000    0.036    0.000 persistent_evidence.py:42(<genexpr>)
+      6/1    0.001    0.000    0.030    0.030 artifact_store.py:202(_verify)
+   186771    0.020    0.000    0.020    0.000 {built-in method builtins.isinstance}
+        8    0.000    0.000    0.019    0.002 artifact_store.py:128(get_blob)
+      193    0.000    0.000    0.017    0.000 tag_names.py:10(parse_tags)
+        4    0.000    0.000    0.017    0.004 tag_utils.py:153(apply_tag_rules)
+      346    0.002    0.000    0.016    0.000 {built-in method fromkeys}
+    99801    0.016    0.000    0.016    0.000 {method 'get' of 'dict' objects}
+        9    0.000    0.000    0.014    0.002 _abc.py:621(read_bytes)
+        1    0.000    0.000    0.014    0.014 workflow_api.py:37(open_store)
+
+

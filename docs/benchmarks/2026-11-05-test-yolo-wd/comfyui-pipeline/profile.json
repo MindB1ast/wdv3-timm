@@ -1,0 +1,18 @@
+{
+  "image": "Wide_shot/0SxBXLP.png",
+  "python": "3.13.12 (main, Feb 12 2026, 00:38:53) [MSC v.1944 64 bit (AMD64)]",
+  "profiled_stage_seconds": {
+    "load": 0.3197896000929177,
+    "filter_tag_sets": 0.4236949000041932,
+    "merge_tag_sets": 0.46786159998737276,
+    "outputs": 0.3430151999928057,
+    "save_result": 0.13360139995347708
+  },
+  "counts": {
+    "labels": 10861,
+    "regions": 2,
+    "decisions": 32571,
+    "accepted_tags": 25
+  },
+  "note": "One cached frame; cProfile adds overhead. No models loaded and no inference called."
+}

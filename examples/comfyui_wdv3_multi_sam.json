@@ -122,7 +122,11 @@
         "",
         "",
         ", ",
-        1
+        1,
+        "reuse",
+        "",
+        "",
+        true
       ]
     },
     {
@@ -339,7 +343,33 @@
       "flags": {},
       "order": 10,
       "mode": 0,
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "child_detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        },
+        {
+          "name": "child_sam_model",
+          "type": "WDV3_SAM_MODEL",
+          "link": null
+        },
+        {
+          "name": "child_sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        },
+        {
+          "name": "local_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        },
+        {
+          "name": "aggregate_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        }
+      ],
       "outputs": [
         {
           "name": "rules",
@@ -368,7 +398,9 @@
         "",
         "",
         "",
-        ""
+        "",
+        "separate",
+        true
       ],
       "title": "person_detail / tag rules"
     },
@@ -437,7 +469,33 @@
       "flags": {},
       "order": 12,
       "mode": 0,
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "child_detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        },
+        {
+          "name": "child_sam_model",
+          "type": "WDV3_SAM_MODEL",
+          "link": null
+        },
+        {
+          "name": "child_sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        },
+        {
+          "name": "local_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        },
+        {
+          "name": "aggregate_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        }
+      ],
       "outputs": [
         {
           "name": "rules",
@@ -466,7 +524,9 @@
         "",
         "",
         "",
-        ""
+        "",
+        "separate",
+        true
       ],
       "title": "person_context / tag rules"
     },
@@ -535,7 +595,33 @@
       "flags": {},
       "order": 14,
       "mode": 0,
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "child_detectors",
+          "type": "WDV3_DETECTORS",
+          "link": null
+        },
+        {
+          "name": "child_sam_model",
+          "type": "WDV3_SAM_MODEL",
+          "link": null
+        },
+        {
+          "name": "child_sources",
+          "type": "WDV3_SAM_SOURCES",
+          "link": null
+        },
+        {
+          "name": "local_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        },
+        {
+          "name": "aggregate_operations",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        }
+      ],
       "outputs": [
         {
           "name": "rules",
@@ -564,7 +650,9 @@
         "",
         "",
         "",
-        ""
+        "",
+        "separate",
+        true
       ],
       "title": "cup / tag rules"
     },

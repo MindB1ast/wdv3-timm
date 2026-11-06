@@ -16,10 +16,17 @@ from .comfy_evidence import formatted_text
 
 
 def make_report(value):
-    if value.kind not in ('results','evidence','regions'): raise ValueError('Inspect expects regions, evidence or results')
+    if value.kind not in ('results','evidence','regions','tag_sets'): raise ValueError('Inspect expects regions, evidence, tag_sets or results')
     data=value.data()
-    return Bundle.pack('report', dict(stage=value.kind, model=data.get('model'), frames=data['frames'],
-                       source_fingerprint=value.fingerprint, schema_version=1))
+    if value.kind == 'tag_sets':
+        from .Scripts.tag_postprocessing import local_decisions
+        for frame in data['frames']:
+            frame['decisions'] = local_decisions(frame)
+    payload = dict(stage=value.kind, model=data.get('model'), frames=data['frames'],
+                   source_fingerprint=value.fingerprint, schema_version=1)
+    if 'postprocessing' in data:
+        payload['postprocessing'] = data['postprocessing']
+    return Bundle.pack('report', payload)
 
 
 def preview_report(report, temp_directory):
@@ -73,8 +80,10 @@ function render(){const query=el('search').value.toLowerCase(),status=el('status
  let items=frame().decisions||Object.entries(frame().detectors||{}).flatMap(([source,rs])=>rs.flatMap(r=>['general','character'].flatMap(category=>Object.entries(r[category]||{}).map(([tag,score])=>({tag,score,category,source,region_id:r.region_id,status:'raw',reason:'raw_evidence'})))));
  items=items.filter(r=>(status==='all'||r.status===status)&&(r.tag+' '+r.source+' '+r.reason).toLowerCase().includes(query)&&(!selected||r.source+':'+r.region_id===selected));
  items.sort((a,b)=>b.score-a.score);page=Math.min(page,Math.max(0,Math.ceil(items.length/50)-1));el('rows').replaceChildren();
- for(const r of items.slice(page*50,(page+1)*50)){const tr=document.createElement('tr');for(const v of [r.tag,r.category,(100*r.score).toFixed(2)+'%',r.source+(r.region_id==null?'':' #'+r.region_id),r.status,r.reason]){const td=document.createElement('td');td.textContent=v;tr.append(td)}tr.onclick=()=>{if(r.region_id!=null){selected=r.source+':'+r.region_id;draw();render()}};el('rows').append(tr)}
+ for(const r of items.slice(page*50,(page+1)*50)){const tr=document.createElement('tr');const causes=(r.postprocessing?.causes||[]).map(c=>c.method+(c.method==='regex'?' ['+c.rule.id+'] '+c.rule.specific+' → '+c.rule.general:'')+': '+c.witness+' → '+r.tag).join('; ');for(const v of [r.tag,r.category,(100*r.score).toFixed(2)+'%',r.source+(r.region_id==null?'':' #'+r.region_id),r.status,r.reason+(causes?' · '+causes:'')]){const td=document.createElement('td');td.textContent=v;tr.append(td)}tr.onclick=()=>{if(r.region_id!=null){selected=r.source+':'+r.region_id;draw();render()}};el('rows').append(tr)}
  el('page').textContent=(page+1)+' / '+Math.max(1,Math.ceil(items.length/50))+' · '+items.length+' records';
+ const record=selected?regions().find(r=>r.key===selected):frame().full_image;
+ el('history').textContent=(record?.postprocessing_history||[]).map(h=>'Operation '+(h.operation_index+1)+'\nBefore: '+Object.keys(h.before).join(', ')+'\nAfter: '+Object.keys(h.after).join(', ')).join('\n\n')+(record?.region_uid?'\nCascade: '+(record.stage_path||[]).join(' / ')+'\nParent: '+record.parent_region_uid+'\nDetector input: '+JSON.stringify(record.detector_input_bbox)+'\nOwn: '+JSON.stringify({general:record.general,character:record.character})+'\nAggregate: '+JSON.stringify(record.aggregate||{})+'\nRouting: '+JSON.stringify(record.route_history||[]):'')+(frame().cascade?'\nExecution: '+JSON.stringify(frame().cascade.report||[]):'');
  el('assets').replaceChildren();for(const r of regions()){const a=document.createElement('a');a.href=r.crop_asset;a.textContent=r.name+' #'+r.region_id+' crop';el('assets').append(a);if(r.mask_asset){const m=document.createElement('a');m.href=r.mask_asset;m.textContent='mask';el('assets').append(m)}}}
 canvas.onclick=e=>{const b=canvas.getBoundingClientRect(),x=(e.clientX-b.left)*canvas.width/b.width,y=(e.clientY-b.top)*canvas.height/b.height;
  const hits=regions().filter(r=>r.bbox[0]<=x&&x<r.bbox[2]&&r.bbox[1]<=y&&y<r.bbox[3]).sort((a,b)=>(a.bbox[2]-a.bbox[0])*(a.bbox[3]-a.bbox[1])-(b.bbox[2]-b.bbox[0])*(b.bbox[3]-b.bbox[1]));selected=hits.length?hits[(hits.findIndex(r=>r.key===selected)+1)%hits.length].key:null;draw();render()};
@@ -115,7 +124,7 @@ def export_report(report, output_directory, prefix='report', save_json=True, sav
         title=escape(prefix)
         html=f'''<!doctype html><html><head><meta charset="utf-8"><title>{title}</title>
 <style>body{{background:#20242c;color:#eee;font:14px sans-serif;max-width:1100px;margin:auto;padding:20px}}canvas{{max-width:100%;max-height:500px}}td,th{{padding:6px;border-bottom:1px solid #555;text-align:left}}button,input,select{{margin:6px;padding:6px}}#assets a{{display:inline-block;margin:8px;color:#8deaff}}</style></head><body>
-<h1>{title}</h1><select id="frame"></select><button id="reset">All regions</button><div><canvas id="image"></canvas></div><pre id="tags"></pre><div id="changes"></div>
+<h1>{title}</h1><select id="frame"></select><button id="reset">All regions</button><div><canvas id="image"></canvas></div><pre id="tags"></pre><pre id="history" style="white-space:pre-wrap"></pre><div id="changes"></div>
 <input id="search" placeholder="Search tag, source or reason"><select id="status"><option value="all">All</option><option value="accepted">Accepted</option><option value="rejected">Rejected</option></select>
 <button id="prev">Previous</button><span id="page"></span><button id="next">Next</button><table><thead><tr><th>Tag</th><th>Category</th><th>Score</th><th>Source</th><th>Status</th><th>Reason</th></tr></thead><tbody id="rows"></tbody></table><div id="assets"></div>
 <script type="application/json" id="report-data">{payload}</script><script>{HTML_SCRIPT}</script></body></html>'''
