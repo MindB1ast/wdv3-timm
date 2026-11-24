@@ -1,5 +1,38 @@
 # Регрессионные проверки
 
+## GitHub Actions
+
+[CI](../.github/workflows/ci.yml) запускается на push в `main` и на pull request
+в `main`. `Python regressions (CPU)` проверяет правила тегов, каскады,
+постобработку, экспорт и два набора эталонных сценариев. `Validate OpenSpec`
+проверяет основные спецификации отдельно. Для этих задач не нужны ComfyUI,
+модельные веса или секреты.
+
+Эквивалентный локальный запуск из корня проекта (Bash, в активном
+окружении Python 3.11, с Node.js 22 для OpenSpec):
+
+```bash
+python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0
+python -m pip install -r requirements.txt
+export HF_HUB_OFFLINE=1 MPLBACKEND=Agg PYTHONIOENCODING=utf-8
+python -B -m unittest \
+  audit.test_saved_region_filters \
+  audit.test_region_filter_outcomes \
+  audit.test_conditional_tags \
+  audit.test_folder_postprocessing \
+  audit.test_comfy_export \
+  audit.test_cascade_tags \
+  audit.test_tag_policies \
+  audit.test_tag_regex
+npx --yes --package=@fission-ai/openspec@1.15.0 -- openspec validate --specs
+```
+
+CI сравнивает результаты на сохранённых данных и не проверяет реальный
+инференс WD/YOLO/SAM. Прогоны сохранённых workflow с реальными моделями
+по-прежнему запускаются вручную, как описано ниже.
+Для побайтовых SHA-256 используйте Git checkout: `.gitattributes` сохраняет
+CRLF у двух исторических JSON-эталонов и на Linux.
+
 Исходная ревизия 2026-10-29: 30 проверок, 18 passed и 12 нарушений.
 Исторические свидетельства остаются в docs/audit/2026-10-29.
 После исправлений исходные 30 контрактов проходят без изменения assertions.

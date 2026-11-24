@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-tests:
+    name: Python regressions (CPU)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      HF_HUB_OFFLINE: "1"
+      MPLBACKEND: Agg
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install CPU test dependencies
+        run: |
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0
+          python -m pip install -r requirements.txt
+      - name: Run regressions without model weights
+        run: >-
+          python -B -m unittest
+          audit.test_saved_region_filters
+          audit.test_region_filter_outcomes
+          audit.test_conditional_tags
+          audit.test_folder_postprocessing
+          audit.test_comfy_export
+          audit.test_cascade_tags
+          audit.test_tag_policies
+          audit.test_tag_regex
+
+  openspec:
+    name: Validate OpenSpec
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate main specifications
+        run: npx --yes --package=@fission-ai/openspec@1.15.0 -- openspec validate --specs

@@ -1,0 +1,3 @@
+# These fixtures have byte-level SHA-256 pins captured with CRLF.
+audit/fixtures/region_filters/workflow.json text eol=crlf
+audit/fixtures/region_filters/1girl_allowed_tags.regions.json text eol=crlf
