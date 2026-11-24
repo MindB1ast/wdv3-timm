@@ -28,9 +28,11 @@ MODEL = io.Custom("WDV3_MODEL")
 
 LITERAL_HELP = (' Буквальные имена: blue eyes = blue_eyes. Список через запятые или переводы строк; '
                 'пробел внутри имени не разделяет теги. Regex-метасимволы здесь буквальные.')
-REGEX_HELP = ('Regex: один Python-шаблон на строку, полное совпадение с именем с _, '
-              'с учётом регистра. Например .*_eyes. Пробелы и запятые сохраняются. '
-              'Обычные теги вводите в отдельное буквальное поле.')
+REGEX_HELP = ('Каждый шаблон пишите с новой строки. Достаточно совпадения с любым шаблоном '
+              'или тегом из соответствующего буквального списка. Проверяется полное имя тега '
+              'с подчёркиваниями и с учётом регистра. .* означает любые символы: '
+              '.*girl.* находит 1girl и 6+girls, .*_eyes находит blue_eyes. '
+              'Пробелы и запятые являются частью шаблона. Пустое поле не добавляет regex-ограничений.')
 
 
 def literal_input(name, **kwargs):
@@ -39,8 +41,43 @@ def literal_input(name, **kwargs):
 
 
 def regex_inputs(fields):
+    labels = {'exclude_from_region': 'require_full_confirmation_regex'}
+    descriptions = {
+        'remove_tags': (
+            'Убрать совпавшие теги из общего caption независимо от того, какой источник их дал. '
+            'Например, .*black.* убирает из итоговой строки black_hair и black_footwear.'),
+        'remove_tags_from_full': (
+            'Доверить мелкие детали вырезкам, если этот источник нашёл хотя бы один регион. '
+            'Например, у детектора головы шаблон hair_flower|.*hairpin не даст полному кадру '
+            'добавить hair_flower в caption. В тегах кадра hair_flower останется; регион '
+            'по своим правилам может добавить flower_hairpin.'),
+        'remove_tags_from_region': (
+            'Убрать из вырезок этого источника семейство тегов, которым от него не стоит доверять. '
+            r'Например, [0-9]+\+?(girls?|boys?) удалит 1girl и 6+girls из регионов лица, '
+            'но оставит smile. Полный кадр и другие источники всё ещё могут дать теги количества в caption.'),
+        'exclude_from_region': (
+            'Сохранить правильное описание вырезки, не перенося его автоматически в общий caption. '
+            'Например, 1(girl|boy) оставит 1girl в вырезке, но этот источник не добавит его в caption, '
+            'если полный кадр не принял именно 1girl. Тег 3girls его не подтверждает. '
+            'Другой источник без ограничения всё ещё может добавить 1girl.'),
+        'only_from_source': (
+            'Поручить семейство тегов специализированному источнику. Например, .*_eyes у детектора '
+            'лица разрешит добавлять blue_eyes в caption только источникам, которые объявили этот тег '
+            'своим. Если ни один из них не принял тег, подмены с полного кадра не будет. '
+            'Локальные теги кадра и регионов не меняются.'),
+        'allowed_tags': (
+            'Оставить в вырезках только теги, ради которых запускался детектор. Например, .*_eyes '
+            'оставит blue_eyes, но исключит smile из его регионов, если smile не разрешён в allowed_tags. '
+            'Новые теги не добавляются; отклонённые теги могут попасть в caption от других источников.'),
+        'full_image_only_tags': (
+            'Закрепить за полным кадром теги, которым нужен контекст всей сцены. '
+            r'Например, [0-9]+\+?(girls?|boys?) уберёт 1girl и 6+girls из всех регионов '
+            'и агрегатов, даже если задан у одного источника. В caption такой тег может попасть '
+            'только с полного кадра, если прошёл его порог.'),
+    }
     return [string_input(field + '_regex', default='', multiline=True,
-                            tooltip=field + ': ' + REGEX_HELP) for field in fields]
+                            display_name=labels.get(field, field + '_regex'),
+                            tooltip=descriptions[field] + ' ' + REGEX_HELP) for field in fields]
 
 
 def progress(done, total):
@@ -106,18 +143,18 @@ class WDRegionRules(io.ComfyNode):
                     io.Float.Input("character_threshold", default=.75, min=0, max=1, step=.01,
                         tooltip='Порог WD для имён персонажей только в регионах этого источника. Это не уверенность детектора и не класс person. Выше — меньше ложных имён.'),
                     literal_input("remove_from_full", default="", multiline=True,
-                        tooltip='Убрать эти теги из вклада полного изображения, если этот источник нашёл хотя бы один регион. Например, перенести определение 1girl на регионы. Другие источники всё ещё могут добавить эти теги.'),
+                         tooltip='Доверить мелкие детали вырезкам, если этот источник нашёл хотя бы один регион. Например, hair_flower останется в тегах полного кадра, но не попадёт в caption с кадра. Регион может добавить тот же тег или предложить более точный.'),
                     literal_input("remove_from_regions", default="", multiline=True,
-                        tooltip='Не принимать эти теги из регионов данного источника. Запятые или переносы строк. Полное изображение и другие источники сохраняют свои теги; удаление побеждает add_to_regions.'),
-                    literal_input("add_to_regions", default="", multiline=True, tooltip='Добавить теги в каждый найденный регион этого источника. Формат: person или person:0.9, через запятую/перенос строки. Без оценки назначается 1.0; это ручная оценка, не уверенность WD. Если регионов нет, ничего не добавится. Ограничения и удаление продолжают действовать.'),
+                         tooltip='Убрать теги, которым не стоит доверять от этого детектора. Например, portrait удалится из вырезок лица и не попадёт в caption от них. Полный кадр и другие источники всё ещё могут добавить его. Удаление имеет приоритет над add_to_regions.'),
+                    literal_input("add_to_regions", default="", multiline=True, tooltip='Превратить факт обнаружения в тег: например, car добавится в каждую вырезку детектора машин, даже если WD его не предсказал. Формат: car или car:0.9; без оценки назначается ручная оценка 1.0. Тег может попасть в caption, если другие правила его не заблокируют.'),
                     literal_input("require_full_confirmation", default="", multiline=True,
-                        tooltip='Принимать перечисленные теги из регионов только если они также прошли порог на полном изображении. Например, full_body не попадёт в итог лишь из-за маленького кропа. Запятые или переносы строк.'),
+                         tooltip='Сохранить правильный тег вырезки, не описывая им автоматически весь кадр. Например, 1girl останется у вырезки с одной девушкой, но этот источник не добавит его в общий caption, если полный кадр не принял именно 1girl. Тег 3girls его не подтверждает. Другие источники без ограничения всё ещё могут добавить 1girl.'),
                     literal_input("only_from_source", default="", multiline=True,
-                        tooltip='Закрепить эти теги за данным источником: полное изображение и источники, не объявившие этот тег своим, не смогут добавить его в итог. Если источник не нашёл/не подтвердил тег, запасного варианта с полного изображения нет.'),
+                         tooltip='Доверить отдельные теги специализированному источнику. Например, blue_eyes у детектора лица попадёт в caption только от источника, который объявил этот тег своим и принял его. Если ни один не принял, подмены с полного кадра не будет. Локальные теги не меняются.'),
                     literal_input("allowed_tags", default="", multiline=True,
-                        tooltip='Разрешить из этого источника только перечисленные теги, включая ручные добавления. Пусто — без такого ограничения. Например, для лица оставьте blue_eyes, smile. Запятые или переносы строк.'),
+                         tooltip='Белый список для самих вырезок: например, blue_eyes, smile оставит в регионах лица только эти теги, если они уже приняты. Остальные не попадут в caption от этого источника. Учитывается также allowed_tags_regex; если оба поля пусты, белый список не применяется.'),
                     literal_input('full_image_only_tags', default=', '.join(sorted(GLOBAL_EXCLUDED_REGION_TAGS)),multiline=True,
-                        tooltip='Эти теги нельзя добавлять из регионов данного источника: они описывают фон и композицию всей картинки. Они могут прийти с полного изображения. Очистите поле, чтобы разрешить их из этого источника.'),
+                         tooltip='Закрепить за полным кадром теги, которым нужен контекст сцены. Например, 1girl исчезнет из всех регионов и их агрегатов, даже если правило задано у одного источника. В caption 1girl может попасть только с полного кадра, если там прошёл порог.'),
                     *regex_inputs(REGEX_RULE_FIELDS),
                     DETECTORS.Input('child_detectors', optional=True, tooltip='Дочерний стек обычных YOLO Detector / Combine YOLO Detectors. Ищет внутри каждого исходного bbox этого источника, без маски или заливки родителя.'),
                     SAM_MODEL.Input('child_sam_model', optional=True, tooltip='Модель дочернего SAM из Load SAM 3.1; подключите вместе с child_sources.'),
@@ -369,7 +406,7 @@ class WDTagFolder(io.ComfyNode):
         return io.Schema(node_id="WDV3TagFolder", display_name="WDV3 Tag Folder", category="WDV3/Batch",
             description="Тегирует изображения из files полным WD и подключёнными YOLO/SAM-источниками. Для каждого изображения формирует общий caption и подробный JSON; при включении сохранения записывает TXT/JSON в выбранную папку. Общие параметры берутся из options.",
             is_output_node=True,
-            inputs=[FILES.Input("files",
+            inputs=[io.Custom("WDV3_POSTPROCESSING").Input("postprocessing", optional=True, tooltip="Упорядоченная цепочка из Postprocessing Config / Load Pipeline Config. После фильтров, до merge и сохранения TXT/JSON."), FILES.Input("files",
                         tooltip='Список файлов из Image Folder. Изображения читаются группами, поэтому папка может содержать картинки разных размеров.'), MODEL.Input("wd_model",
                         tooltip='Модель WD из Load Tagger Model. Она распознаёт теги на полном изображении и вырезанных регионах; YOLO/SAM только находят эти регионы.'), OPTIONS.Input("options",
                         tooltip='Настройки из Tagging Settings или Load Pipeline Config. Задают глобальные пороги WD, формат текста и батчи. В Tag Image / Regions эти настройки задаются только через options; без подключения используются стандартные значения.'),
@@ -393,12 +430,12 @@ class WDTagFolder(io.ComfyNode):
 
     @classmethod
     def execute(cls, files, wd_model, options, save_txt, save_json, output_directory, overwrite,
-                sam_batch_size, detectors=None, sam_model=None, sources=None):
+                sam_batch_size, detectors=None, sam_model=None, sources=None, postprocessing=None):
         if sources and sam_model is None:
             raise ValueError("SAM sources need sam_model")
         tags, details = tag_folder(files, wd_model, options, detectors=detectors, sam_settings=sam_model if sources else None,
             sources=sources, sam_batch_size=sam_batch_size, output_directory=output_directory,
-            save_txt=save_txt, save_json=save_json, overwrite=overwrite, progress=progress)
+            save_txt=save_txt, save_json=save_json, overwrite=overwrite, progress=progress, postprocessing=postprocessing)
         return io.NodeOutput(tags, details)
 
 
@@ -406,10 +443,10 @@ class WDSaveResult(io.ComfyNode):
     @classmethod
     def define_schema(cls):
         return io.Schema(node_id="WDV3SaveResult", display_name="WDV3 Save Result", category="WDV3/Output",
-            description="Сохраняет один выбранный результат из results_json в TXT и/или JSON. result_index выбирает изображение в батче. Необязательный вход tags позволяет записать точный текст того же результата с его форматированием.",
+            description="Сохраняет один выбранный результат в TXT и/или JSON. Для TXT достаточно tags при выключенном save_json. Для JSON или получения текста без tags подключите results_json. result_index выбирает результат в батче.",
             is_output_node=True, is_input_list=True, not_idempotent=True,
-            inputs=[string_input("results_json", force_input=True,
-                        tooltip='Подробные результаты из выхода results_json ноды тегирования, Apply Filters или Merge Results: один JSON на изображение. Подключайте напрямую; это не путь к файлу и не простой список тегов.'),
+            inputs=[string_input("results_json", force_input=True, optional=True,
+                        tooltip='Подробные результаты из выхода results_json ноды тегирования, Apply Filters или Merge Results: один JSON на изображение. Требуется для JSON или TXT без tags. Для TXT из tags можно не подключать.'),
                     string_input("output_directory", default=str(Path(folder_paths.get_output_directory()) / "wdv3"),
                         tooltip='Папка сохранения на машине, где работает ComfyUI; при необходимости создаётся автоматически. Это папка, а не имя файла.'),
                     string_input("filename", default="result",
@@ -422,17 +459,61 @@ class WDSaveResult(io.ComfyNode):
                     io.Boolean.Input("overwrite", default=False,
                         tooltip='Разрешить заменять существующие файлы с теми же именами. Если выключено, при совпадении имён будет ошибка: выберите другое имя или папку.'),
                     string_input("tags", force_input=True, optional=True,
-                        tooltip='Необязательно: tags из той же ноды и ветки, что и results_json. Сохраняет точное форматирование текста, включая пробелы и экранирование скобок. Без подключения текст берётся из JSON.')],
+                        tooltip='Для сохранения только TXT достаточно этого входа; results_json не нужен. Если подключены оба, берите их из одной ветки. Сохраняет точное форматирование текста, включая пробелы и экранирование скобок. Без подключения текст берётся из JSON.')],
             outputs=[io.String.Output("txt_path",
                         tooltip='Полный путь к сохранённому TXT. Пустая строка, если сохранение TXT выключено.'), io.String.Output("json_path",
                         tooltip='Полный путь к сохранённому JSON. Пустая строка, если сохранение JSON выключено.')])
 
     @classmethod
-    def execute(cls, results_json, output_directory, filename, result_index, save_txt, save_json, overwrite, tags=None):
+    def execute(cls, results_json=None, output_directory=None, filename=None, result_index=None, save_txt=None, save_json=None, overwrite=None, tags=None):
         from .comfy_export import save_result
         txt_path, json_path = save_result(results_json, output_directory[0], filename[0],
             result_index=result_index[0], tags=tags, save_txt=save_txt[0], save_json=save_json[0], overwrite=overwrite[0])
         return io.NodeOutput(txt_path, json_path, ui={"text": [f"Saved: {path}" for path in (txt_path, json_path) if path]})
+
+
+class WDSaveRegionResults(io.ComfyNode):
+    @classmethod
+    def define_schema(cls):
+        return io.Schema(node_id='WDV3SaveRegionResults', display_name='WDV3 Save Compact JSON',
+            category='WDV3/Output', is_output_node=True, is_input_list=True, not_idempotent=True,
+            description='Сохраняет компактный JSON с тегами полного кадра, отдельных регионов или обоих. Общую строку тегов, оценки и историю можно добавить отдельно.',
+            inputs=[string_input('results_json', force_input=True, tooltip='Подключите выход results_json ноды тегирования или Merge Tag Sets. Имена принятых тегов учитывают настройку replace_underscores из Tagging Settings.'),
+                string_input('output_directory', default=str(Path(folder_paths.get_output_directory()) / 'wdv3'), tooltip='Папка, в которой появится файл .regions.json.'),
+                string_input('filename', default='result', tooltip='Имя файла без пути и расширения. Например, person создаст person.regions.json.'),
+                io.Int.Input('result_index', default=0, min=-1, max=10000000, tooltip='Выберите изображение по позиции во входном списке. 0 сохраняет первое, 1 — второе, -1 — все в одном файле.'),
+                io.Combo.Input('write_mode', options=['error', 'skip', 'overwrite'], default='error', tooltip='Если файл уже есть, error выдаёт ошибку, skip оставляет файл на месте, overwrite заменяет его.'),
+                io.Boolean.Input('include_full', default=True, tooltip='Добавить раздел full с тегами, принятыми на самом полном кадре.'),
+                io.Boolean.Input('include_scores', default=False, tooltip='Записать оценку рядом с каждым принятым тегом. При выключенной опции сохраняется список имён тегов.'),
+                io.Boolean.Input('include_ratings', default=False, tooltip='Записать оценки всех категорий рейтинга WD, например general: 0.94 и sensitive: 0.05.'),
+                io.Boolean.Input('include_caption', default=False, tooltip='Добавить поле caption с одной итоговой строкой тегов на изображение. Строка уже включает вклад кадра и регионов по правилам объединения. include_full и include_regions управляют отдельными записями в JSON.'),
+                io.Boolean.Input('include_aggregate', default=False, tooltip='Для каскада добавить внутри региона поле aggregate с его тегами после передачи от детей. Например, свои теги тела плюс теги лица, переданные телу. Требуется include_regions.'),
+                io.Boolean.Input('include_history', default=False, tooltip='Добавить причины принятия и отклонения тегов и доступную историю операций. Эта опция может заметно увеличить файл.'),
+                io.Boolean.Input('include_regions', default=True, optional=True, tooltip='Добавить список regions. У каждого региона отдельная запись с тегами, координатами рамки и именем источника.'),
+                io.Boolean.Input('include_general', default=True, optional=True, tooltip='Сохранить принятые общие теги, например shirt и blue_eyes, у выбранных областей. Они также попадут в общий текст, если включён include_caption.'),
+                io.Boolean.Input('include_character', default=True, optional=True, tooltip='Сохранить принятые имена персонажей у выбранных областей. Они также попадут в общий текст, если включён include_caption.'),
+                io.Combo.Input('depth_mode', options=['all', 'exact', 'up_to'], default='all', optional=True,
+                    tooltip='all — все уровни. exact — только depth_level. up_to — уровни от 0 до depth_level включительно. Применяется вместе с include_full и include_regions.'),
+                io.Int.Input('depth_level', default=0, min=0, max=1000000, optional=True,
+                    tooltip='0 — полный кадр, 1 — регионы детекторов на полном кадре, 2 — их дети и так далее. Используется в режимах exact и up_to.')],
+            outputs=[io.String.Output('json_path', tooltip='Путь к файлу компактного JSON.'),
+                     io.String.Output('status', tooltip='Статус записи файла.')])
+
+    @classmethod
+    def execute(cls, results_json, output_directory, filename, result_index, write_mode,
+                include_full, include_scores, include_ratings, include_caption, include_aggregate, include_history,
+                include_regions=None, include_general=None, include_character=None, depth_mode=None, depth_level=None):
+        from .comfy_export import save_region_results
+        path, status = save_region_results(results_json, output_directory[0], filename[0],
+            result_index=result_index[0], write_mode=write_mode[0], include_full=include_full[0],
+            include_scores=include_scores[0], include_ratings=include_ratings[0], include_caption=include_caption[0],
+            include_aggregate=include_aggregate[0], include_history=include_history[0],
+            include_regions=True if include_regions is None else include_regions[0],
+            include_general=True if include_general is None else include_general[0],
+            include_character=True if include_character is None else include_character[0],
+            depth_mode="all" if depth_mode is None else depth_mode[0],
+            depth_level=0 if depth_level is None else depth_level[0])
+        return io.NodeOutput(path, status, ui={'text': [f'{status}: {path}']})
 
 
 class WDPreview(io.ComfyNode):
@@ -597,7 +678,7 @@ class WDLoadConfig(io.ComfyNode):
 
 NODE_CLASSES = [WDTaggingOptions, WDRegionRules, WDYOLODetector, WDSAMLoader, WDSAMSource,
                 WDSAMSegment, WDLoadFolder, WDTagFolder, WDPreview, WDCombineDetectors, WDCombineSAMSources,
-                WDSaveConfig, WDLoadConfig, WDSaveResult]
+                WDSaveConfig, WDLoadConfig, WDSaveResult, WDSaveRegionResults]
 
 from .comfy_pipeline_nodes import NODE_CLASSES as PIPELINE_CLASSES
 NODE_CLASSES += PIPELINE_CLASSES

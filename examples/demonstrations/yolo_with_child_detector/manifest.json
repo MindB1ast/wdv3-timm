@@ -1,0 +1,10 @@
+{
+  "workflow_sha256": "32815d049989e96793a7eb6db92c9879a7912570cb2d567fc93fee15f2db7d1e",
+  "expected_sha256": "adf8987516cd9770234daac13c3ad5ac706ac62c00c9647c9e884e11fed29d07",
+  "input_name": "tag_managing1.png",
+  "image_sha256": "6966291f5df90e6ac85928f3fe78fa46ad1bd44beeaf4a41b80172894ee7efea",
+  "route": "separate",
+  "source": "user saved workflow and TXT",
+  "captured": "2026-11-10",
+  "regional_assertions": false
+}

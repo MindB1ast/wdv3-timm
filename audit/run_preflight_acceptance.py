@@ -69,6 +69,8 @@ def main():
                     inputs[name] = opts['options'][0]
                 elif group == 'required':
                     link(name, kind)
+        if node_id == 'WDV3SaveResult':
+            link('results_json', 'STRING')
         if node_id == 'WDV3Inspect':
             link('results', 'WDV3_RESULTS')
         if node_id == 'WDV3SaveConfig':

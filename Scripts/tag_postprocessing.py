@@ -91,6 +91,8 @@ def _check_cycles(pairs):
 
 def validate_operation(value):
     """Normalize a versioned redundancy operation, without inference or I/O."""
+    if isinstance(value, dict) and value.get('operation') == 'conditional_remove':
+        return validate_conditional(value)
     defaults = dict(schema_version=1, operation='remove_redundant', explicit_enabled=False,
                     textual_enabled=False, relations=[], protected_tags=[], scope='all', sources=[],
                     regex_enabled=False, regex_relations=[])
@@ -266,5 +268,102 @@ def local_decisions(frame):
 def apply_chain(tag_sets: Bundle, operations: list) -> Bundle:
     operations = validate_chain(operations)
     for operation in operations:
-        tag_sets = remove_redundant(tag_sets, operation)
+        function = conditional_remove if operation['operation'] == 'conditional_remove' else remove_redundant
+        tag_sets = function(tag_sets, operation)
     return tag_sets
+
+
+def validate_conditional(value):
+    defaults = dict(schema_version=1, operation='conditional_remove', scope='regions', sources=[], rules=[])
+    if not isinstance(value, dict) or set(value) - defaults.keys():
+        raise ValueError('Unknown conditional_remove fields')
+    op = {**defaults, **deepcopy(value)}
+    if type(op['schema_version']) is not int or op['schema_version'] != 1:
+        raise ValueError('Unsupported conditional_remove schema_version')
+    if op['operation'] != 'conditional_remove' or op['scope'] not in ('full', 'regions', 'all'):
+        raise ValueError('Invalid conditional_remove operation/scope')
+    if not isinstance(op['sources'], list) or any(not isinstance(s, str) or not s.strip() for s in op['sources']):
+        raise ValueError('sources: expected nonempty source names')
+    op['sources'] = sorted(set(s.strip() for s in op['sources']))
+    if not isinstance(op['rules'], list):
+        raise ValueError('rules: expected array')
+    seen, rules = set(), []
+    for index, row in enumerate(op['rules'], 1):
+        label = f'rules {index} ({row.get("id") if isinstance(row, dict) else "?"})'
+        if not isinstance(row, dict) or set(row) - {'id', 'all_of', 'any_of', 'none_of', 'remove'}:
+            raise ValueError(f'{label}: unknown fields')
+        identity = row.get('id')
+        if not isinstance(identity, str) or not identity.strip() or identity in seen:
+            raise ValueError(f'{label}: expected unique nonempty id')
+        seen.add(identity)
+        rule = dict(id=identity)
+        for field in ('all_of', 'any_of', 'none_of', 'remove'):
+            names = row.get(field, [])
+            if not isinstance(names, list) or any(not isinstance(n, str) or not n.strip() or any(c in n for c in ',\r\n') for n in names):
+                raise ValueError(f'{label}.{field}: expected array of literal names')
+            rule[field] = _names(names, field)
+        if not rule['remove'] or not any(rule[f] for f in ('all_of', 'any_of', 'none_of')):
+            raise ValueError(f'{label}: empty action or conditions')
+        if set(rule['all_of']) & set(rule['none_of']) or (rule['any_of'] and set(rule['any_of']) <= set(rule['none_of'])):
+            raise ValueError(f'{label}: contradictory conditions')
+        rules.append(rule)
+    op['rules'] = sorted(rules, key=lambda r: r['id'])
+    return op
+
+
+def conditional_from_fields(rules_json='[]', scope='regions', sources=''):
+    if not isinstance(sources, str):
+        raise ValueError('sources: expected comma/newline separated names')
+    return validate_conditional(dict(rules=json.loads(rules_json), scope=scope,
+        sources=[s.strip() for s in sources.replace('\n', ',').split(',') if s.strip()]))
+
+
+def conditional_remove(tag_sets: Bundle, operation: dict) -> Bundle:
+    if tag_sets.kind != 'tag_sets':
+        raise ValueError('Conditional Tag Rules needs tag_sets')
+    op = validate_conditional(operation)
+    data = tag_sets.data()
+    for frame in data['frames']:
+        unknown = set(op['sources']) - set(frame['detectors'])
+        if unknown:
+            raise ValueError('Unknown postprocessing sources: ' + ', '.join(sorted(unknown)))
+    index = len(data.get('postprocessing', []))
+    for frame in data['frames']:
+        if op['rules'] and frame.get('cascade'):
+            frame['cascade']['routed'] = False
+        records = [('full', None, frame['full_image'])] if op['scope'] in ('all', 'full') else []
+        if op['scope'] in ('all', 'regions'):
+            records += [(s, r['region_id'], r) for s, rows in sorted(frame['detectors'].items())
+                        if not op['sources'] or s in op['sources'] for r in rows]
+        for source, region_id, record in records:
+            if not op['rules']:
+                continue
+            before = {c: deepcopy(record[c]) for c in ('general', 'character')}
+            names = set(before['general']) | set(before['character'])
+            reasons = {}
+            for rule in op['rules']:
+                if not set(rule['all_of']) <= names or (rule['any_of'] and not names.intersection(rule['any_of'])) or names.intersection(rule['none_of']):
+                    continue
+                witnesses = sorted(names.intersection(rule['all_of'] + rule['any_of']))
+                cause = dict(method='conditional', rule=deepcopy(rule), rule_id=rule['id'],
+                             witnesses=witnesses, absent=rule['none_of'], witness=', '.join(witnesses),
+                             evidence={c: {t: before[c][t] for t in witnesses if t in before[c]} for c in before})
+                for tag in names.intersection(rule['remove']):
+                    reasons.setdefault(tag, []).append(cause)
+            removed = []
+            for category in before:
+                for tag in sorted(set(before[category]) & reasons.keys()):
+                    item = dict(tag=tag, category=category, score=record[category].pop(tag),
+                                image_id=frame['image_id'], source=source, region_id=region_id,
+                                operation_index=index, operation_digest=fingerprint(op), causes=deepcopy(reasons[tag]))
+                    removed.append(item)
+                    record.get('provenance', {}).pop(tag, None)
+                    record['decisions'].setdefault(category, {}).setdefault(tag, {}).update(
+                        status='rejected', reason='conditional_remove', postprocessing=deepcopy(item))
+            after = {c: deepcopy(record[c]) for c in before}
+            record.setdefault('postprocessing_history', []).append(dict(operation_index=index,
+                operation=deepcopy(op), input_digest=fingerprint(before), output_digest=fingerprint(after),
+                before=before, after=after, removed=removed))
+            _format(record)
+    data.setdefault('postprocessing', []).append(op)
+    return type(tag_sets).pack('tag_sets', data)

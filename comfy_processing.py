@@ -189,7 +189,9 @@ def scan_folder(directory, recursive, start, limit):
 
 def tag_folder(files, runtime, options, *, detectors=None, sam_settings=None, sources=None,
                sam_batch_size=1, output_directory=None, save_txt=False, save_json=False,
-               overwrite=False, progress=None):
+               overwrite=False, progress=None, postprocessing=None):
+    from .Scripts.tag_postprocessing import validate_chain, apply_chain
+    chain = validate_chain([] if postprocessing is None else postprocessing)
     sam_batch_size = options.get('sam_batch_size', sam_batch_size)
     paths = files["paths"]
     root = Path(files["root"])
@@ -224,17 +226,23 @@ def tag_folder(files, runtime, options, *, detectors=None, sam_settings=None, so
         chunk = paths[start:start + batch_size]
         with ExitStack() as stack:
             frames = [stack.enter_context(file_frame(path)) for path in chunk]
-            from .comfy_evidence import cached_segment,apply_filters,outputs
+            from .comfy_evidence import cached_segment,apply_filters,outputs,collect,filter_tag_sets,merge_tag_sets
             from .comfy_automatic_cache import cached_evidence
             raw=cached_evidence(frames,runtime,options=options,detectors=detectors,sam_model=sam_settings,sources=sources,
                                 image_paths=chunk,dataset_root=root,progress=progress)
             if raw is not None:
-                texts,encoded=outputs(apply_filters(raw,options))
+                texts,encoded=outputs(merge_tag_sets(apply_chain(filter_tag_sets(raw,options),chain)) if chain else apply_filters(raw,options))
                 records=[json.loads(row) for row in encoded]
             else:
                 regions = cached_segment(frames, runtime, sam_settings, sources, sam_batch_size, progress, low_memory_mode=options.get('low_memory_mode',True)) if sam_settings else None
-                texts, records = tag_frames(frames, runtime, detectors=detectors, sam_regions=regions,
-                                           options=options, image_paths=chunk, progress=progress)
+                if chain:
+                    raw = collect(frames, runtime, options=options, detectors=detectors,
+                                  sam_regions=regions, image_paths=chunk, progress=progress)
+                    texts, encoded = outputs(merge_tag_sets(apply_chain(filter_tag_sets(raw, options), chain)))
+                    records = [json.loads(row) for row in encoded]
+                else:
+                    texts, records = tag_frames(frames, runtime, detectors=detectors, sam_regions=regions,
+                                               options=options, image_paths=chunk, progress=progress)
         for offset, (path, text, record) in enumerate(zip(chunk, texts, records)):
             record["image_index"] = start + offset
             encoded = json_result(record)

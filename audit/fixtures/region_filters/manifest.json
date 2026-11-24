@@ -1,0 +1,2422 @@
+{
+  "schema_version": 1,
+  "source_workflow_sha256": "f7d8719ff893a270727ddbfbbb3da39845911a6a5a0abe232faacc10861bdc44",
+  "image": "tachibana arisu, sasaki chie, ichihara nina, sajo yukimi, ryuzaki kaoru, and 1 more (idolmaster and 2 more) drawn by crys_(dai) - faeabf0bb71c18def21e7849db8cd3c0.jpg",
+  "base_rules": {
+    "general_threshold": 0.35,
+    "character_threshold": 0.75,
+    "remove_from_full": "",
+    "remove_from_regions": "",
+    "add_to_regions": "",
+    "require_full_confirmation": "",
+    "only_from_source": "",
+    "allowed_tags": "",
+    "full_image_only_tags": "",
+    "remove_tags_from_full_regex": "",
+    "remove_tags_from_region_regex": "",
+    "exclude_from_region_regex": "",
+    "only_from_source_regex": "",
+    "allowed_tags_regex": "",
+    "full_image_only_tags_regex": "",
+    "child_tag_route": "separate",
+    "tag_enabled": true
+  },
+  "cases": [
+    {
+      "name": "filter_test_default",
+      "overrides": {},
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "filter_test_default.regions.json",
+      "expected_sha256": "576cbb106fd04d49196163f78b4206acf840f8d587528377b3636b648ce693e1",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [],
+        "caption_added": []
+      },
+      "rule_node": 100
+    },
+    {
+      "name": "1girl_remove_from_regions",
+      "overrides": {
+        "remove_from_regions": "1girl"
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "1girl_remove_from_regions.regions.json",
+      "expected_sha256": "d681fe09593ab2266e2d87e3f9045d3392a5e351421f3a282f35322ad140ae93",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [
+              "1girl"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [
+              "1girl"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [
+              "1girl"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [
+              "1girl"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [
+              "1girl"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [
+              "1girl"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "1girl"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 110
+    },
+    {
+      "name": "multiple_girls_remove_from_full",
+      "overrides": {
+        "remove_from_full": "multiple_girls"
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "multiple_girls_remove_from_full.regions.json",
+      "expected_sha256": "c526fc36e26317358e5186c174547c67b5c4f7980db3385fb7bf14c2a611f899",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "multiple girls"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 120
+    },
+    {
+      "name": "test_added_to_regions",
+      "overrides": {
+        "add_to_regions": "test"
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "test_added_to_regions.regions.json",
+      "expected_sha256": "7af75b158b9deef337c36ddd3e33cee064b063c0612f8c7dcf0eadb5364645b5",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [],
+            "added_general": [
+              "test"
+            ],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [],
+            "added_general": [
+              "test"
+            ],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [],
+            "added_general": [
+              "test"
+            ],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [],
+            "added_general": [
+              "test"
+            ],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [],
+            "added_general": [
+              "test"
+            ],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [],
+            "added_general": [
+              "test"
+            ],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [],
+        "caption_added": [
+          "test"
+        ]
+      },
+      "rule_node": 130
+    },
+    {
+      "name": "pigeon-toed_require_full_confirmation",
+      "overrides": {
+        "require_full_confirmation": "pigeon-toed"
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "pigeon-toed_require_full_confirmation.regions.json",
+      "expected_sha256": "4bc7ef8cf698632bce5b7b41923aca3e3e8f0838efdd321ea050f0df76726ced",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "pigeon-toed"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 140
+    },
+    {
+      "name": "height_chart_only_from_source",
+      "overrides": {
+        "only_from_source": "height_chart"
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "height_chart_only_from_source.regions.json",
+      "expected_sha256": "63d4ec61107340ec6511fadd7eb6a71eb1e111a2851473b2dd137c7aaa79a9ed",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "height chart"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 150
+    },
+    {
+      "name": "1girl_allowed_tags",
+      "overrides": {
+        "allowed_tags": "1girl"
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "1girl_allowed_tags.regions.json",
+      "expected_sha256": "67539d5208a870119016253575c6b4aef650677824341b1eb6203e42a31bc981",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [
+              "black eyes",
+              "black footwear",
+              "black hair",
+              "blue skirt",
+              "blush",
+              "closed mouth",
+              "collarbone",
+              "full body",
+              "hair ornament",
+              "hair scrunchie",
+              "kneehighs",
+              "long hair",
+              "long sleeves",
+              "looking at viewer",
+              "mary janes",
+              "pink shirt",
+              "ponytail",
+              "scrunchie",
+              "shirt",
+              "shoes",
+              "skirt",
+              "smile",
+              "socks",
+              "solo",
+              "standing",
+              "white background",
+              "white socks"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [
+              "belt",
+              "black shorts",
+              "blunt bangs",
+              "blush",
+              "bow",
+              "brown eyes",
+              "brown hair",
+              "closed mouth",
+              "collared shirt",
+              "full body",
+              "hair bow",
+              "long hair",
+              "looking at viewer",
+              "pink footwear",
+              "shirt",
+              "shoes",
+              "short shorts",
+              "short sleeves",
+              "shorts",
+              "smile",
+              "socks",
+              "solo",
+              "standing",
+              "striped clothes",
+              "striped socks",
+              "very long hair",
+              "white background",
+              "white shirt"
+            ],
+            "added_general": [],
+            "removed_character": [
+              "ichihara nina"
+            ],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [
+              "blue dress",
+              "blue skirt",
+              "blush",
+              "brown eyes",
+              "brown footwear",
+              "brown hair",
+              "closed mouth",
+              "dot nose",
+              "dress",
+              "full body",
+              "loafers",
+              "long hair",
+              "looking at viewer",
+              "pleated dress",
+              "pleated skirt",
+              "puffy short sleeves",
+              "puffy sleeves",
+              "shirt",
+              "shoes",
+              "short sleeves",
+              "simple background",
+              "skirt",
+              "smile",
+              "socks",
+              "solo",
+              "standing",
+              "white background",
+              "white socks"
+            ],
+            "added_general": [],
+            "removed_character": [
+              "tachibana arisu"
+            ],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [
+              "black footwear",
+              "black skirt",
+              "black thighhighs",
+              "blue hair",
+              "blush",
+              "closed mouth",
+              "collared shirt",
+              "frilled skirt",
+              "frills",
+              "full body",
+              "high-waist skirt",
+              "juliet sleeves",
+              "long hair",
+              "long sleeves",
+              "looking at viewer",
+              "mary janes",
+              "neck ribbon",
+              "pigeon-toed",
+              "puffy sleeves",
+              "red eyes",
+              "red ribbon",
+              "ribbon",
+              "shirt",
+              "shoes",
+              "simple background",
+              "skirt",
+              "smile",
+              "solo",
+              "standing",
+              "thighhighs",
+              "very long hair",
+              "white background",
+              "white shirt",
+              "wide sleeves"
+            ],
+            "added_general": [],
+            "removed_character": [
+              "sajo yukimi"
+            ],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [
+              "black hair",
+              "blue cardigan",
+              "blue jacket",
+              "blush",
+              "brown eyes",
+              "cardigan",
+              "closed mouth",
+              "dress",
+              "full body",
+              "hair ornament",
+              "hairclip",
+              "jacket",
+              "long sleeves",
+              "looking at viewer",
+              "mary janes",
+              "pink dress",
+              "rabbit hair ornament",
+              "red footwear",
+              "shoes",
+              "short hair",
+              "smile",
+              "solo",
+              "standing",
+              "white background"
+            ],
+            "added_general": [],
+            "removed_character": [
+              "sasaki chie"
+            ],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [
+              "arms at sides",
+              "bare arms",
+              "bare shoulders",
+              "blue shorts",
+              "camisole",
+              "closed mouth",
+              "collarbone",
+              "denim",
+              "denim shorts",
+              "facing viewer",
+              "flat chest",
+              "full body",
+              "head out of frame",
+              "red footwear",
+              "shoes",
+              "short hair",
+              "short shorts",
+              "shorts",
+              "simple background",
+              "smile",
+              "sneakers",
+              "socks",
+              "solo",
+              "spaghetti strap",
+              "standing",
+              "straight-on",
+              "white background",
+              "white socks",
+              "yellow camisole"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "arms at sides",
+          "bare arms",
+          "bare shoulders",
+          "belt",
+          "black footwear",
+          "black shorts",
+          "black thighhighs",
+          "blue cardigan",
+          "blue dress",
+          "cardigan",
+          "collarbone",
+          "collared shirt",
+          "denim",
+          "denim shorts",
+          "dot nose",
+          "facing viewer",
+          "flat chest",
+          "frilled skirt",
+          "frills",
+          "hair bow",
+          "hair scrunchie",
+          "head out of frame",
+          "high-waist skirt",
+          "juliet sleeves",
+          "loafers",
+          "pigeon-toed",
+          "pleated dress",
+          "puffy short sleeves",
+          "puffy sleeves",
+          "rabbit hair ornament",
+          "red ribbon",
+          "scrunchie",
+          "short shorts",
+          "simple background",
+          "sneakers",
+          "solo",
+          "spaghetti strap",
+          "straight-on",
+          "striped clothes",
+          "striped socks",
+          "very long hair",
+          "white background",
+          "wide sleeves",
+          "yellow camisole"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 160
+    },
+    {
+      "name": "1girl_full_region_tags_only",
+      "overrides": {
+        "full_image_only_tags": "1girl"
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "1girl_full_region_tags_only.regions.json",
+      "expected_sha256": "d681fe09593ab2266e2d87e3f9045d3392a5e351421f3a282f35322ad140ae93",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [
+              "1girl"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [
+              "1girl"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [
+              "1girl"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [
+              "1girl"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [
+              "1girl"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [
+              "1girl"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "1girl"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 170
+    },
+    {
+      "name": "black_remove_from_region_regex",
+      "overrides": {
+        "remove_tags_from_region_regex": ".*black.*"
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "black_remove_from_region_regex.regions.json",
+      "expected_sha256": "6cb3ec3bd28a25e90d68c02fffd2cdf3e1604140263b2c81dd6b23fd9997960f",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [
+              "black eyes",
+              "black footwear",
+              "black hair"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [
+              "black shorts"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [
+              "black footwear",
+              "black skirt",
+              "black thighhighs"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [
+              "black hair"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "black footwear",
+          "black shorts",
+          "black thighhighs"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 180
+    },
+    {
+      "name": "girl_regex_remove_from_full",
+      "overrides": {
+        "remove_tags_from_full_regex": ".*girls?"
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "girl_regex_remove_from_full.regions.json",
+      "expected_sha256": "426a84db22fa34d9dfaa3f44881aa68274afad8f34dae322150e8fcd277af3ad",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "6+girls",
+          "multiple girls"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 190
+    },
+    {
+      "name": "pigeon_require_full_confirmation_regex",
+      "overrides": {
+        "exclude_from_region_regex": ".*pigeon.*"
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "pigeon_require_full_confirmation_regex.regions.json",
+      "expected_sha256": "4bc7ef8cf698632bce5b7b41923aca3e3e8f0838efdd321ea050f0df76726ced",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "pigeon-toed"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 200
+    },
+    {
+      "name": "girl_only_from_source_regex",
+      "overrides": {
+        "only_from_source_regex": ".*girl.*"
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "girl_only_from_source_regex.regions.json",
+      "expected_sha256": "426a84db22fa34d9dfaa3f44881aa68274afad8f34dae322150e8fcd277af3ad",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "6+girls",
+          "multiple girls"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 210
+    },
+    {
+      "name": "eye_allowed_tags_regex",
+      "overrides": {
+        "allowed_tags_regex": ".*eye.*"
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "eye_allowed_tags_regex.regions.json",
+      "expected_sha256": "87329dc6b2eb4d534d00d75a23c08411e00eae1d264def52741c8fc12f75f26a",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [
+              "1girl",
+              "black footwear",
+              "black hair",
+              "blue skirt",
+              "blush",
+              "closed mouth",
+              "collarbone",
+              "full body",
+              "hair ornament",
+              "hair scrunchie",
+              "kneehighs",
+              "long hair",
+              "long sleeves",
+              "looking at viewer",
+              "mary janes",
+              "pink shirt",
+              "ponytail",
+              "scrunchie",
+              "shirt",
+              "shoes",
+              "skirt",
+              "smile",
+              "socks",
+              "solo",
+              "standing",
+              "white background",
+              "white socks"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [
+              "1girl",
+              "belt",
+              "black shorts",
+              "blunt bangs",
+              "blush",
+              "bow",
+              "brown hair",
+              "closed mouth",
+              "collared shirt",
+              "full body",
+              "hair bow",
+              "long hair",
+              "looking at viewer",
+              "pink footwear",
+              "shirt",
+              "shoes",
+              "short shorts",
+              "short sleeves",
+              "shorts",
+              "smile",
+              "socks",
+              "solo",
+              "standing",
+              "striped clothes",
+              "striped socks",
+              "very long hair",
+              "white background",
+              "white shirt"
+            ],
+            "added_general": [],
+            "removed_character": [
+              "ichihara nina"
+            ],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [
+              "1girl",
+              "blue dress",
+              "blue skirt",
+              "blush",
+              "brown footwear",
+              "brown hair",
+              "closed mouth",
+              "dot nose",
+              "dress",
+              "full body",
+              "loafers",
+              "long hair",
+              "looking at viewer",
+              "pleated dress",
+              "pleated skirt",
+              "puffy short sleeves",
+              "puffy sleeves",
+              "shirt",
+              "shoes",
+              "short sleeves",
+              "simple background",
+              "skirt",
+              "smile",
+              "socks",
+              "solo",
+              "standing",
+              "white background",
+              "white socks"
+            ],
+            "added_general": [],
+            "removed_character": [
+              "tachibana arisu"
+            ],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [
+              "1girl",
+              "black footwear",
+              "black skirt",
+              "black thighhighs",
+              "blue hair",
+              "blush",
+              "closed mouth",
+              "collared shirt",
+              "frilled skirt",
+              "frills",
+              "full body",
+              "high-waist skirt",
+              "juliet sleeves",
+              "long hair",
+              "long sleeves",
+              "looking at viewer",
+              "mary janes",
+              "neck ribbon",
+              "pigeon-toed",
+              "puffy sleeves",
+              "red ribbon",
+              "ribbon",
+              "shirt",
+              "shoes",
+              "simple background",
+              "skirt",
+              "smile",
+              "solo",
+              "standing",
+              "thighhighs",
+              "very long hair",
+              "white background",
+              "white shirt",
+              "wide sleeves"
+            ],
+            "added_general": [],
+            "removed_character": [
+              "sajo yukimi"
+            ],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [
+              "1girl",
+              "black hair",
+              "blue cardigan",
+              "blue jacket",
+              "blush",
+              "cardigan",
+              "closed mouth",
+              "dress",
+              "full body",
+              "hair ornament",
+              "hairclip",
+              "jacket",
+              "long sleeves",
+              "looking at viewer",
+              "mary janes",
+              "pink dress",
+              "rabbit hair ornament",
+              "red footwear",
+              "shoes",
+              "short hair",
+              "smile",
+              "solo",
+              "standing",
+              "white background"
+            ],
+            "added_general": [],
+            "removed_character": [
+              "sasaki chie"
+            ],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [
+              "1girl",
+              "arms at sides",
+              "bare arms",
+              "bare shoulders",
+              "blue shorts",
+              "camisole",
+              "closed mouth",
+              "collarbone",
+              "denim",
+              "denim shorts",
+              "facing viewer",
+              "flat chest",
+              "full body",
+              "head out of frame",
+              "red footwear",
+              "shoes",
+              "short hair",
+              "short shorts",
+              "shorts",
+              "simple background",
+              "smile",
+              "sneakers",
+              "socks",
+              "solo",
+              "spaghetti strap",
+              "standing",
+              "straight-on",
+              "white background",
+              "white socks",
+              "yellow camisole"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "1girl",
+          "arms at sides",
+          "bare arms",
+          "bare shoulders",
+          "belt",
+          "black footwear",
+          "black shorts",
+          "black thighhighs",
+          "blue cardigan",
+          "blue dress",
+          "cardigan",
+          "collarbone",
+          "collared shirt",
+          "denim",
+          "denim shorts",
+          "dot nose",
+          "facing viewer",
+          "flat chest",
+          "frilled skirt",
+          "frills",
+          "hair bow",
+          "hair scrunchie",
+          "head out of frame",
+          "high-waist skirt",
+          "juliet sleeves",
+          "loafers",
+          "pigeon-toed",
+          "pleated dress",
+          "puffy short sleeves",
+          "puffy sleeves",
+          "rabbit hair ornament",
+          "red ribbon",
+          "scrunchie",
+          "short shorts",
+          "simple background",
+          "sneakers",
+          "solo",
+          "spaghetti strap",
+          "straight-on",
+          "striped clothes",
+          "striped socks",
+          "very long hair",
+          "white background",
+          "wide sleeves",
+          "yellow camisole"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 220
+    },
+    {
+      "name": "ornament_full_image_only_tags_regex",
+      "overrides": {
+        "full_image_only_tags_regex": ".*ornament.*"
+      },
+      "settings_origin": "verified_in_comfyui_execution_history",
+      "expected": "ornament_full_image_only_tags_regex.regions.json",
+      "expected_sha256": "dc2790911343604770efdf7bc26b9ed43d3965df57cc955f61d0a8c5bf857aca",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [
+              "hair ornament"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [
+              "hair ornament",
+              "rabbit hair ornament"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "rabbit hair ornament"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 230
+    },
+    {
+      "name": "1_general_treshold",
+      "overrides": {
+        "general_threshold": 1.0
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "1_general_treshold.regions.json",
+      "expected_sha256": "d1bf73d88d8d3f1fa13912748e91a8b9d94ad95ee39c4a5eb0b03b4d9827171a",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [
+              "1girl",
+              "black eyes",
+              "black footwear",
+              "black hair",
+              "blue skirt",
+              "blush",
+              "closed mouth",
+              "collarbone",
+              "full body",
+              "hair ornament",
+              "hair scrunchie",
+              "kneehighs",
+              "long hair",
+              "long sleeves",
+              "looking at viewer",
+              "mary janes",
+              "pink shirt",
+              "ponytail",
+              "scrunchie",
+              "shirt",
+              "shoes",
+              "skirt",
+              "smile",
+              "socks",
+              "solo",
+              "standing",
+              "white background",
+              "white socks"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [
+              "1girl",
+              "belt",
+              "black shorts",
+              "blunt bangs",
+              "blush",
+              "bow",
+              "brown eyes",
+              "brown hair",
+              "closed mouth",
+              "collared shirt",
+              "full body",
+              "hair bow",
+              "long hair",
+              "looking at viewer",
+              "pink footwear",
+              "shirt",
+              "shoes",
+              "short shorts",
+              "short sleeves",
+              "shorts",
+              "smile",
+              "socks",
+              "solo",
+              "standing",
+              "striped clothes",
+              "striped socks",
+              "very long hair",
+              "white background",
+              "white shirt"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [
+              "1girl",
+              "blue dress",
+              "blue skirt",
+              "blush",
+              "brown eyes",
+              "brown footwear",
+              "brown hair",
+              "closed mouth",
+              "dot nose",
+              "dress",
+              "full body",
+              "loafers",
+              "long hair",
+              "looking at viewer",
+              "pleated dress",
+              "pleated skirt",
+              "puffy short sleeves",
+              "puffy sleeves",
+              "shirt",
+              "shoes",
+              "short sleeves",
+              "simple background",
+              "skirt",
+              "smile",
+              "socks",
+              "solo",
+              "standing",
+              "white background",
+              "white socks"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [
+              "1girl",
+              "black footwear",
+              "black skirt",
+              "black thighhighs",
+              "blue hair",
+              "blush",
+              "closed mouth",
+              "collared shirt",
+              "frilled skirt",
+              "frills",
+              "full body",
+              "high-waist skirt",
+              "juliet sleeves",
+              "long hair",
+              "long sleeves",
+              "looking at viewer",
+              "mary janes",
+              "neck ribbon",
+              "pigeon-toed",
+              "puffy sleeves",
+              "red eyes",
+              "red ribbon",
+              "ribbon",
+              "shirt",
+              "shoes",
+              "simple background",
+              "skirt",
+              "smile",
+              "solo",
+              "standing",
+              "thighhighs",
+              "very long hair",
+              "white background",
+              "white shirt",
+              "wide sleeves"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [
+              "1girl",
+              "black hair",
+              "blue cardigan",
+              "blue jacket",
+              "blush",
+              "brown eyes",
+              "cardigan",
+              "closed mouth",
+              "dress",
+              "full body",
+              "hair ornament",
+              "hairclip",
+              "jacket",
+              "long sleeves",
+              "looking at viewer",
+              "mary janes",
+              "pink dress",
+              "rabbit hair ornament",
+              "red footwear",
+              "shoes",
+              "short hair",
+              "smile",
+              "solo",
+              "standing",
+              "white background"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [
+              "1girl",
+              "arms at sides",
+              "bare arms",
+              "bare shoulders",
+              "blue shorts",
+              "camisole",
+              "closed mouth",
+              "collarbone",
+              "denim",
+              "denim shorts",
+              "facing viewer",
+              "flat chest",
+              "full body",
+              "head out of frame",
+              "red footwear",
+              "shoes",
+              "short hair",
+              "short shorts",
+              "shorts",
+              "simple background",
+              "smile",
+              "sneakers",
+              "socks",
+              "solo",
+              "spaghetti strap",
+              "standing",
+              "straight-on",
+              "white background",
+              "white socks",
+              "yellow camisole"
+            ],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [
+          "1girl",
+          "arms at sides",
+          "bare arms",
+          "bare shoulders",
+          "belt",
+          "black footwear",
+          "black shorts",
+          "black thighhighs",
+          "blue cardigan",
+          "blue dress",
+          "cardigan",
+          "collarbone",
+          "collared shirt",
+          "denim",
+          "denim shorts",
+          "dot nose",
+          "facing viewer",
+          "flat chest",
+          "frilled skirt",
+          "frills",
+          "hair bow",
+          "hair scrunchie",
+          "head out of frame",
+          "high-waist skirt",
+          "juliet sleeves",
+          "loafers",
+          "pigeon-toed",
+          "pleated dress",
+          "puffy short sleeves",
+          "puffy sleeves",
+          "rabbit hair ornament",
+          "red ribbon",
+          "scrunchie",
+          "short shorts",
+          "simple background",
+          "sneakers",
+          "solo",
+          "spaghetti strap",
+          "straight-on",
+          "striped clothes",
+          "striped socks",
+          "very long hair",
+          "white background",
+          "wide sleeves",
+          "yellow camisole"
+        ],
+        "caption_added": []
+      },
+      "rule_node": 240
+    },
+    {
+      "name": "1_character_treshold",
+      "overrides": {
+        "character_threshold": 1.0
+      },
+      "settings_origin": "reconstructed_from_filename_and_result",
+      "expected": "1_character_treshold.regions.json",
+      "expected_sha256": "67023a87563f9c8238b12afcb39edaccea6689aef099bbd5bf864fc61de75158",
+      "expected_changes": {
+        "regions": [
+          {
+            "source": "person",
+            "region_id": 0,
+            "bbox": [
+              1400.15087890625,
+              493.0608825683594,
+              2026.056884765625,
+              2187.528564453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 1,
+            "bbox": [
+              214.49609375,
+              571.0908813476562,
+              713.9866333007812,
+              2195.0830078125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [
+              "ichihara nina"
+            ],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 2,
+            "bbox": [
+              3301.498046875,
+              431.21759033203125,
+              3827.110107421875,
+              2201.83447265625
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [
+              "tachibana arisu"
+            ],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 3,
+            "bbox": [
+              2079.92822265625,
+              488.4195556640625,
+              2644.489013671875,
+              2181.200927734375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [
+              "sajo yukimi"
+            ],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 4,
+            "bbox": [
+              2724.125,
+              455.87579345703125,
+              3234.658935546875,
+              2184.16064453125
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [
+              "sasaki chie"
+            ],
+            "added_character": []
+          },
+          {
+            "source": "person",
+            "region_id": 5,
+            "bbox": [
+              769.9140014648438,
+              860.5385131835938,
+              1381.56689453125,
+              2186.787109375
+            ],
+            "removed_general": [],
+            "added_general": [],
+            "removed_character": [],
+            "added_character": []
+          }
+        ],
+        "caption_removed": [],
+        "caption_added": []
+      },
+      "rule_node": 250
+    }
+  ],
+  "uncovered": [],
+  "image_sha256": "9eb6851e7e8bbaf11b21fdf92a54d47cf2a44b873e6afdadce6742df66519d3f",
+  "evidence_sha256": "7f8ccfeaf10df7ef8bca4d19b0df42f9746f7c1dd716580d2d8299e5e56f5e93",
+  "evidence_omits_pixels": true,
+  "options": {
+    "general_threshold": 0.35,
+    "character_threshold": 0.75,
+    "image_batch_size": 2,
+    "region_batch_size": 8,
+    "replace_underscores": true,
+    "escape_parentheses": true,
+    "remove_tags": "",
+    "prefix_tags": "",
+    "suffix_tags": "",
+    "remove_tags_regex": "",
+    "tag_separator": ", ",
+    "sam_batch_size": 1,
+    "cache_mode": "off",
+    "cache_dataset_root": "",
+    "cache_refresh": "",
+    "low_memory_mode": true
+  },
+  "workflow_sha256": "25f59b0c26688cf90022282ba62df91d0ec5f18e567c559fec34bb506cd72dfc"
+}

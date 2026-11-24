@@ -529,3 +529,64 @@ Filter Tag Sets → операции → Merge Tag Sets маршрутизаци
 Примеры: comfyui_wdv3_cascade_separate.json и comfyui_wdv3_cascade_merge.json.
 eyes.pt в примерах заменяется вашей локальной моделью глаз.
 Подробности: [cascaded-regions.md](cascaded-regions.md).
+
+
+### Conditional Tag Rules
+
+Пример `examples/comfyui_wdv3_conditional_tags.json`:
+Filter Tag Sets → Conditional Tag Rules → Merge Tag Sets → Inspect.
+В `rules_json` задано apron → remove dress, scope=regions, sources=clothes.
+Каждый регион проверяется отдельно до merge. Dress из другого разрешённого
+региона или полного кадра может сохраниться в общем caption: это локальная
+очистка, а не глобальный запрет. Inspect показывает before/after и все причины.
+Для отката обойдите ноду (Filter Tag Sets → Merge Tag Sets) либо задайте `[]`.
+Условия можно менять на сохранённых evidence без повторной загрузки моделей.
+JSON и Python API используют одинаковую схему без frontend callbacks.
+
+
+### Постобработка папки за один запуск
+
+Подключите Postprocessing Config.postprocessing к Tag Folder.postprocessing.
+В JSON задаётся массив операций в порядке выполнения; пример с двумя операциями:
+`examples/comfyui_wdv3_folder_postprocessing.json`. Load Pipeline Config также
+выдаёт совместимую цепочку. После распознавания/кэша Tag Folder выполняет локальные
+фильтры → цепочку → merge → сохранение TXT/JSON. Импорт не требуется.
+У каждой операции собственный scope: full — только набор полного кадра,
+regions — каждый регион отдельно, all — оба. Sources выбирает имена региональных
+источников; пустой список означает все. All не объединяет свидетельства из разных
+регионов. Внутри conditional_remove строки читают один снимок; следующая операция
+цепочки получает уже изменённые теги. Пустая цепочка сохраняет прежнее поведение.
+
+
+### Сохранить только TXT
+
+Пример `examples/comfyui_wdv3_save_txt_only.json`: загрузите изображение, выберите
+модель, подключите Tag Image / Regions.tags → Save Result.tags. У Save Result
+save_txt=true, save_json=false; results_json оставьте свободным. Файл содержит
+точную строку tags выбранного result_index. Для JSON включите save_json и подключите
+results_json; для TXT без tags подключите results_json. При сохранении обоих
+форматов берите оба выхода из одной ветки. overwrite разрешает замену старого файла.
+
+
+### Компактный JSON регионов
+
+Подключите `results_json` к **WDV3 Save Region Results**. Файл
+`<filename>.regions.json` содержит массив `images` с тегами полного кадра,
+отдельными регионами, их bbox, источниками и доступными связями каскада.
+По умолчанию категории хранятся списками имён. `include_scores` заменяет списки
+словарями оценок; рейтинги, итоговый caption, агрегаты и история включаются отдельно.
+`include_full` и `include_regions` независимо включают полный кадр и регионы.
+`include_general` / `include_character` выбирают категории принятых тегов, в том
+числе для опционального caption. При включённой истории в ней остаются сведения
+об отклонённых тегах. `result_index` выбирает изображение (0 — первое, 1 — второе,
+-1 — все); номера регионов он не меняет. `write_mode` выбирает ошибку, пропуск или замену.
+Для масок используйте Inspect → Export Report.
+
+Демонстрация: `examples/comfyui_wdv3_save_region_results.json`.
+Проверка: `python -m unittest audit.test_comfy_export`; для реальной схемы и API
+запустите `audit/run_save_txt_acceptance.py --comfy-root <ComfyUI>` из окружения ComfyUI.
+
+В раздельном графе подключите Tagging Settings.options к Apply Filters.options
+(или Filter Tag Sets.options), чтобы настройки форматирования попали в results_json.
+Save Region Results по умолчанию заменяет подчёркивания пробелами, как caption.
+Чтобы сохранить подчёркивания, передайте replace_underscores=false.

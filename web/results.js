@@ -40,10 +40,16 @@ function regionCanvas(row, regions, pick) {
     };
     const drawBox = (region, active) => {
         const [x1, y1, x2, y2] = region.bbox;
-        context.strokeStyle = active ? "#00ddff" : "rgba(255,255,255,.7)";
-        context.lineWidth = active ? 3 : 1;
-        context.strokeRect(x1 * canvas.width / width, y1 * canvas.height / height,
-            (x2 - x1) * canvas.width / width, (y2 - y1) * canvas.height / height);
+        const box = [x1 * canvas.width / width, y1 * canvas.height / height,
+            (x2 - x1) * canvas.width / width, (y2 - y1) * canvas.height / height];
+        const scale = canvas.width / (canvas.clientWidth || canvas.width);
+        const thickness = active ? 4 : 2.5;
+        context.strokeStyle = "#101014";
+        context.lineWidth = (thickness + 4) * scale;
+        context.strokeRect(...box);
+        context.strokeStyle = active ? "#00ddff" : "#fff";
+        context.lineWidth = thickness * scale;
+        context.strokeRect(...box);
         if (active) {
             context.font = "14px sans-serif";
             const labelWidth = context.measureText(region.name).width + 8;
@@ -138,7 +144,9 @@ function regionCanvas(row, regions, pick) {
         const next = index < 0 ? (offset > 0 ? 0 : regions.length - 1) : (index + offset + regions.length) % regions.length;
         pick(regions[next].option);
     });
-    return {element: wrapper, resetClicks() { lastClick = null; }, select(region, all) {
+    const resizeObserver = new ResizeObserver(draw);
+    resizeObserver.observe(canvas);
+    return {element: wrapper, dispose() { resizeObserver.disconnect(); }, resetClicks() { lastClick = null; }, select(region, all) {
         selected = region;
         const label = region ? `Selected region: ${region.name}` : all ? "All regions" : "Full image";
         status.textContent = label; canvas.setAttribute("aria-label", label); draw();
@@ -161,6 +169,12 @@ app.registerExtension({
             repairPreviewLimit(this);
             return result;
         };
+        const removed = nodeType.prototype.onRemoved;
+        nodeType.prototype.onRemoved = function () {
+            this.wdv3ImageView?.dispose();
+            this.wdv3ImageView = undefined;
+            return removed?.apply(this, arguments);
+        };
         const previous = nodeType.prototype.onExecuted;
         nodeType.prototype.onExecuted = function (message) {
             previous?.apply(this, arguments);
@@ -172,6 +186,8 @@ app.registerExtension({
                 this.setSize([Math.max(inspect ? 660 : 500, this.size[0]), Math.max(inspect ? 1100 : 720, this.size[1])]);
             }
             const panel = this.wdv3Panel;
+            this.wdv3ImageView?.dispose();
+            this.wdv3ImageView = undefined;
             panel.replaceChildren();
             const rows = message.wdv3_results || [];
             const total = message.wdv3_total?.[0] ?? rows.length;
@@ -191,6 +207,8 @@ app.registerExtension({
             const render = () => {
                 const row = rows[Number(imageChoice.value)];
                 const detail = row.detail;
+                this.wdv3ImageView?.dispose();
+                this.wdv3ImageView = undefined;
                 content.replaceChildren();
                 if (detail.model) {
                     const model=element("div",`${detail.model.model_id} · ${detail.model.device || ""} · ${(detail.image_size || []).join(" × ")}`);
@@ -254,8 +272,8 @@ app.registerExtension({
                         const container = element('details');
                         container.append(element('summary', 'Postprocessing: before / after'));
                         for (const entry of history) {
-                            const before = Object.keys(entry.before).join(', ');
-                            const after = Object.keys(entry.after).join(', ');
+                            const before = JSON.stringify(entry.before);
+                            const after = JSON.stringify(entry.after);
                             const block = element('pre', `Operation ${entry.operation_index + 1}\nBefore: ${before}\nAfter: ${after}`);
                             block.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere';
                             container.append(block);
@@ -289,7 +307,7 @@ app.registerExtension({
                             for(const record of filtered.slice(page*50,(page+1)*50)){
                                 const tr=element("tr");
                                 const rules=[...(record.matched_rules||[]).map(r=>`${r.source}.${r.action}: ${r.pattern}`),
-                                    ...(record.postprocessing?.causes||[]).map(c=>`${c.method}${c.method === 'regex' ? ` [${c.rule.id}] ${c.rule.specific} → ${c.rule.general}` : ''}: ${c.witness} → ${record.tag}`)].join("; ");
+                                    ...(record.postprocessing?.causes||[]).map(c=>`${c.method}${c.method === 'conditional' ? ` [${c.rule_id}] ALL=${c.rule.all_of} ANY=${c.rule.any_of} NONE=${c.absent}` : ''}${c.method === 'regex' ? ` [${c.rule.id}] ${c.rule.specific} → ${c.rule.general}` : ''}: ${c.witness} → ${record.tag}`)].join("; ");
                                 for(const value of [record.tag,`${(100*record.score).toFixed(2)}%`,record.source,`${record.status}: ${record.reason}${rules ? " · "+rules : ""}`])tr.append(element("td",value));
                                 if(record.region_id!==undefined&&record.region_id!==null)tr.onclick=()=>{
                                     const region=regions.find(r=>r.key===`${record.source}:${record.region_id}`);
@@ -362,7 +380,7 @@ app.registerExtension({
                 };
                 source.onchange = () => { imageView?.resetClicks(); update(); };
                 if (row.image) {
-                    imageView = regionCanvas(row, regions, option => { source.value = String(option); update(); });
+                    imageView = this.wdv3ImageView = regionCanvas(row, regions, option => { source.value = String(option); update(); });
                     content.append(imageView.element);
                 }
                 content.append(source, text, copy, download, scores); update();

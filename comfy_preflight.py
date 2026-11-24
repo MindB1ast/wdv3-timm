@@ -133,6 +133,12 @@ def validate_preflight(node_id, schema, input_types=None, values=None):
             _sam_pair(roots)
         if node_id == 'WDV3Inspect' and len(roots & {'results', 'evidence', 'regions', 'tag_sets'}) != 1:
             raise ValueError('Inspect: подключите ровно один вход — results, evidence, regions или tag_sets.')
+        if node_id == 'WDV3SaveResult':
+            txt, js = known.get('save_txt'), known.get('save_json')
+            if txt is False and js is False:
+                raise ValueError('Enable save_txt or save_json')
+            if (js is True or (txt is True and 'tags' not in roots)) and 'results_json' not in roots:
+                raise ValueError('Connect results_json to save JSON or TXT without tags')
         if node_id == 'WDV3SaveConfig' and not roots & {'options', 'detectors', 'sources', 'sam_model', 'postprocessing','calculation_store','inference','caption_read','caption_edit','caption_export'}:
             raise ValueError('Save Pipeline Config: подключите хотя бы один набор настроек.')
         if node_id in ('WDV3CombineDetectors', 'WDV3CombineSAMSources') and not connected:
@@ -150,7 +156,7 @@ def validate_preflight(node_id, schema, input_types=None, values=None):
                     raise ValueError('output_directory: укажите каталог сохранения.')
                 if Path(directory).exists() and not Path(directory).is_dir():
                     raise ValueError('output_directory: указан файл вместо папки.')
-        if node_id == 'WDV3SaveResult' and 'filename' in known:
+        if node_id in ('WDV3SaveResult', 'WDV3SaveRegionResults') and 'filename' in known:
             _filename(known['filename'].strip(), 'filename')
         if node_id == 'WDV3SaveConfig' and 'preset_name' in known:
             _filename(known['preset_name'].strip(), 'preset_name', max_length=80)
@@ -184,6 +190,9 @@ def validate_preflight(node_id, schema, input_types=None, values=None):
         if node_id == 'WDV3RemoveRedundantTags':
             from .Scripts.tag_postprocessing import operation_from_fields
             operation_from_fields(**{name: value for name, value in known.items() if name != 'tag_sets'})
+        if node_id == 'WDV3ConditionalTagRules':
+            from .Scripts.tag_postprocessing import conditional_from_fields
+            conditional_from_fields(**{name: value for name, value in known.items() if name != 'tag_sets'})
         if node_id == 'WDV3PostprocessingConfig' and 'postprocessing_json' in known:
             from .Scripts.tag_postprocessing import validate_chain
             validate_chain(json.loads(known['postprocessing_json']))

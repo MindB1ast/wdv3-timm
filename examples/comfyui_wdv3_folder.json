@@ -161,6 +161,11 @@
           "link": 2
         },
         {
+          "name": "postprocessing",
+          "type": "WDV3_POSTPROCESSING",
+          "link": null
+        },
+        {
           "name": "detectors",
           "type": "WDV3_DETECTORS",
           "link": null

@@ -57,6 +57,29 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual(self.evidence['frames'][0]['detectors']['body'][0]['general'], {'skirt': .8})
         self.assertEqual(Bundle.from_json(result.to_json()), result)
 
+    def test_full_only_applies_across_cascade_and_export(self):
+        export = importlib.import_module('wdv3_comfy_test.comfy_export')
+        data = self.evidence.data()
+        frame = data['frames'][0]
+        frame['source_settings'][0]['full_image_only_tags'] = ['1girl']
+        frame['source_settings'][0]['full_image_only_tags_regex'] = ['black_.*']
+        frame['source_settings'][1]['add_tags_to_region'] = {'1girl': .99}
+        frame['full_image']['general']['1girl'] = .95
+        evidence = Bundle.pack('evidence', data)
+        local = pipeline.filter_tag_sets(evidence)
+        merged = pipeline.merge_tag_sets(tags.route_cascade_tags(local))['frames'][0]
+        self.assertEqual(merged['merged_tags']['general']['1girl'], .95)
+        for region in export.compact_region_result(merged, include_aggregate=True)['regions']:
+            for record in (region, region['aggregate']):
+                self.assertNotIn('1girl', record['general'])
+                self.assertNotIn('black skirt', record['general'])
+        eyes = merged['detectors']['eyes'][0]
+        self.assertEqual(eyes['raw_scores']['general']['1girl'], .99)
+        self.assertEqual(eyes['decisions']['general']['1girl']['reason'], 'composition_full_only')
+        local = pipeline.filter_tag_sets(evidence, {'general_threshold': .96, 'prefix_tags': '1girl'})
+        merged = pipeline.merge_tag_sets(tags.route_cascade_tags(local))['frames'][0]
+        self.assertNotIn('1girl', merged['merged_tags']['general'])
+
     def test_aggregate_cleanup_and_separate_descendant(self):
         value = deepcopy(self.local['frames'][0]['cascade']['plan'])
         value['stages'][0]['aggregate_operations'] = [dict(textual_enabled=True)]

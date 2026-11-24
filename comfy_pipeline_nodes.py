@@ -70,9 +70,9 @@ class WDApplyFilters(io.ComfyNode):
                         tooltip='Новые правила YOLO для уже собранных evidence. При подключении detectors или запросы SAM передайте полный набор источников, совпадающий с Collect Evidence по именам. Параметры детекции менять нельзя — для этого заново соберите evidence.'),SAM_SOURCES.Input('sources', display_name='sam_queries',optional=True,
                         tooltip='Новые правила SAM для уже найденных регионов. При подключении запросы SAM или detectors передайте полный набор исходных источников с теми же именами. Изменение prompt, масок или вырезок требует повторного Collect Evidence.')],
             outputs=[RESULTS.Output('results',
-                        tooltip='Отфильтрованные результаты с решениями по тегам и их происхождением. Подключите к results у Inspect или к left/right у Merge Results.'),io.String.Output('tags',is_output_list=True,
-                        tooltip='Готовый текст тегов: отдельная строка на каждое изображение, с выбранным форматированием. Можно передать в текстовый промпт или tags у Save Result вместе с results_json из той же ветки.'),io.String.Output('results_json',is_output_list=True,
-                        tooltip='Подробный JSON для каждого изображения: теги полного кадра и регионов, оценки и происхождение итоговых тегов. Подключите к Results Viewer или Save Result. Это содержимое JSON, а не путь к файлу.')])
+                        tooltip='Структурированный результат с тегами полного кадра и каждого региона, общей строкой тегов, оценками и происхождением тегов.'),io.String.Output('tags',is_output_list=True,
+                        tooltip='Одна итоговая строка на изображение. В ней объединены теги полного кадра и регионов после фильтрации.'),io.String.Output('results_json',is_output_list=True,
+                        tooltip='Строка JSON на изображение с тегами полного кадра и регионов, общей строкой тегов, оценками и происхождением тегов.')])
     @classmethod
     def execute(cls,evidence,options=None,detectors=None,sources=None):
         configs=None
@@ -92,9 +92,9 @@ class WDMergeResults(io.ComfyNode):
                         tooltip='Первая ветка результатов из Apply Filters или Merge Results. Обе ветки должны относиться к тем же изображениям и совместимым настройкам текста. Теги объединяются с сохранением происхождения.'),RESULTS.Input('right',
                         tooltip='Вторая ветка результатов для тех же изображений. При совпадении тегов выбирается наибольшая оценка; данные регионов и происхождение сохраняются.')],
             outputs=[RESULTS.Output('results',
-                        tooltip='Отфильтрованные результаты с решениями по тегам и их происхождением. Подключите к results у Inspect или к left/right у Merge Results.'),io.String.Output('tags',is_output_list=True,
-                        tooltip='Готовый текст тегов: отдельная строка на каждое изображение, с выбранным форматированием. Можно передать в текстовый промпт или tags у Save Result вместе с results_json из той же ветки.'),io.String.Output('results_json',is_output_list=True,
-                        tooltip='Подробный JSON для каждого изображения: теги полного кадра и регионов, оценки и происхождение итоговых тегов. Подключите к Results Viewer или Save Result. Это содержимое JSON, а не путь к файлу.')])
+                        tooltip='Структурированный результат с тегами полного кадра и каждого региона, общей строкой тегов, оценками и происхождением тегов.'),io.String.Output('tags',is_output_list=True,
+                        tooltip='Одна итоговая строка на изображение. В ней объединены теги полного кадра и регионов после фильтрации.'),io.String.Output('results_json',is_output_list=True,
+                        tooltip='Строка JSON на изображение с тегами полного кадра и регионов, общей строкой тегов, оценками и происхождением тегов.')])
     @classmethod
     def execute(cls,left,right):
         result=merge_results(left,right);tags,details=outputs(result)

@@ -1,0 +1,28 @@
+{
+  "nodes": 43,
+  "model_calls": 0,
+  "mixed_sources": [
+    "full",
+    "clothes:YOLO",
+    "face:SAM"
+  ],
+  "immutable_evidence": true,
+  "valid_prompt": true,
+  "invalid_rules_rejected": true,
+  "preset_roundtrip": true,
+  "global_caption_preserved": true,
+  "snapshot_and_order": true,
+  "folder_chain": true,
+  "conditional_preset_roundtrip": true,
+  "local_report": {
+    "json": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\conditional-acceptance\\wdv3-report-b92a721fc4a64e99a4a92aed4abb2f85\\report.json",
+    "html": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\conditional-acceptance\\wdv3-report-b92a721fc4a64e99a4a92aed4abb2f85\\report.html"
+  },
+  "merged_report": {
+    "json": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\conditional-acceptance\\wdv3-report-95b278295cd54f83a66f0e4b80c2c882\\report.json",
+    "txt": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\conditional-acceptance\\wdv3-report-95b278295cd54f83a66f0e4b80c2c882\\tags.txt",
+    "html": "C:\\Users\\annak\\Downloads\\full_tagger_project\\wdv3-timm\\temp\\conditional-acceptance\\wdv3-report-95b278295cd54f83a66f0e4b80c2c882\\report.html"
+  },
+  "python": "3.13.12 (main, Feb 12 2026, 00:38:53) [MSC v.1944 64 bit (AMD64)]",
+  "browser_tested": false
+}

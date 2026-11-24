@@ -74,7 +74,7 @@ class WDPostprocessingConfig(io.ComfyNode):
         return io.Schema(node_id='WDV3PostprocessingConfig', display_name='WDV3 Postprocessing Config', category='WDV3/Settings',
             description="Создаёт переносимую упорядоченную цепочку операций из JSON-описания. Подключите postprocessing к Save Pipeline Config для сохранения или к Filter Tag Sets для применения к готовым evidence. Подходит для хранения и повторного использования правил без загрузки изображений и моделей.",
             inputs=[string_input('postprocessing_json', default='[]', multiline=True,
-                tooltip='JSON-массив операций schema_version=1, operation=remove_redundant. Сохраните через Save Pipeline Config или примените через Filter Tag Sets. Без пикселей/оценок.')],
+                tooltip='JSON-массив операций schema_version=1, operation=remove_redundant или conditional_remove. Сохраните через Save Pipeline Config или примените через Filter Tag Sets. Без пикселей/оценок.')],
             outputs=[POSTPROCESSING.Output('postprocessing', tooltip='Проверенная цепочка для Save Pipeline Config или Filter Tag Sets.')])
 
     @classmethod
@@ -83,3 +83,25 @@ class WDPostprocessingConfig(io.ComfyNode):
 
 
 NODE_CLASSES = [WDFilterTagSets, WDRemoveRedundantTags, WDMergeTagSets, WDPostprocessingConfig]
+
+
+class WDConditionalTagRules(io.ComfyNode):
+    @classmethod
+    def define_schema(cls):
+        return io.Schema(node_id='WDV3ConditionalTagRules', display_name='WDV3 Conditional Tag Rules',
+            category='WDV3/Postprocessing',
+            description='Local literal conditions on one accepted snapshot. Separate nodes execute sequentially.',
+            inputs=[TAG_SETS.Input('tag_sets'),
+                    string_input('rules_json', default='[]', multiline=True,
+                        tooltip='JSON rules: id, all_of/any_of/none_of, remove. Example: [{"id":"apron","all_of":["apron"],"remove":["dress"]}]'),
+                    io.Combo.Input('scope', options=['regions', 'full', 'all'], default='regions'),
+                    string_input('sources', default='', tooltip='Comma-separated regional source names; empty means all.')],
+            outputs=[TAG_SETS.Output('tag_sets')])
+
+    @classmethod
+    def execute(cls, tag_sets, rules_json='[]', scope='regions', sources=''):
+        from .Scripts.tag_postprocessing import conditional_from_fields, conditional_remove
+        return io.NodeOutput(conditional_remove(tag_sets, conditional_from_fields(rules_json, scope, sources)))
+
+
+NODE_CLASSES.append(WDConditionalTagRules)

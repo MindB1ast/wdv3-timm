@@ -1,0 +1,106 @@
+[
+  {
+    "name": "just_tagging_test",
+    "image": "tag_managing1.png",
+    "image_sha256": "6966291f5df90e6ac85928f3fe78fa46ad1bd44beeaf4a41b80172894ee7efea",
+    "expected": {
+      "just_tagging_test.txt": {
+        "fixture": "just_tagging_test.txt"
+      }
+    }
+  },
+  {
+    "name": "single_yolo_test",
+    "image": "tag_managing1.png",
+    "image_sha256": "6966291f5df90e6ac85928f3fe78fa46ad1bd44beeaf4a41b80172894ee7efea",
+    "expected": {
+      "single_yolo_test.txt": {
+        "fixture": "single_yolo_test.txt"
+      },
+      "single_yolo_test.json": {
+        "canonical_sha256": "f66a8d6233a31f11fc6b277b9970f6b24d8e4484b93767ca04a274c08e7fd4f4"
+      }
+    }
+  },
+  {
+    "name": "yolo_with_child_detector_test",
+    "image": "tag_managing1.png",
+    "image_sha256": "6966291f5df90e6ac85928f3fe78fa46ad1bd44beeaf4a41b80172894ee7efea",
+    "expected": {
+      "yolo_with_child_detector_test.txt": {
+        "fixture": "yolo_with_child_detector_test.txt"
+      }
+    }
+  },
+  {
+    "name": "paralel_yolo",
+    "image": "tachibana arisu, sasaki chie, ichihara nina, sajo yukimi, ryuzaki kaoru, and 1 more (idolmaster and 2 more) drawn by crys_(dai) - faeabf0bb71c18def21e7849db8cd3c0.jpg",
+    "image_sha256": "9eb6851e7e8bbaf11b21fdf92a54d47cf2a44b873e6afdadce6742df66519d3f",
+    "expected": {
+      "paralel_yolo.regions.json": {
+        "fixture": "paralel_yolo.regions.json"
+      }
+    }
+  },
+  {
+    "name": "cascade_yolo",
+    "image": "tachibana arisu, sasaki chie, ichihara nina, sajo yukimi, ryuzaki kaoru, and 1 more (idolmaster and 2 more) drawn by crys_(dai) - faeabf0bb71c18def21e7849db8cd3c0.jpg",
+    "image_sha256": "9eb6851e7e8bbaf11b21fdf92a54d47cf2a44b873e6afdadce6742df66519d3f",
+    "expected": {
+      "cascade_yolo.regions.json": {
+        "fixture": "cascade_yolo.regions.json"
+      }
+    }
+  },
+  {
+    "name": "cascade_yolo_parent_merge.regions",
+    "image": "tachibana arisu, sasaki chie, ichihara nina, sajo yukimi, ryuzaki kaoru, and 1 more (idolmaster and 2 more) drawn by crys_(dai) - faeabf0bb71c18def21e7849db8cd3c0.jpg",
+    "image_sha256": "9eb6851e7e8bbaf11b21fdf92a54d47cf2a44b873e6afdadce6742df66519d3f",
+    "expected": {
+      "cascade_yolo_parent_merge.regions.json": {
+        "fixture": "cascade_yolo_parent_merge.regions.json"
+      }
+    }
+  },
+  {
+    "name": "sam_test",
+    "image": "tag_managing1.png",
+    "image_sha256": "6966291f5df90e6ac85928f3fe78fa46ad1bd44beeaf4a41b80172894ee7efea",
+    "expected": {
+      "sam_test.txt": {
+        "fixture": "sam_test.txt"
+      }
+    }
+  },
+  {
+    "name": "folder_tagging",
+    "folder_name": "folder_tagging",
+    "recursive": false,
+    "input_files": {
+      "folder/tag_managing1.png": "6966291f5df90e6ac85928f3fe78fa46ad1bd44beeaf4a41b80172894ee7efea",
+      "tachibana arisu, sasaki chie, ichihara nina, sajo yukimi, ryuzaki kaoru, and 1 more (idolmaster and 2 more) drawn by crys_(dai) - faeabf0bb71c18def21e7849db8cd3c0.jpg": "9eb6851e7e8bbaf11b21fdf92a54d47cf2a44b873e6afdadce6742df66519d3f"
+    },
+    "expected": {
+      "tachibana arisu, sasaki chie, ichihara nina, sajo yukimi, ryuzaki kaoru, and 1 more (idolmaster and 2 more) drawn by crys_(dai) - faeabf0bb71c18def21e7849db8cd3c0.jpg.txt": {
+        "fixture": "tachibana arisu, sasaki chie, ichihara nina, sajo yukimi, ryuzaki kaoru, and 1 more (idolmaster and 2 more) drawn by crys_(dai) - faeabf0bb71c18def21e7849db8cd3c0.jpg.txt"
+      }
+    }
+  },
+  {
+    "name": "folder_tagging_recursive",
+    "folder_name": "folder_tagging",
+    "recursive": true,
+    "input_files": {
+      "folder/tag_managing1.png": "6966291f5df90e6ac85928f3fe78fa46ad1bd44beeaf4a41b80172894ee7efea",
+      "tachibana arisu, sasaki chie, ichihara nina, sajo yukimi, ryuzaki kaoru, and 1 more (idolmaster and 2 more) drawn by crys_(dai) - faeabf0bb71c18def21e7849db8cd3c0.jpg": "9eb6851e7e8bbaf11b21fdf92a54d47cf2a44b873e6afdadce6742df66519d3f"
+    },
+    "expected": {
+      "folder/tag_managing1.png.txt": {
+        "fixture": "folder/tag_managing1.png.txt"
+      },
+      "tachibana arisu, sasaki chie, ichihara nina, sajo yukimi, ryuzaki kaoru, and 1 more (idolmaster and 2 more) drawn by crys_(dai) - faeabf0bb71c18def21e7849db8cd3c0.jpg.txt": {
+        "fixture": "tachibana arisu, sasaki chie, ichihara nina, sajo yukimi, ryuzaki kaoru, and 1 more (idolmaster and 2 more) drawn by crys_(dai) - faeabf0bb71c18def21e7849db8cd3c0.jpg.txt"
+      }
+    }
+  }
+]

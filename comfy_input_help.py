@@ -17,6 +17,7 @@ _calculation = [{
 }]
 
 EXAMPLES = {
+    'rules_json': '[{"id":"apron","all_of":["apron"],"remove":["dress"]}]',
     'remove_tags': 'watermark, blurry',
     'prefix_tags': 'highres',
     'suffix_tags': 'dataset_sample',

@@ -12,7 +12,7 @@ from .Scripts.configs import DetectorConfig
 from .Scripts.evidence import Bundle
 from .Scripts.region_tagging import RegionTagger
 from .Scripts.tag_utils import (apply_tag_rules, enforce_owners, format_result,
-                               parse_tags, parse_additions, restrict_allowed_tags, source_owners,
+                               parse_tags, parse_additions, parse_regex, restrict_allowed_tags, source_owners,
                                rule_matcher, TagMatcher, REGEX_RULE_FIELDS)
 from .Scripts.preprocess import composition_tags, merge_tags_from_regions
 
@@ -264,6 +264,32 @@ def filter_record(raw, rules, general, character, character_names):
     return format_result(result)
 
 
+def _full_only_matchers(settings):
+    general = TagMatcher(
+        [tag for rule in settings for tag in composition_tags(rule)],
+        [pattern for rule in settings for pattern in parse_regex(rule.full_image_only_tags_regex)],
+    )
+    character = TagMatcher(
+        [tag for rule in settings for tag in parse_tags(rule.full_image_only_tags)],
+        [pattern for rule in settings for pattern in parse_regex(rule.full_image_only_tags_regex)],
+    )
+    return {'general': general, 'character': character}
+
+
+def _exclude_full_only(record, matchers):
+    changed = False
+    for category, matcher in matchers.items():
+        for tag in list(record[category]):
+            if tag in matcher:
+                record[category].pop(tag)
+                record.get('provenance', {}).pop(tag, None)
+                record['decisions'][category][tag].update(
+                    status='rejected', reason='composition_full_only')
+                changed = True
+    if changed:
+        format_result(record, record.get('caption'))
+
+
 def filter_tag_sets(evidence, options=None, configs=None):
     if evidence.kind != 'evidence': raise ValueError('Apply Filters needs evidence')
     data = evidence.data(); options = deepcopy(dict(options or {}))
@@ -291,8 +317,10 @@ def filter_tag_sets(evidence, options=None, configs=None):
                              options.get('general_threshold', .35), options.get('character_threshold', .75), characters)
         detected = {c.name: [filter_record(r,c,options.get('general_threshold',.35),options.get('character_threshold',.75),characters)
                             for r in original['detectors'][c.name]] for c in settings}
+        full_only = _full_only_matchers(settings)
         for rows in detected.values():
             for row in rows:
+                _exclude_full_only(row, full_only)
                 if row.get('tag_enabled') is False:
                     row.update(general={}, character={}, ratings={}, caption='', taglist='',
                                decisions={'general': {}, 'character': {}}, provenance={})
@@ -340,11 +368,16 @@ def merge_tag_sets(tag_sets):
                      for field in REGEX_RULE_FIELDS} for c in settings}
         characters = list(original['full_image'].get('raw_scores', {}).get('character', original['full_image']['character']))
         full, detected = detail['full_image'], detail['detectors']
+        full_only = _full_only_matchers(settings)
+        manual = {}
+        for field in ('prefix_tags', 'suffix_tags'):
+            manual[field] = [tag for tag in parse_tags(options.get(field, ''))
+                             if tag not in full_only['character' if tag in characters else 'general']]
         merged = enforce_owners(apply_tag_rules(merge_tags_from_regions(detail, settings),
-            remove=options.get('remove_tags',''), before=options.get('prefix_tags',''), after=options.get('suffix_tags',''),
+            remove=options.get('remove_tags',''), before=manual['prefix_tags'], after=manual['suffix_tags'],
             character_names=characters, remove_regex=options.get('remove_tags_regex', [])), settings)
         candidates = set(full['general']) | set(full['character'])
-        candidates.update(parse_tags(options.get('prefix_tags','')) + parse_tags(options.get('suffix_tags','')))
+        candidates.update(manual['prefix_tags'] + manual['suffix_tags'])
         for rows in detected.values():
             for row in rows:
                 candidates.update(row['general']); candidates.update(row['character'])
@@ -368,7 +401,7 @@ def merge_tag_sets(tag_sets):
                         if reason: item.update(status='rejected',reason=reason)
                         else: item['reason']='merged' if merged.get(category,{}).get(tag)==item['score'] else 'lower_score'
                     decisions.append(item)
-        for tag in parse_tags(options.get('prefix_tags',''))+parse_tags(options.get('suffix_tags','')):
+        for tag in manual['prefix_tags'] + manual['suffix_tags']:
             category='character' if tag in characters else 'general'
             provenance=merged.get('provenance',{}).get(tag,{})
             if tag in merged[category] and (provenance.get('source')!='manual_rule' or provenance.get('region_source')):

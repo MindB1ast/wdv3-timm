@@ -72,7 +72,7 @@ const producerPriority = {
     WDV3_RESULTS: ['WDV3ApplyFilters', 'WDV3MergeResults'],
     WDV3_REGIONS: ['WDV3CollectEvidence'],
     WDV3_REPORT: ['WDV3Inspect'],
-    WDV3_TAG_SETS: ['WDV3FilterTagSets', 'WDV3RemoveRedundantTags'],
+    WDV3_TAG_SETS: ['WDV3FilterTagSets', 'WDV3RemoveRedundantTags', 'WDV3ConditionalTagRules'],
     WDV3_POSTPROCESSING: ['WDV3PostprocessingConfig', 'WDV3LoadConfig'],
     WDV3_CALCULATION_STORE: ['WDV3CalculationStore', 'WDV3LoadConfig'],
     WDV3_INFERENCE: ['WDV3InferenceSettings', 'WDV3LoadConfig'],
@@ -105,7 +105,7 @@ export function suggestConnections(context, catalog) {
     const preferred = context.type === 'STRING' && role === 'results_json'
         ? (wanted === 'outputs'
             ? ['WDV3TagFolder', 'WDV3Tagger', 'WDV3MergeTagSets', 'WDV3ApplyFilters', 'WDV3MergeResults']
-            : ['WDV3Preview', 'WDV3SaveResult'])
+            : ['WDV3Preview', 'WDV3SaveResult', 'WDV3SaveRegionResults'])
         : (wanted === 'outputs' ? producerPriority[context.type] || [] : []);
     const candidates = [];
     for (const node of catalog.values()) {

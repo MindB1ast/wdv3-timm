@@ -259,6 +259,32 @@ def build(root):
     local_graph['last_node_id'] = 32
     local_graph['last_link_id'] = max(row[0] for row in local_graph['links'])
     variants['comfyui_wdv3_postprocessing.json'] = local_graph
+    conditional_graph = deepcopy(local_graph)
+    detector = next(n for n in conditional_graph['nodes'] if n['id'] == 7)
+    clothes = node(7, 'WDV3YOLODetector', detector['pos'], {'source_name': 'clothes'})
+    clothes['inputs'] = detector['inputs']
+    clothes['outputs'] = detector['outputs']
+    conditional_graph['nodes'][conditional_graph['nodes'].index(detector)] = clothes
+
+    old = next(n for n in conditional_graph['nodes'] if n['id'] == 30)
+    conditional = node(30, 'WDV3ConditionalTagRules', old['pos'], {
+        'scope': 'regions', 'sources': 'clothes',
+        'rules_json': json.dumps([{'id': 'apron_suppresses_dress', 'all_of': ['apron'], 'remove': ['dress']}])})
+    conditional['inputs'][0]['link'] = old['inputs'][0]['link']
+    conditional['outputs'] = old['outputs']
+    conditional_graph['nodes'][conditional_graph['nodes'].index(old)] = conditional
+    variants['comfyui_wdv3_conditional_tags.json'] = conditional_graph
+
+    folder_post = workflow(folder=True, yolo=True)
+    folder_node = next(n for n in folder_post['nodes'] if n['type']=='WDV3TagFolder')
+    config_node = node(90, 'WDV3PostprocessingConfig', [800,1100], {'postprocessing_json': json.dumps([
+        {'operation':'conditional_remove','scope':'regions','rules':[{'id':'apron','all_of':['apron'],'remove':['dress']}]},
+        {'operation':'remove_redundant','scope':'all','textual_enabled':True}])})
+    folder_post['nodes'].append(config_node)
+    wire(folder_post, config_node, 'postprocessing', folder_node, 'postprocessing')
+    folder_post['last_node_id']=90
+    folder_post['last_link_id']=max(row[0] for row in folder_post['links'])
+    variants['comfyui_wdv3_folder_postprocessing.json']=folder_post
     automatic_graph=workflow(yolo=True)
     for index,existing in enumerate(automatic_graph['nodes']):
         if existing['type']=='WDV3Options':
@@ -346,6 +372,32 @@ def build(root):
             wire(graph, src, out, dst, inp)
         graph.update(last_node_id=10, last_link_id=len(graph['links']))
         variants['comfyui_wdv3_cascade_'+suffix+'.json'] = graph
+    txt_graph = workflow()
+    tagger = next(n for n in txt_graph['nodes'] if n['type']=='WDV3Tagger')
+    saver = node(90, 'WDV3SaveResult', [1640,20], {'save_txt':True,'save_json':False,
+        'filename':'tags-only','output_directory':'output/wdv3'})
+    saver['title']='Save TXT: only tags connected; JSON disabled'
+    tagger['title']='Tag image: connect tags to Save Result'
+    txt_graph['nodes'].append(saver)
+    wire(txt_graph,tagger,'tags',saver,'tags')
+    txt_graph['last_node_id']=90
+    txt_graph['last_link_id']=max(row[0] for row in txt_graph['links'])
+    txt_graph['extra']['description']='Load an image and select a tagger model. Save Result receives only tags. save_txt=true, save_json=false. Expected: output/wdv3/tags-only.txt contains the exact tags; no JSON input or JSON file is needed. Set overwrite=true to replace an existing TXT.'
+    variants['comfyui_wdv3_save_txt_only.json']=txt_graph
+    region_graph = workflow(yolo=True)
+    tagger = next(n for n in region_graph['nodes'] if n['type'] == 'WDV3Tagger')
+    saver = node(91, 'WDV3SaveRegionResults', [1660, 20], {
+        'output_directory': 'output/wdv3', 'filename': 'person-regions', 'write_mode': 'overwrite'})
+    saver['title'] = 'Compact JSON: frame and separate regions'
+    region_graph['nodes'].append(saver)
+    wire(region_graph, tagger, 'results_json', saver, 'results_json')
+    region_graph['last_node_id'] = 91
+    region_graph['last_link_id'] = max(link[0] for link in region_graph['links'])
+    region_graph['extra']['description'] = (
+        'Select an image and YOLO model. View region tags in Results Viewer. '
+        'Save Region Results writes person-regions.regions.json with accepted tags and region geometry. '
+        'Enable include_scores, include_caption or include_aggregate to add detail.')
+    variants['comfyui_wdv3_save_region_results.json'] = region_graph
     for name, graph in variants.items():
         path = root / "examples" / name
         path.write_text(json.dumps(graph, ensure_ascii=False, indent=2), encoding="utf-8")
