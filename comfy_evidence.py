@@ -349,6 +349,9 @@ def merge_tag_sets(tag_sets):
     if tag_sets.kind != 'tag_sets':
         raise ValueError('Merge Tag Sets needs tag_sets')
     data = tag_sets.data()
+    if 'manual_text_source' in data:
+        raise ValueError('Merge Tag Sets не поддерживает тестовые наборы из Tag Sets from Text. '
+                         'Подключите выход tag_sets к Tag Sets to Text.')
     if any(frame.get('cascade') for frame in data['frames']):
         from .comfy_cascade_tags import merge_cascade_tag_sets
         if all(f.get('cascade', {}).get('nested_rules') for f in data['frames']):

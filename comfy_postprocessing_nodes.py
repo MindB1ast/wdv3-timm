@@ -5,6 +5,8 @@ from .comfy_input_help import string_input
 from .comfy_pipeline_nodes import WDApplyFilters, TAG_SETS
 from .comfy_evidence import filter_tag_sets, merge_tag_sets, outputs
 from .Scripts.configs import DetectorConfig
+from .Scripts.evidence import Bundle
+from .Scripts.tag_names import parse_tags
 from .Scripts.tag_postprocessing import remove_redundant, operation_from_fields, apply_chain, validate_chain
 
 POSTPROCESSING = io.Custom('WDV3_POSTPROCESSING')
@@ -82,7 +84,29 @@ class WDPostprocessingConfig(io.ComfyNode):
         return io.NodeOutput(validate_chain(json.loads(postprocessing_json)))
 
 
-NODE_CLASSES = [WDFilterTagSets, WDRemoveRedundantTags, WDMergeTagSets, WDPostprocessingConfig]
+class WDRedundancySettings(io.ComfyNode):
+    @classmethod
+    def define_schema(cls):
+        return io.Schema(node_id='WDV3RedundancySettings', display_name='WDV3 Redundancy Settings',
+            category='WDV3/Settings',
+            description='Настраивает текстовое удаление избыточности для Tag Folder или Filter Tag Sets без JSON.',
+            inputs=[io.Boolean.Input('textual_enabled', default=False,
+                        tooltip='Сравнивать целые компоненты: purple_jacket вытесняет jacket.'),
+                    io.Combo.Input('scope', options=['all', 'full', 'regions'], default='all'),
+                    string_input('sources', default='', tooltip='Региональные источники через запятую; пусто — все.'),
+                    string_input('protected_tags', default='', multiline=True,
+                        tooltip='Теги, которые нельзя удалять, через запятую.')],
+            outputs=[POSTPROCESSING.Output('postprocessing')])
+
+    @classmethod
+    def execute(cls, textual_enabled=False, scope='all', sources='', protected_tags=''):
+        operations = [operation_from_fields(textual_enabled=True, scope=scope, sources=sources,
+                                            protected_tags=protected_tags)] if textual_enabled else []
+        return io.NodeOutput(operations)
+
+
+NODE_CLASSES = [WDFilterTagSets, WDRemoveRedundantTags, WDMergeTagSets, WDPostprocessingConfig,
+                WDRedundancySettings]
 
 
 class WDConditionalTagRules(io.ComfyNode):
@@ -105,3 +129,59 @@ class WDConditionalTagRules(io.ComfyNode):
 
 
 NODE_CLASSES.append(WDConditionalTagRules)
+
+
+def _manual_record(tags):
+    return dict(general=dict.fromkeys(tags, 1.0), character={}, ratings={},
+                caption=', '.join(tags), taglist=', '.join(tag.replace('_', ' ') for tag in tags),
+                decisions=dict(general={tag: dict(status='accepted', reason='manual_add', score=1.0)
+                                        for tag in tags}, character={}, ratings={}))
+
+
+class WDTagSetsFromText(io.ComfyNode):
+    @classmethod
+    def define_schema(cls):
+        return io.Schema(node_id='WDV3TagSetsFromText', display_name='WDV3 Tag Sets from Text',
+            category='WDV3/Postprocessing',
+            description='Ввод принятых тегов для проверки постобработки без моделей и изображения.',
+            inputs=[string_input('tags', default='', multiline=True, tooltip='Теги через запятую.'),
+                    io.Combo.Input('target', options=['full', 'region'], default='full'),
+                    string_input('source_name', default='', tooltip='Имя источника для режима region.')],
+            outputs=[TAG_SETS.Output('tag_sets')])
+
+    @classmethod
+    def execute(cls, tags='', target='full', source_name=''):
+        if target not in ('full', 'region'):
+            raise ValueError('target must be full or region')
+        source = source_name.strip() if target == 'region' else None
+        if source is not None and (not source or any(c in source for c in ',\r\n')):
+            raise ValueError('region requires one source_name')
+        record = _manual_record(parse_tags(tags))
+        frame = dict(image_id='manual_text', full_image=record, detectors={})
+        if source is not None:
+            frame['full_image'] = _manual_record([])
+            frame['detectors'][source] = [dict(record, region_id=0)]
+        return io.NodeOutput(Bundle.pack('tag_sets', dict(frames=[frame], manual_text_source=source)))
+
+
+class WDTagSetsToText(io.ComfyNode):
+    @classmethod
+    def define_schema(cls):
+        return io.Schema(node_id='WDV3TagSetsToText', display_name='WDV3 Tag Sets to Text',
+            category='WDV3/Postprocessing', is_output_node=True,
+            description='Показывает принятые теги выбранного набора из Tag Sets from Text, без merge.',
+            inputs=[TAG_SETS.Input('tag_sets')], outputs=[io.String.Output('text')])
+
+    @classmethod
+    def execute(cls, tag_sets):
+        data = tag_sets.data()
+        if 'manual_text_source' not in data:
+            raise ValueError('Tag Sets to Text needs a set from Tag Sets from Text')
+        frame, = data['frames']
+        source = data['manual_text_source']
+        record = frame['full_image'] if source is None else frame['detectors'][source][0]
+        text = record['taglist']
+        return io.NodeOutput(text, ui={'text': [text]})
+
+
+NODE_CLASSES.extend([WDTagSetsFromText, WDTagSetsToText])

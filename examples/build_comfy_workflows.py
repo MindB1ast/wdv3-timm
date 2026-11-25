@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 
 
-def build(root):
+def build(root, only=None):
     spec = importlib.util.spec_from_file_location("wdv3_workflow_builder", root / "__init__.py",
                                                 submodule_search_locations=[str(root)])
     package = importlib.util.module_from_spec(spec)
@@ -275,6 +275,26 @@ def build(root):
     conditional_graph['nodes'][conditional_graph['nodes'].index(old)] = conditional
     variants['comfyui_wdv3_conditional_tags.json'] = conditional_graph
 
+    text_graph = {'nodes': [], 'links': [], 'groups': [], 'config': {},
+                  'extra': {'description': 'Edit either string and queue the graph. No image or models are needed.'},
+                  'version': .4, 'last_node_id': 6, 'last_link_id': 4}
+    for start, y, title, entry, operation, fields in [
+            (1, 20, 'Full frame: jacket → purple jacket', {'tags': 'jacket, purple jacket'},
+             'WDV3RemoveRedundantTags', {'textual_enabled': True, 'scope': 'full'}),
+            (4, 400, 'Region clothes: apron removes dress',
+             {'tags': 'apron, dress', 'target': 'region', 'source_name': 'clothes'},
+             'WDV3ConditionalTagRules', {'scope': 'regions', 'sources': 'clothes',
+                'rules_json': json.dumps([{'id': 'apron', 'all_of': ['apron'], 'remove': ['dress']}])}),
+    ]:
+        source = node(start, 'WDV3TagSetsFromText', [20, y], entry)
+        source['title'] = title
+        step = node(start + 1, operation, [420, y], fields)
+        result = node(start + 2, 'WDV3TagSetsToText', [820, y])
+        text_graph['nodes'].extend([source, step, result])
+        wire(text_graph, source, 'tag_sets', step, 'tag_sets')
+        wire(text_graph, step, 'tag_sets', result, 'tag_sets')
+    variants['comfyui_wdv3_text_postprocessing.json'] = text_graph
+
     folder_post = workflow(folder=True, yolo=True)
     folder_node = next(n for n in folder_post['nodes'] if n['type']=='WDV3TagFolder')
     config_node = node(90, 'WDV3PostprocessingConfig', [800,1100], {'postprocessing_json': json.dumps([
@@ -285,6 +305,19 @@ def build(root):
     folder_post['last_node_id']=90
     folder_post['last_link_id']=max(row[0] for row in folder_post['links'])
     variants['comfyui_wdv3_folder_postprocessing.json']=folder_post
+    folder_redundancy = deepcopy(folder_post)
+    remove_nodes(folder_redundancy, {90})
+    settings = node(90, 'WDV3RedundancySettings', [800,1100],
+                    {'textual_enabled': True, 'scope': 'all'})
+    settings['title'] = 'Enable or disable whole-word redundancy here'
+    folder_redundancy['nodes'].append(settings)
+    wire(folder_redundancy, settings, 'postprocessing',
+         next(n for n in folder_redundancy['nodes'] if n['type'] == 'WDV3TagFolder'), 'postprocessing')
+    folder_redundancy['last_link_id'] = max(row[0] for row in folder_redundancy['links'])
+    folder_redundancy['extra']['description'] = (
+        'Choose an input folder and configure the models. Redundancy Settings replaces the JSON '
+        'configuration: toggle the heuristic, select a scope, or protect tags before saving.')
+    variants['comfyui_wdv3_folder_redundancy.json'] = folder_redundancy
     automatic_graph=workflow(yolo=True)
     for index,existing in enumerate(automatic_graph['nodes']):
         if existing['type']=='WDV3Options':
@@ -399,10 +432,12 @@ def build(root):
         'Enable include_scores, include_caption or include_aggregate to add detail.')
     variants['comfyui_wdv3_save_region_results.json'] = region_graph
     for name, graph in variants.items():
+        if only is not None and name not in only:
+            continue
         path = root / "examples" / name
         path.write_text(json.dumps(graph, ensure_ascii=False, indent=2), encoding="utf-8")
         print(path)
 
 
 if __name__ == "__main__":
-    build(Path(__file__).resolve().parents[1])
+    build(Path(__file__).resolve().parents[1], set(sys.argv[1:]) or None)

@@ -1,0 +1,269 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "type": "WDV3TagSetsFromText",
+      "pos": [
+        20,
+        20
+      ],
+      "size": [
+        340,
+        166
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3TagSetsFromText"
+      },
+      "widgets_values": [
+        "jacket, purple jacket",
+        "full",
+        ""
+      ],
+      "title": "Full frame: jacket → purple jacket"
+    },
+    {
+      "id": 2,
+      "type": "WDV3RemoveRedundantTags",
+      "pos": [
+        420,
+        20
+      ],
+      "size": [
+        340,
+        326
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3RemoveRedundantTags"
+      },
+      "widgets_values": [
+        false,
+        true,
+        "[]",
+        "",
+        "full",
+        "",
+        false,
+        "[]"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "WDV3TagSetsToText",
+      "pos": [
+        820,
+        20
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3TagSetsToText"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 4,
+      "type": "WDV3TagSetsFromText",
+      "pos": [
+        20,
+        400
+      ],
+      "size": [
+        340,
+        166
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3TagSetsFromText"
+      },
+      "widgets_values": [
+        "apron, dress",
+        "region",
+        "clothes"
+      ],
+      "title": "Region clothes: apron removes dress"
+    },
+    {
+      "id": 5,
+      "type": "WDV3ConditionalTagRules",
+      "pos": [
+        420,
+        400
+      ],
+      "size": [
+        340,
+        166
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "link": 3
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3ConditionalTagRules"
+      },
+      "widgets_values": [
+        "[{\"id\": \"apron\", \"all_of\": [\"apron\"], \"remove\": [\"dress\"]}]",
+        "regions",
+        "clothes"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "WDV3TagSetsToText",
+      "pos": [
+        820,
+        400
+      ],
+      "size": [
+        340,
+        120
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "tag_sets",
+          "type": "WDV3_TAG_SETS",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WDV3TagSetsToText"
+      },
+      "widgets_values": []
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      2,
+      0,
+      "WDV3_TAG_SETS"
+    ],
+    [
+      2,
+      2,
+      0,
+      3,
+      0,
+      "WDV3_TAG_SETS"
+    ],
+    [
+      3,
+      4,
+      0,
+      5,
+      0,
+      "WDV3_TAG_SETS"
+    ],
+    [
+      4,
+      5,
+      0,
+      6,
+      0,
+      "WDV3_TAG_SETS"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "description": "Edit either string and queue the graph. No image or models are needed."
+  },
+  "version": 0.4,
+  "last_node_id": 6,
+  "last_link_id": 4
+}

@@ -1,7 +1,9 @@
 """Local accepted tags, snapshot semantics and compatibility without model calls."""
+from base64 import b64decode
 from copy import deepcopy
 from dataclasses import asdict
 import importlib
+from io import BytesIO
 import json
 from pathlib import Path
 import subprocess
@@ -68,12 +70,26 @@ class TagSetTests(unittest.TestCase):
         self.assertIn('skirt', self.local.data()['frames'][0]['full_image']['general'])
 
     def test_legacy_golden_and_shortcut(self):
+        def face_mask(frames):
+            return frames[0]['detectors']['face'][0].pop('mask_png')
+
+        def decoded_mask(encoded):
+            with Image.open(BytesIO(b64decode(encoded))) as mask:
+                return mask.mode, mask.size, mask.tobytes()
+
         golden = json.loads((ROOT / 'audit/fixtures/tag-sets-legacy.json').read_text(encoding='utf-8'))
+        input_png = face_mask(self.evidence.data()['frames'])
         for options in ({}, {'remove_tags_regex': ['solo'], 'prefix_tags': 'manual', 'tag_separator': ' | '}):
-            key = json.dumps(options, sort_keys=True)
-            result = pipeline.apply_filters(self.evidence, options)
-            self.assertEqual(result.data()['frames'], golden[key])
-            self.assertEqual(result, pipeline.merge_tag_sets(pipeline.filter_tag_sets(self.evidence, options)))
+            with self.subTest(options=options):
+                result = pipeline.apply_filters(self.evidence, options)
+                actual = result.data()['frames']
+                expected = golden[json.dumps(options, sort_keys=True)]
+                output_png, golden_png = face_mask(actual), face_mask(expected)
+                # PNG compression may differ from the golden, but merge must not re-encode the input.
+                self.assertEqual(decoded_mask(output_png), decoded_mask(golden_png))
+                self.assertEqual(output_png, input_png)
+                self.assertEqual(actual, expected)
+                self.assertEqual(result, pipeline.merge_tag_sets(pipeline.filter_tag_sets(self.evidence, options)))
 
     def test_strict_schema_and_pure_imports(self):
         bad = [[], {'oops': 1}, {'explicit_enabled': 1}, {'schema_version': True}, {'scope': 'other'},
