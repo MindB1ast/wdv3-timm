@@ -1,0 +1,78 @@
+name: ComfyUI CPU pipelines
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: Pipeline to run
+        type: choice
+        required: true
+        default: all
+        options:
+          - all
+          - yolo-cpu
+          - sam-cpu
+          - yolo-sam-cpu
+
+permissions:
+  contents: read
+
+jobs:
+  pipeline:
+    name: ${{ matrix.scenario }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: ${{ fromJSON(inputs.scenario == 'all' && '["yolo-cpu","sam-cpu","yolo-sam-cpu"]' || format('["{0}"]', inputs.scenario)) }}
+    env:
+      PIPELINE_SCENARIO: ${{ matrix.scenario }}
+      PYTHONIOENCODING: utf-8
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install ComfyUI CPU environment
+        shell: bash
+        run: |
+          start=$SECONDS
+          mkdir -p "$RUNNER_TEMP/diagnostics"
+          trap 'echo "Installation: $((SECONDS - start)) seconds" >> "$GITHUB_STEP_SUMMARY"' EXIT
+          bash audit/install_comfy_cpu.sh "$RUNNER_TEMP/ComfyUI" 2>&1 | tee "$RUNNER_TEMP/diagnostics/install.log"
+      - name: Check test harness
+        run: python -B -m unittest audit.test_comfy_cpu_cases audit.test_comfy_cpu_runner
+      - name: Run real CPU pipeline through ComfyUI API
+        run: |
+          python -B -m audit.run_comfy_cpu "$PIPELINE_SCENARIO" \
+            --comfy-root "$RUNNER_TEMP/ComfyUI" \
+            --model-cache "$RUNNER_TEMP/model-cache" \
+            --work "$RUNNER_TEMP/run"
+      - name: Summarize pipeline result
+        if: ${{ always() }}
+        run: |
+          if [[ -f "$RUNNER_TEMP/run/metrics.json" ]]; then
+            {
+              echo '```json'
+              cat "$RUNNER_TEMP/run/metrics.json"
+              echo
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload pipeline diagnostics
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: comfy-${{ matrix.scenario }}
+          retention-days: 7
+          if-no-files-found: ignore
+          path: |
+            ${{ runner.temp }}/diagnostics/install.log
+            ${{ runner.temp }}/run/comfy.log
+            ${{ runner.temp }}/run/metrics.json
+            ${{ runner.temp }}/run/prompt.json
+            ${{ runner.temp }}/run/output/

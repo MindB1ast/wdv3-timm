@@ -33,6 +33,35 @@ CI сравнивает результаты на сохранённых дан�
 Для побайтовых SHA-256 используйте Git checkout: `.gitattributes` сохраняет
 CRLF у двух исторических JSON-эталонов и на Linux.
 
+## Локальный ComfyUI API с реальными моделями (Ubuntu)
+
+В отдельном окружении Python 3.12 выполните из корня репозитория:
+
+```bash
+work=$(mktemp -d)
+bash audit/install_comfy_cpu.sh "$work/ComfyUI"
+python -B -m audit.run_comfy_cpu yolo-cpu \
+  --comfy-root "$work/ComfyUI" --model-cache "$work/models" --work "$work/yolo-run"
+```
+
+Для `sam-cpu` или `yolo-sam-cpu` используйте свой новый `--work`; каталог
+весов можно переиспользовать. Скрипт скачивает только файлы нужных моделей
+из [закреплённых источников](fixtures/comfy_cpu/models.json); после проверки
+SHA-256 запускает ComfyUI на `127.0.0.1` и передаёт граф через API. WD — общая
+вспомогательная модель для `Collect Evidence`, не отдельный сценарий.
+`metrics.json` показывает этап сбоя, время подготовки весов и исполнения, а
+также пиковую выборку суммарного RSS процессов ComfyUI. `comfy.log` содержит
+лог сервера, `output/` — проверяемый отчёт. Таймаут и ошибка графа дают
+ненулевой код. Проверки обвязки без моделей:
+`python -B -m unittest audit.test_comfy_cpu_cases audit.test_comfy_cpu_runner`.
+
+На GitHub: **Actions → ComfyUI CPU pipelines → Run workflow**. Выберите
+`yolo-cpu`, `sam-cpu`, `yolo-sam-cpu` или `all` (по умолчанию).
+Каждый сценарий получает независимый Ubuntu-раннер и лимит 35 минут;
+ожидание результата API ограничено 3 минутами для YOLO и 15 минутами для
+SAM и каскада. Логи и отчёты доступны в `comfy-<сценарий>` в течение 7 дней;
+веса не загружаются в артефакт. На push и PR этот workflow не запускается.
+
 Исходная ревизия 2026-10-29: 30 проверок, 18 passed и 12 нарушений.
 Исторические свидетельства остаются в docs/audit/2026-10-29.
 После исправлений исходные 30 контрактов проходят без изменения assertions.

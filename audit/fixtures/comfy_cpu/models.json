@@ -1,0 +1,36 @@
+{
+  "yolo": {
+    "base_url": "https://github.com/ultralytics/assets/releases/download/v8.3.0",
+    "license": "AGPL-3.0",
+    "license_url": "https://github.com/ultralytics/ultralytics/blob/v8.3.85/LICENSE",
+    "sha256": {
+      "yolo11n.pt": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1"
+    }
+  },
+  "sam": {
+    "base_url": "https://huggingface.co/unsloth/sam3.1/resolve/cd3538905f98152ba184d2791fc5aa5d06e2ae45",
+    "license": "SAM License",
+    "license_url": "https://huggingface.co/unsloth/sam3.1/blob/cd3538905f98152ba184d2791fc5aa5d06e2ae45/LICENSE",
+    "sha256": {
+      "LICENSE": "bec48f70bd37bf8280a9d1ebf01642d26086f6122ba735baa08fe03c5a6e7448",
+      "config.json": "8c543c43a0767a6f2c79036fb846b24d1356c6d4c950c6b713072b462858b671",
+      "merges.txt": "9fd691f7c8039210e0fced15865466c65820d09b63988b0174bfe25de299051a",
+      "model.safetensors": "28cd71c60e3034fc05ab67aa6b960d5340087fc72e456f2989b50294dd6b4dc9",
+      "processor_config.json": "2dd00f49eee27c1df598273cc184acc897ff11c97d37dee0ac0ad529f6a7ac42",
+      "special_tokens_map.json": "2cdb3b8331a60c92fc1e55a13e9fd61fd2293c5a51275fdcccd62b780052530e",
+      "tokenizer.json": "6d9109cc838977f3ca94a379eec36aecc7c807e1785cd729660ca2fc0171fb35",
+      "tokenizer_config.json": "39670ad98457fe8f14ca59f6bb74591e9fc850974380a63993e5b8ffc865baa2",
+      "vocab.json": "5047b556ce86ccaf6aa22b3ffccfc52d391ea4accdab9c2f2407da5b742d4363"
+    }
+  },
+  "wd": {
+    "base_url": "https://huggingface.co/SmilingWolf/wd-vit-tagger-v3/resolve/7f6b584d0bd3f55c4531f14ba3d4761b2bccdc0f",
+    "license": "Apache-2.0",
+    "license_url": "https://huggingface.co/SmilingWolf/wd-vit-tagger-v3/blob/7f6b584d0bd3f55c4531f14ba3d4761b2bccdc0f/README.md",
+    "sha256": {
+      "config.json": "038b25b517e0511475195bd1a45a19710929a3f2afa8f96d002ee28e1115dc1f",
+      "model.safetensors": "ee78db0cd9f1c7e01578cc89661a10c73675d60c30e235e505c391f57ea4d4e5",
+      "selected_tags.csv": "298633d94d0031d2081c0893f29c82eab7f0df00b08483ba8f29d1e979441217"
+    }
+  }
+}

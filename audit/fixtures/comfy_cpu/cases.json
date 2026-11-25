@@ -1,0 +1,12 @@
+{
+  "image": "chelsea.png",
+  "image_sha256": "596aa1e7cb875eb79f437e310381d26b338a81c2da23439704a73c4651e8c4bb",
+  "size": [451, 300],
+  "class_id": 15,
+  "prompt": "cat",
+  "cases": {
+    "yolo-cpu": {"yolo": true, "sam": false, "timeout": 180},
+    "sam-cpu": {"yolo": false, "sam": true, "timeout": 900},
+    "yolo-sam-cpu": {"yolo": true, "sam": true, "timeout": 900}
+  }
+}
