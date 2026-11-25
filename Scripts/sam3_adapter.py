@@ -32,7 +32,8 @@ class SamWorker:
         self.closing = threading.Event()
         self.config = config
         worker_path = worker_path or Path(__file__).with_name("sam3_worker.py")
-        command = [str(python), "-u", str(worker_path)]
+        # A symlinked Scripts directory must not shadow the stdlib types module.
+        command = [str(python), "-P", "-u", str(worker_path)]
         try:
             self.process = subprocess.Popen(
                 command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,

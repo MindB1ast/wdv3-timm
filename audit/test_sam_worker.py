@@ -15,7 +15,7 @@ from Scripts.sam_masks import select_masks
 
 class WorkerTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory(dir="temp")
+        self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.directory = Path(self.temp.name).resolve()
         self.config = SamConfig("ok.pt", "cuda", False, (
@@ -92,6 +92,17 @@ class WorkerTests(unittest.TestCase):
             if version < (2, 7):
                 with self.assertRaisesRegex(SamWorkerError, "torch >=2.7"):
                     SamWorker(sys.executable, self.config)
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Linux symlink launch regression")
+    def test_real_worker_preflight_via_symlink_without_weights(self):
+        project = Path(__file__).resolve().parents[1]
+        link = self.directory / "custom_nodes" / "wdv3-timm"
+        link.parent.mkdir()
+        link.symlink_to(project, target_is_directory=True)
+        config = replace(self.config, device="cpu", backend="native")
+        # An error from the backend proves the worker started and responded over JSONL.
+        with self.assertRaisesRegex(SamWorkerError, "Native SAM weights require CUDA"):
+            SamWorker(sys.executable, config, worker_path=link / "Scripts" / "sam3_worker.py")
 
 
 class MaskSelectionTests(unittest.TestCase):

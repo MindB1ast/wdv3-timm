@@ -45,7 +45,7 @@ jobs:
           trap 'echo "Installation: $((SECONDS - start)) seconds" >> "$GITHUB_STEP_SUMMARY"' EXIT
           bash audit/install_comfy_cpu.sh "$RUNNER_TEMP/ComfyUI" 2>&1 | tee "$RUNNER_TEMP/diagnostics/install.log"
       - name: Check test harness
-        run: python -B -m unittest audit.test_comfy_cpu_cases audit.test_comfy_cpu_runner
+        run: python -B -m unittest audit.test_comfy_cpu_cases audit.test_comfy_cpu_runner audit.test_sam_worker
       - name: Run real CPU pipeline through ComfyUI API
         run: |
           python -B -m audit.run_comfy_cpu "$PIPELINE_SCENARIO" \

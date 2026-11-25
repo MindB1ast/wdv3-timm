@@ -53,7 +53,7 @@ SHA-256 запускает ComfyUI на `127.0.0.1` и передаёт граф
 также пиковую выборку суммарного RSS процессов ComfyUI. `comfy.log` содержит
 лог сервера, `output/` — проверяемый отчёт. Таймаут и ошибка графа дают
 ненулевой код. Проверки обвязки без моделей:
-`python -B -m unittest audit.test_comfy_cpu_cases audit.test_comfy_cpu_runner`.
+`python -B -m unittest audit.test_comfy_cpu_cases audit.test_comfy_cpu_runner audit.test_sam_worker`.
 
 На GitHub: **Actions → ComfyUI CPU pipelines → Run workflow**. Выберите
 `yolo-cpu`, `sam-cpu`, `yolo-sam-cpu` или `all` (по умолчанию).
